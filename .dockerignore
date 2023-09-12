@@ -1,0 +1,6 @@
+.git
+.vscode
+.yarn-error.log
+packages/server/src
+packages/web/src
+packages/common

@@ -1,0 +1,28 @@
+{
+  "printWidth": 100,
+  "semi": true,
+  "tabWidth": 4,
+  "useTabs": false,
+  "singleQuote": true,
+  "jsxSingleQuote": false,
+  "overrides": [
+    {
+      "files": [
+        "**/*.css",
+        "**/*.scss",
+        "**/*.html"
+      ],
+      "options": {
+        "singleQuote": false
+      }
+    }
+  ],
+  "trailingComma": "all",
+  "bracketSpacing": true,
+  "arrowParens": "avoid",
+  "proseWrap": "never",
+  "htmlWhitespaceSensitivity": "strict",
+  "vueIndentScriptAndStyle": false,
+  "endOfLine": "lf",
+  "singleAttributePerLine": true
+}
