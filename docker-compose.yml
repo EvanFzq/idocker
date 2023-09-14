@@ -1,7 +1,8 @@
 version: "3" # 表示该docker-compose.yml文件使用的是Version 3  
 services:  # 为project定义服务
   docker-mobile:  # 指定服务名称
-    image: docker-mobile  # 指定服务所使用的镜像
+    container_name: docker-mobile
+    image: evanfzq/docker-mobile:latest  # 指定服务所使用的镜像
     ports:  # 暴露端口信息
       - 3680:3580
     volumes:

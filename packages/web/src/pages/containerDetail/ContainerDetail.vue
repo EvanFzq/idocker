@@ -1,5 +1,5 @@
 <template>
-    <van-nav-bar title="容器详情" left-text="返回" left-arrow @click-left="onClickLeft" />
+    <van-nav-bar :title="containerDetail.Name?.slice(1)" left-text="返回" left-arrow @click-left="onClickLeft" />
     <div class="dashbord">
         <van-circle v-model:current-rate="cpuCurrentRate" :rate="cpuRate" :speed="100">
             <span class="material-icons-outlined icon">
@@ -28,10 +28,10 @@
             <mount :list="containerDetail.Mounts" />
         </van-tab>
         <van-tab class="tab" title="端口">
-            <port :data="containerDetail.NetworkSettings?.Ports" />
+            <port :data="containerDetail.HostConfig?.PortBindings" />
         </van-tab>
         <van-tab class="tab" title="网络">
-            <network />
+            <network :networks="containerDetail.NetworkSettings?.Networks" />
         </van-tab>
         <van-tab class="tab" title="变量">
             <env-var :envs="containerDetail.Config?.Env" />

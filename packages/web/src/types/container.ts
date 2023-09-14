@@ -2,6 +2,7 @@ export interface ContainerFormat {
     startedAt: string;
     status: string;
     id: string;
+    disabled?: boolean;
     image: string;
     labels: Record<string, any>;
     name: string;

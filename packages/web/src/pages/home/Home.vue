@@ -2,18 +2,18 @@
 
 <template>
     <div>
-        <Container v-if="active === 0" />
-        <Setting v-if="active === 4" />
+        <Container v-if="active === 'container'" />
+        <Setting v-if="active === 'setting'" />
         <van-tabbar v-model="active">
-            <van-tabbar-item icon="play-circle-o">容器</van-tabbar-item>
-            <van-tabbar-item icon="records">模版</van-tabbar-item>
+            <van-tabbar-item name="container" icon="play-circle-o">容器</van-tabbar-item>
+            <!-- <van-tabbar-item name="template" icon="records">模版</van-tabbar-item>
             <van-tabbar-item>
                 <div class="center-add">
                     <van-icon name="plus" />
                 </div>
             </van-tabbar-item>
-            <van-tabbar-item icon="apps-o">其他</van-tabbar-item>
-            <van-tabbar-item icon="setting-o">设置</van-tabbar-item>
+            <van-tabbar-item name="other" icon="apps-o">其他</van-tabbar-item> -->
+            <van-tabbar-item name="setting" icon="setting-o">设置</van-tabbar-item>
         </van-tabbar>
     </div>
 </template>
@@ -22,7 +22,7 @@
 import { ref } from 'vue';
 import Container from './Container.vue'
 import Setting from './Setting.vue'
-const active = ref(0);
+const active = ref('container');
 </script>
   
 <style scoped>

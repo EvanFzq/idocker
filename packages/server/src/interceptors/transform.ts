@@ -18,10 +18,10 @@ interface IHttpData<T> {
 type TransformFunc = (data: any, req: Request, res: Response) => any;
 
 function defaultTransformFunc(data: any): any {
-    const message = 'Success';
+    const msg = 'Success';
     return {
         code: 0,
-        message,
+        msg,
         data,
     };
 }

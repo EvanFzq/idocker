@@ -11,4 +11,4 @@ EXPOSE 3580
 
 VOLUME /var/run/docker.sock /docker-mobile
 
-CMD yarn start
+ENTRYPOINT yarn start

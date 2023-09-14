@@ -10,7 +10,7 @@
     "build:server-w": "cd ./packages/server && vite build -w",
     "build:server": "cd ./packages/server && vite build",
     "build": "yarn build:server && yarn build:web",
-    "image": "yarn build && docker image build -t 1143046586/docker-mobile .",
+    "image": "yarn build && docker buildx build -t evanfzq/docker-mobile:latest --platform=linux/arm,linux/arm64,linux/amd64 . --push",
     "start": "pm2-runtime start pm2.config.js"
   },
   "dependencies": {
@@ -47,6 +47,7 @@
     "less": "^4.2.0",
     "typescript": "^5.0.2",
     "vite": "^4.4.5",
+    "vite-plugin-pwa": "^0.16.5",
     "vue-tsc": "^1.8.5"
   }
 }

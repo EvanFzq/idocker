@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, HttpException, HttpStatus } from '@nestjs/common';
 import { AppModule } from './src/app.module';
 import { LoggerInterceptor, TransformInterceptor } from '@/interceptors';
+import { HttpExceptionFilter } from '@/filter';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
@@ -20,6 +21,7 @@ async function bootstrap() {
     );
     app.useGlobalInterceptors(new LoggerInterceptor());
     app.useGlobalInterceptors(new TransformInterceptor());
+    app.useGlobalFilters(new HttpExceptionFilter());
     app.enableCors({
         origin: ['http://localhost:5173'],
         allowedHeaders: ['token', 'content-type'],

@@ -36,17 +36,17 @@
                 </div>
             </div>
             <div class="bottom">
-                <van-button v-if="isExited" :color="buttonColorMap.running" square plain size="mini"
+                <van-button v-if="isExited" :disabled="disabled" :color="buttonColorMap.running" square plain size="mini"
                     @click="(e) => handleActive(e, ContainerActive.start)">启动</van-button>
-                <van-button v-if="isRunning" :color="buttonColorMap.exited" square plain size="mini"
+                <van-button v-if="isRunning" :disabled="disabled" :color="buttonColorMap.exited" square plain size="mini"
                     @click="(e) => handleActive(e, ContainerActive.stop)">停止</van-button>
-                <van-button :color="buttonColorMap.restart" square plain size="mini"
+                <van-button :disabled="disabled" :color="buttonColorMap.restart" square plain size="mini"
                     @click="(e) => handleActive(e, ContainerActive.restart)">重启</van-button>
-                <van-button v-if="isRunning" :color="buttonColorMap.paused" square plain size="mini"
+                <van-button v-if="isRunning" :disabled="disabled" :color="buttonColorMap.paused" square plain size="mini"
                     @click="(e) => handleActive(e, ContainerActive.pause)">暂停</van-button>
-                <van-button v-if="isPaused" :color="buttonColorMap.running" square plain size="mini"
+                <van-button v-if="isPaused" :disabled="disabled" :color="buttonColorMap.running" square plain size="mini"
                     @click="(e) => handleActive(e, ContainerActive.unpause)">恢复</van-button>
-                <van-button :color="buttonColorMap.delete" square plain size="mini"
+                <van-button :disabled="disabled" :color="buttonColorMap.delete" square plain size="mini"
                     @click="(e) => handleActive(e, ContainerActive.remove)">删除</van-button>
             </div>
         </div>
@@ -70,6 +70,7 @@ const props = defineProps({
         type: String,
         required: true,
     },
+    disabled: Boolean,
     icon: String,
     image: String,
     id: {

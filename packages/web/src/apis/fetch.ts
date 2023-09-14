@@ -2,11 +2,9 @@ import { showToast } from 'vant';
 import axios from 'axios';
 import type { AxiosRequestConfig } from 'axios';
 
-import { isDev } from '@/constants/base';
-
 export const _fetch = axios.create({
     timeout: 60000,
-    baseURL: isDev ? 'http://localhost:3580/api/v1' : '/api/v1',
+    baseURL: '/api/v1',
 });
 
 _fetch.interceptors.request.use(
@@ -33,14 +31,11 @@ _fetch.interceptors.response.use(
         // 2xx 范围内的状态码都会触发该函数。
         // 对响应数据做点什么
         if (res.status !== 200 || res.data?.code !== 0) {
-            showToast(res.data?.msg || res.statusText || '请求错误！');
-            if (res.status === 401 && location.href !== '/login') {
-                location.href = '/login';
-            }
+            showToast(res.data?.msg || '请求错误！');
             return {
                 code: res.data?.code || res.status || 500,
                 success: false,
-                msg: res.data?.message || res.statusText || 'unknow error',
+                msg: res.data?.msg || 'unknow error',
             };
         }
         return { ...res.data, success: true };
@@ -48,8 +43,7 @@ _fetch.interceptors.response.use(
     function (error) {
         // 超出 2xx 范围的状态码都会触发该函数。
         // 对响应错误做点什么
-
-        if (error?.response?.status === 401 && location.href !== '/login') {
+        if (error?.response?.status === 401 && location.pathname !== '/login') {
             showToast({
                 message: '未登录，即将前往登录',
                 onClose() {
@@ -57,7 +51,9 @@ _fetch.interceptors.response.use(
                 },
             });
         } else {
-            showToast(error?.msg || error.request.statusText || '请求错误！');
+            console.log(error);
+
+            showToast(error?.response?.data?.msg || '请求错误！');
         }
         return Promise.resolve({
             code: error.code || 500,

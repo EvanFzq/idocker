@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { v4 as uuidV4 } from 'uuid';
 import { UserInfo } from './type';
@@ -42,5 +42,13 @@ export class AuthService {
     async jwt(user: UserInfo) {
         const payload = { username: user.username };
         return this.jwtService.sign(payload);
+    }
+    async changePassword(currentPassword: string, newPassword: string) {
+        const password = this.configService.getConfig<string>('password');
+        if (password === currentPassword) {
+            await this.configService.setConfig('password', newPassword);
+        } else {
+            throw new HttpException('当前密码错误！', HttpStatus.FORBIDDEN);
+        }
     }
 }

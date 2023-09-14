@@ -1,17 +1,31 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import Docker from 'dockerode';
+import { execSync } from 'child_process';
 import { ContainerStats } from '@common/types/container';
 import { ContainerActive } from '@common/constants/enum';
 
 @Injectable()
 export class ContainerService {
     private docker: Docker;
+    private currentContainerId: string;
     constructor() {
         this.docker = new Docker({ socketPath: '/var/run/docker.sock' });
+        try {
+            this.currentContainerId = execSync('hostname', { timeout: 1000, encoding: 'utf-8' });
+            console.log(this.currentContainerId);
+        } catch (error) {
+            console.log('获取容器本身ID失败，', error);
+        }
     }
     async getContainerList() {
-        return await this.docker.listContainers({
+        const list = await this.docker.listContainers({
             all: true,
+        });
+        return list.map(item => {
+            if (item.Id.startsWith(this.currentContainerId)) {
+                return { ...item, disabled: true };
+            }
+            return item;
         });
     }
     async getContainerDetail(id: string) {
@@ -39,6 +53,9 @@ export class ContainerService {
 
     async activeContainer(id: string, type: ContainerActive) {
         const container = this.docker.getContainer(id);
+        if (id.startsWith(this.currentContainerId)) {
+            throw new HttpException('禁止操作提供容器管理的容器本身', HttpStatus.FORBIDDEN);
+        }
         switch (type) {
             case ContainerActive.start:
                 await container.start();

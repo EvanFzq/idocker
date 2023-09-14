@@ -7,6 +7,7 @@ export interface ContainerStats {
 
 export interface Container {
     Id: string;
+    disabled?: boolean;
     Created: string;
     Path: string;
     Args: string[];
@@ -216,10 +217,11 @@ export interface Port {
 }
 
 export interface Networks {
-    bridge: Bridge;
+    bridge: Network;
+    host: Network;
 }
 
-export interface Bridge {
+export interface Network {
     IPAMConfig: any;
     Links: any;
     Aliases: any;

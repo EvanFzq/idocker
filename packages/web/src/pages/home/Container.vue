@@ -3,7 +3,8 @@
         <ContainerCard v-for="item in containerList" :key="item.id" :id="item.id" :name="item.name" :image="item.image"
             :startedAt="item.startedAt" :status="item.status" :created="item.created" :labels="item.labels"
             :icon="item.icon" :cpu="item.cpu" :memory_limit="item.memory_limit" :memory_usage="item.memory_usage"
-            @reload="handleReload" />
+            :disabled="item.disabled" @reload="handleReload" />
+        <p class="no-more">没有更多了</p>
     </div>
 </template>
 
@@ -26,6 +27,7 @@ const getList = async () => {
         const list = res.data.map(item => ({
             id: item.Id,
             name: item.Name.slice(1),
+            disabled: item.disabled,
             image: item.Config.Image,
             status: item.State.Status,
             startedAt: item.State.StartedAt,
@@ -77,4 +79,10 @@ onUnmounted(() => {
 
 </script>
 
-<style scoped></style>
+<style scoped>
+.no-more {
+    font-size: 10px;
+    margin: 12px 12px 48px;
+    text-align: center;
+}
+</style>
