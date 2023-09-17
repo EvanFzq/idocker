@@ -1,5 +1,5 @@
 <template>
-    <div class="box" @click="handleCardClick">
+    <div class="box" @click="onCardClick">
         <div v-if="icon" class="left">
             <van-image width="80" height="80" fit="contain" :src="icon">
                 <template v-slot:error>{{
@@ -37,17 +37,17 @@
             </div>
             <div class="bottom">
                 <van-button v-if="isExited" :disabled="disabled" :color="buttonColorMap.running" square plain size="mini"
-                    @click="(e) => handleActive(e, ContainerActive.start)">启动</van-button>
+                    @click="(e) => onActive(e, ContainerActive.start)">启动</van-button>
                 <van-button v-if="isRunning" :disabled="disabled" :color="buttonColorMap.exited" square plain size="mini"
-                    @click="(e) => handleActive(e, ContainerActive.stop)">停止</van-button>
+                    @click="(e) => onActive(e, ContainerActive.stop)">停止</van-button>
                 <van-button :disabled="disabled" :color="buttonColorMap.restart" square plain size="mini"
-                    @click="(e) => handleActive(e, ContainerActive.restart)">重启</van-button>
+                    @click="(e) => onActive(e, ContainerActive.restart)">重启</van-button>
                 <van-button v-if="isRunning" :disabled="disabled" :color="buttonColorMap.paused" square plain size="mini"
-                    @click="(e) => handleActive(e, ContainerActive.pause)">暂停</van-button>
+                    @click="(e) => onActive(e, ContainerActive.pause)">暂停</van-button>
                 <van-button v-if="isPaused" :disabled="disabled" :color="buttonColorMap.running" square plain size="mini"
-                    @click="(e) => handleActive(e, ContainerActive.unpause)">恢复</van-button>
+                    @click="(e) => onActive(e, ContainerActive.unpause)">恢复</van-button>
                 <van-button :disabled="disabled" :color="buttonColorMap.delete" square plain size="mini"
-                    @click="(e) => handleActive(e, ContainerActive.remove)">删除</van-button>
+                    @click="(e) => onActive(e, ContainerActive.remove)">删除</van-button>
             </div>
         </div>
     </div>
@@ -103,7 +103,7 @@ const isRunning = computed(() => props.status === 'running');
 const isPaused = computed(() => props.status === 'paused');
 const isExited = computed(() => props.status === 'exited');
 
-const handleActive = async (e: MouseEvent, type: ContainerActive) => {
+const onActive = async (e: MouseEvent, type: ContainerActive) => {
     e.stopPropagation()
     try {
         if (type === ContainerActive.remove) {
@@ -124,7 +124,7 @@ const handleActive = async (e: MouseEvent, type: ContainerActive) => {
     }
 };
 
-const handleCardClick = () => {
+const onCardClick = () => {
     router.push('/container/' + props.id)
 }
 </script>

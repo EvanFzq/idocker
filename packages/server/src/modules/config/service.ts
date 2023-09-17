@@ -29,7 +29,10 @@ export class ConfigService {
         // 建立配置文件或读取配置文件
         try {
             accessSync(configFilePath, constants.W_OK);
-            this.config = JSON.parse(readFileSync(configFilePath, { encoding: 'utf-8' }) || '{}');
+            this.config = {
+                ...this.config,
+                ...JSON.parse(readFileSync(configFilePath, { encoding: 'utf-8' }) || '{}'),
+            };
         } catch (error) {
             writeFileSync(configFilePath, JSON.stringify(this.config));
         }

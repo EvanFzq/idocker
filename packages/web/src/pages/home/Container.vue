@@ -3,7 +3,7 @@
         <ContainerCard v-for="item in containerList" :key="item.id" :id="item.id" :name="item.name" :image="item.image"
             :startedAt="item.startedAt" :status="item.status" :created="item.created" :labels="item.labels"
             :icon="item.icon" :cpu="item.cpu" :memory_limit="item.memory_limit" :memory_usage="item.memory_usage"
-            :disabled="item.disabled" @reload="handleReload" />
+            :disabled="item.disabled" @reload="onReload" />
         <p class="no-more">没有更多了</p>
     </div>
 </template>
@@ -60,7 +60,7 @@ const getData = async () => {
     }
 }
 
-const handleReload = async () => {
+const onReload = async () => {
     getData()
 }
 
