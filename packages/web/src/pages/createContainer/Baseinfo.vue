@@ -5,6 +5,7 @@
       inset
     >
       <van-field
+        required
         v-model="form.name"
         name="name"
         label="容器名"
@@ -20,6 +21,7 @@
       >
         <template #reference>
           <van-field
+            required
             v-model="form.image"
             name="image"
             label="镜像"
@@ -55,6 +57,7 @@
         </div>
       </van-popover>
       <van-field
+        required
         v-model="form.network"
         is-link
         readonly
@@ -62,6 +65,7 @@
         label="网络"
         placeholder="点击选择网络"
         @click="showNetworkPicker = true"
+        :rules="[{ required: true, message: '请选择网络' }]"
       />
       <van-popup
         v-model:show="showNetworkPicker"
@@ -91,7 +95,7 @@
         position="bottom"
       >
         <van-picker
-          :columns="restartList"
+          :columns="restartPolicyList"
           @confirm="onRestartConfirm"
           @cancel="showRestartPicker = false"
         />
@@ -114,8 +118,11 @@
 import { ref, onMounted } from 'vue';
 import { searchImage, getNetworkList } from '@/apis';
 import { Image } from '@common/types/image';
+import { restartPolicyList } from '@common/constants/const';
 import { Network } from '@common/types/network';
 import { numberFormat } from '@/utils/utils';
+
+const emit = defineEmits(['networkChange']);
 
 const form = ref({
   name: '',
@@ -129,24 +136,6 @@ const showNetworkPicker = ref(false);
 const showRestartPicker = ref(false);
 const imageList = ref<Image[]>([]);
 const networkList = ref<Network[]>([]);
-const restartList = [
-  {
-    text: '无',
-    value: 'no',
-  },
-  {
-    text: '非正常退出',
-    value: 'on-failure',
-  },
-  {
-    text: '总是重启',
-    value: 'always',
-  },
-  {
-    text: '退出时重启（忽略系统启动时已停止）',
-    value: 'unless-stopped',
-  },
-];
 
 onMounted(async () => {
   const res = await getNetworkList();
@@ -176,6 +165,7 @@ const onSelectImage = (selectImage: Image) => {
 const onNetworkConfirm = ({ selectedValues }: { selectedValues: string[] }) => {
   form.value.network = selectedValues[0];
   showNetworkPicker.value = false;
+  emit('networkChange', selectedValues[0]);
 };
 const onRestartConfirm = ({ selectedValues }: { selectedValues: string[] }) => {
   form.value.restart = selectedValues[0];

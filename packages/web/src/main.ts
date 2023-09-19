@@ -21,6 +21,8 @@ import {
   Picker,
   Popup,
   Switch,
+  Radio,
+  RadioGroup,
 } from 'vant';
 import { routes } from '@/constants/routes';
 import './style.css';
@@ -56,6 +58,8 @@ app.use(Popover);
 app.use(Picker);
 app.use(Popup);
 app.use(Switch);
+app.use(Radio);
+app.use(RadioGroup);
 
 app.mount('#app');
 

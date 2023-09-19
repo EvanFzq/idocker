@@ -1,5 +1,8 @@
 <template>
-  <van-cell-group inset>
+  <van-cell-group
+    inset
+    style="margin-top: 16px"
+  >
     <van-field
       v-model="command"
       rows="4"

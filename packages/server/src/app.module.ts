@@ -4,6 +4,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { ContainerModule } from '@/modules/container';
 import { ImageModule } from '@/modules/image';
 import { NetworkModule } from '@/modules/network';
+import { VolumeModule } from '@/modules/volume';
 import { AuthModule } from '@/modules/auth/module';
 import { JwtAuthGuard } from '@/guards';
 import path from 'path';
@@ -14,6 +15,7 @@ import path from 'path';
     AuthModule,
     ImageModule,
     NetworkModule,
+    VolumeModule,
     ServeStaticModule.forRoot({
       rootPath: path.join(__dirname, '..', '..', 'web', 'dist'),
     }),

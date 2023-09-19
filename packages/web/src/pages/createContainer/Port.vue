@@ -1,22 +1,49 @@
 <template>
   <van-cell-group
+    class="port-card"
     v-for="(port, index) in portList"
     inset
     style="margin-top: 16px"
   >
     <van-field
       v-model="port.host"
-      :name="'port[' + index + '].host'"
+      :name="'ports[' + index + '].host'"
       type="digit"
       label="主机端口"
       placeholder="请输入主机端口"
+      required
+      :rules="[{ required: true, message: '请填写主机端口' }]"
     />
     <van-field
       v-model="port.container"
-      :name="'port[' + index + '].container'"
+      :name="'ports[' + index + '].container'"
       type="digit"
       label="容器端口"
       placeholder="请输入容器端口"
+      required
+      :rules="[{ required: true, message: '请填写容器端口' }]"
+    />
+    <van-field
+      :name="'ports[' + index + '].protocol'"
+      label="协议"
+    >
+      <template #input>
+        <van-radio-group
+          v-model="port.protocol"
+          direction="horizontal"
+        >
+          <van-radio name="tcp">TCP</van-radio>
+          <van-radio name="udp">UDP</van-radio>
+        </van-radio-group>
+      </template>
+    </van-field>
+    <van-button
+      icon="delete-o"
+      size="small"
+      round
+      type="danger"
+      class="delete-icon"
+      @click="() => onDeletePort(index)"
     />
   </van-cell-group>
   <div class="add-port">
@@ -40,9 +67,12 @@ const onAddPort = () => {
     {
       host: undefined,
       container: undefined,
-      type: 'tcp',
+      protocol: 'tcp',
     },
   ];
+};
+const onDeletePort = (index: number) => {
+  portList.value.splice(index, 1);
 };
 </script>
 <style scoped lang="less">
@@ -56,6 +86,14 @@ const onAddPort = () => {
   box-sizing: border-box;
   .add-port-btn {
     width: 80%;
+  }
+}
+.port-card {
+  position: relative;
+  .delete-icon {
+    position: absolute;
+    right: 6px;
+    top: 6px;
   }
 }
 </style>

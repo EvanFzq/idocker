@@ -34,5 +34,5 @@ export interface ConfigFrom {
 export interface PortConfig {
   host?: number;
   container?: number;
-  type: 'tcp' | 'udp';
+  protocol: 'tcp' | 'udp';
 }

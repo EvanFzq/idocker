@@ -4,8 +4,9 @@ import { ImageService } from './service';
 import { DockerModule } from '../docker';
 
 @Module({
-    imports: [DockerModule],
-    controllers: [ImageController],
-    providers: [ImageService],
+  imports: [DockerModule],
+  controllers: [ImageController],
+  providers: [ImageService],
+  exports: [ImageService],
 })
 export class ImageModule {}
