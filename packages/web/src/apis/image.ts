@@ -15,9 +15,9 @@ export const removeImage = async (id: string) => {
 };
 
 export const updateImage = async (name: string) => {
-  return fetch.put<void>('/image', { name });
+  return fetch.put<void>('/image', { name }, { timeout: 0 });
 };
 
 export const pullImage = async (name: string) => {
-  return fetch.post<void>('/image', { name });
+  return fetch.post<void>('/image', { name }, { timeout: 0 });
 };

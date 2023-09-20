@@ -20,6 +20,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
       exception.json?.message ||
       'unknow error';
 
+    console.error('response error:', status, message, exception);
+
     response.status(status).json({
       code: status,
       msg: message,

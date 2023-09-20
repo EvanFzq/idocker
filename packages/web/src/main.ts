@@ -24,6 +24,7 @@ import {
   Radio,
   RadioGroup,
   ActionSheet,
+  TextEllipsis,
 } from 'vant';
 import { routes } from '@/constants/routes';
 import './style.css';
@@ -62,6 +63,7 @@ app.use(Switch);
 app.use(Radio);
 app.use(RadioGroup);
 app.use(ActionSheet);
+app.use(TextEllipsis);
 
 app.mount('#app');
 

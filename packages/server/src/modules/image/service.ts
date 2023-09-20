@@ -46,10 +46,9 @@ export class ImageService {
     });
     imageList = imageList.map(image => {
       let containerNum = 0;
-      const [imageName] = image.RepoTags[0].split(':');
+      const [imageName] = image.RepoDigests[0].split('@');
       containerList.forEach(container => {
-        const [containerImage] = container.Image.split(':');
-        if (imageName === containerImage) {
+        if (image.Id === container.ImageID) {
           containerNum++;
         }
       });
@@ -64,14 +63,11 @@ export class ImageService {
   }
   async removeImage(id: string) {
     const image = this.dockerService.docker.getImage(id);
-    const imageDetail = await image.inspect();
     const containerList = await this.dockerService.docker.listContainers({
       all: true,
     });
-    const [imageName] = imageDetail.RepoTags[0].split(':');
     containerList.forEach(container => {
-      const [containerImage] = container.Image.split(':');
-      if (imageName === containerImage) {
+      if (id === container.ImageID) {
         throw new HttpException(
           '镜像存在容器实例，无法删除，请先移除容器',
           HttpStatus.INTERNAL_SERVER_ERROR,

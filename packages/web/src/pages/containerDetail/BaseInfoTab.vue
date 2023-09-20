@@ -15,7 +15,7 @@
         title-class="image-title"
         value-class="image-value"
         title="重启策略"
-        :value="restart"
+        :value="restart || '-'"
       />
       <van-cell
         title="启动时间"
@@ -33,12 +33,17 @@
         title="Entrypoint"
         :value="entrypoint?.join(' ') || '-'"
       />
+      <van-cell
+        title="Id"
+        :value="id"
+      />
     </van-cell-group>
   </div>
 </template>
 <script lang="ts" setup>
 import dayjs from 'dayjs';
 interface BaseInfoProps {
+  id?: string;
   name?: string;
   image?: string;
   restart?: string;

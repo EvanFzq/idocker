@@ -40,7 +40,8 @@
       class="tab"
       title="基本信息"
     >
-      <BaseInfoCard
+      <BaseInfoTab
+        :id="containerDetail.Id"
         :name="containerDetail.Name?.slice(1)"
         :image="containerDetail.Config?.Image"
         :start-time="containerDetail.State?.StartedAt"
@@ -90,7 +91,7 @@ import type { Container } from '@common/types/container';
 import { restartPolicyList } from '@common/constants/const';
 import { fileSizeFormat } from '@/utils/utils';
 import { statusColorMap, statusLabelMap } from '@/constants/container';
-import BaseInfoCard from './BaseInfoCard.vue';
+import BaseInfoTab from './BaseInfoTab.vue';
 import EnvVarTab from './EnvVarTab.vue';
 import LogTab from './LogTab.vue';
 import MountTab from './MountTab.vue';
@@ -121,7 +122,7 @@ const route = useRoute();
 const id = computed(() => route.params.id as string);
 const restart = computed(
   () =>
-    containerDetail.value.HostConfig?.RestartPolicy &&
+    containerDetail.value.HostConfig?.RestartPolicy?.Name &&
     restartPolicyList.find(
       item => item.value === containerDetail.value.HostConfig?.RestartPolicy.Name,
     )?.text + `【${containerDetail.value.HostConfig?.RestartPolicy?.MaximumRetryCount}次】`,

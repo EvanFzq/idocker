@@ -19,7 +19,7 @@
             image.Containers
           }}</span>
         </div>
-        <div>创建时间：{{ dayjs.unix(image.Created).format('YYYY-MM-DD HH:mm') }}</div>
+        <div>时间：{{ dayjs.unix(image.Created).format('YYYY-MM-DD HH:mm') }}</div>
       </div>
       <div class="row">
         <div class="tag-row">
@@ -69,7 +69,17 @@
     v-model:show="showAction"
     :actions="actions"
     cancel-text="取消"
-  />
+  >
+    <template #description>
+      <div style="font-size: 20px; margin-bottom: 12px; color: #333">{{ actionImage?.Name }}</div>
+      <van-text-ellipsis
+        rows="2"
+        :content="actionImage?.Id"
+        expand-text="展开"
+        collapse-text="收起"
+      />
+    </template>
+  </van-action-sheet>
 </template>
 <script setup lang="ts">
 import { onMounted, ref, computed } from 'vue';
