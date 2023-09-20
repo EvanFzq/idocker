@@ -1,11 +1,13 @@
-import Home from '@/pages/home/Home.vue';
-import Login from '@/pages/login/Login.vue';
-import ContainerDetail from '@/pages/containerDetail/ContainerDetail.vue';
-import CreateContainer from '@/pages/createContainer/CreateContainer.vue';
+import HomePage from '@/pages/home/HomePage.vue';
+import LoginPage from '@/pages/login/LoginPage.vue';
+import ContainerDetailPage from '@/pages/containerDetail/ContainerDetailPage.vue';
+import CreateContainerPage from '@/pages/createContainer/CreateContainerPage.vue';
+import ImageListPage from '@/pages/imageList/ImageListPage.vue';
 
 export const routes = [
-    { path: '/', component: Home },
-    { path: '/login', component: Login },
-    { path: '/container/:id', component: ContainerDetail },
-    { path: '/container/new', component: CreateContainer },
+  { path: '/', component: HomePage },
+  { path: '/login', component: LoginPage },
+  { path: '/container/:id', component: ContainerDetailPage },
+  { path: '/container/new', component: CreateContainerPage },
+  { path: '/image/list', component: ImageListPage },
 ];

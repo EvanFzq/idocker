@@ -4,6 +4,6 @@ export interface Volume {
   Labels?: Record<string, string>;
   Mountpoint: string;
   Name: string;
-  Options: any;
+  Options: unknown;
   Scope: string;
 }

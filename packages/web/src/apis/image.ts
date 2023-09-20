@@ -1,7 +1,23 @@
 import { fetch } from './fetch';
-import { Image } from '@common/types/image';
-import { ImageOption } from '@common/types/image';
+import type { Image, ImageItem } from '@common/types/image';
+import type { ImageOption } from '@common/types/image';
 
 export const searchImage = async (keyword: string, option?: ImageOption) => {
-    return fetch.post<Image[]>('/image/search', { keyword, ...option });
+  return fetch.post<Image[]>('/image/search', { keyword, ...option });
+};
+
+export const getImageList = async () => {
+  return fetch.post<ImageItem[]>('/image/list');
+};
+
+export const removeImage = async (id: string) => {
+  return fetch.delete<void>('/image/' + id);
+};
+
+export const updateImage = async (name: string) => {
+  return fetch.put<void>('/image', { name });
+};
+
+export const pullImage = async (name: string) => {
+  return fetch.post<void>('/image', { name });
 };

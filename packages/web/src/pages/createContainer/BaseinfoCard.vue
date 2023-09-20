@@ -5,8 +5,8 @@
       inset
     >
       <van-field
-        required
         v-model="form.name"
+        required
         name="name"
         label="容器名"
         placeholder="容器名"
@@ -21,14 +21,14 @@
       >
         <template #reference>
           <van-field
-            required
             v-model="form.image"
+            required
             name="image"
             label="镜像"
             placeholder="镜像"
             autocomplete="off"
-            @update:model-value="onImageChange"
             :rules="[{ required: true, message: '请填写镜像' }]"
+            @update:model-value="onImageChange"
           />
         </template>
         <div class="image-list">
@@ -57,15 +57,15 @@
         </div>
       </van-popover>
       <van-field
-        required
         v-model="form.network"
+        required
         is-link
         readonly
         name="network"
         label="网络"
         placeholder="点击选择网络"
-        @click="showNetworkPicker = true"
         :rules="[{ required: true, message: '请选择网络' }]"
+        @click="showNetworkPicker = true"
       />
       <van-popup
         v-model:show="showNetworkPicker"
@@ -117,9 +117,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { searchImage, getNetworkList } from '@/apis';
-import { Image } from '@common/types/image';
+import type { Image } from '@common/types/image';
 import { restartPolicyList } from '@common/constants/const';
-import { Network } from '@common/types/network';
+import type { Network } from '@common/types/network';
 import { numberFormat } from '@/utils/utils';
 
 const emit = defineEmits(['networkChange']);

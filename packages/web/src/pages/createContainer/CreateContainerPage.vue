@@ -12,7 +12,7 @@
       @submit="onSubmit"
       @failed="onFailed"
     >
-      <Baseinfo @network-change="value => (networkType = value)" />
+      <BaseinfoCard @network-change="(value: string) => (networkType = value)" />
       <van-tabs
         v-model:active="activeTab"
         class="tabs"
@@ -21,7 +21,7 @@
           class="tab"
           title="命令"
         >
-          <Command />
+          <CommandTab />
         </van-tab>
         <van-tab
           v-if="networkType !== 'host'"
@@ -29,21 +29,21 @@
           title="端口"
           :dot="portError"
         >
-          <Port />
+          <PortTab />
         </van-tab>
         <van-tab
           class="tab"
           title="挂载"
           :dot="mountError"
         >
-          <Mount />
+          <MountTab />
         </van-tab>
         <van-tab
           class="tab"
           title="环境变量"
           :dot="envError"
         >
-          <EnvVar />
+          <EnvVarTab />
         </van-tab>
       </van-tabs>
       <div class="submit-btn van-safe-area-bottom">
@@ -61,15 +61,15 @@
 </template>
 <script setup lang="ts">
 import { ref } from 'vue';
-import { showSuccessToast, showLoadingToast, showFailToast } from 'vant';
+import { showSuccessToast, showLoadingToast } from 'vant';
 import { useRouter } from 'vue-router';
 import set from 'lodash-es/set';
-import { CreateContainerParams } from '@common/types/container';
-import Baseinfo from './Baseinfo.vue';
-import Command from './Command.vue';
-import Mount from './Mount.vue';
-import Port from './Port.vue';
-import EnvVar from './EnvVar.vue';
+import type { CreateContainerParams } from '@common/types/container';
+import BaseinfoCard from './BaseinfoCard.vue';
+import CommandTab from './CommandTab.vue';
+import MountTab from './MountTab.vue';
+import PortTab from './PortTab.vue';
+import EnvVarTab from './EnvVarTab.vue';
 import { createContainer } from '@/apis';
 
 const activeTab = ref(0);
@@ -80,29 +80,24 @@ const envError = ref(false);
 
 const router = useRouter();
 
-const onSubmit = async (values: any) => {
-  const loadingToast = showLoadingToast({
+const onSubmit = async (values: Record<string, string | number | boolean>) => {
+  showLoadingToast({
     message: '创建中...',
     forbidClick: true,
     duration: 0,
   });
   const params: CreateContainerParams = {} as CreateContainerParams;
-  Object.entries(values).forEach(([key, value]: [string, any]) => {
+  Object.entries(values).forEach(([key, value]: [string, string | number | boolean]) => {
     set(params, key, value);
   });
 
   const res = await createContainer(params);
-  loadingToast.close();
   if (res.success) {
     showSuccessToast({
       message: '创建成功',
       onClose() {
         router.push('/');
       },
-    });
-  } else {
-    showFailToast({
-      message: '创建失败！' + res.msg,
     });
   }
 };

@@ -38,15 +38,16 @@
 </template>
 <script lang="ts" setup>
 import dayjs from 'dayjs';
-defineProps({
-  name: String,
-  image: String,
-  restart: String,
-  startTime: String,
-  createTime: String,
-  cmd: Array,
-  entrypoint: Array,
-});
+interface BaseInfoProps {
+  name?: string;
+  image?: string;
+  restart?: string;
+  startTime?: string;
+  createTime?: string;
+  cmd?: string[];
+  entrypoint?: string[];
+}
+defineProps<BaseInfoProps>();
 </script>
 <style lang="less">
 .baseinfo {

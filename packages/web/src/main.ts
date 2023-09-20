@@ -23,6 +23,7 @@ import {
   Switch,
   Radio,
   RadioGroup,
+  ActionSheet,
 } from 'vant';
 import { routes } from '@/constants/routes';
 import './style.css';
@@ -60,7 +61,8 @@ app.use(Popup);
 app.use(Switch);
 app.use(Radio);
 app.use(RadioGroup);
+app.use(ActionSheet);
 
 app.mount('#app');
 
-console.log(import.meta.env);
+console.info(import.meta.env);

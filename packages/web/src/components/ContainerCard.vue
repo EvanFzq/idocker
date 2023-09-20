@@ -13,12 +13,14 @@
         fit="contain"
         :src="icon"
       >
-        <template v-slot:error>{{
-          name
-            .split(/[\s-_]/)
-            .shift()
-            ?.slice(0, 8)
-        }}</template>
+        <template #error>
+          {{
+            name
+              .split(/[\s-_]/)
+              .shift()
+              ?.slice(0, 8)
+          }}
+        </template>
       </van-image>
     </div>
     <div
@@ -34,27 +36,32 @@
     </div>
     <div class="right">
       <div class="top">
-        <div class="van-ellipsis name">{{ name }}</div>
+        <div class="van-ellipsis name">
+          {{ name }}
+        </div>
         <van-tag
           class="status"
           :color="statusColor"
-          >{{ statusLabel }}</van-tag
         >
+          {{ statusLabel }}
+        </van-tag>
       </div>
       <div class="middle">
-        <div class="van-ellipsis image">{{ image }}</div>
-        <div class="startedAt"
-          ><van-icon
+        <div class="van-ellipsis image">
+          {{ image }}
+        </div>
+        <div class="startedAt">
+          <van-icon
             name="clock-o"
             style="margin-right: 4px"
           />{{ dayjs(startedAt).format('YYYY-MM-DD HH:mm:ss') }}
         </div>
       </div>
       <div class="middle">
-        <div class="van-ellipsis cpu">cpu: {{ cpu?.toFixed(1) || 0 }}%</div>
-        <div class="mem"
-          >内存: {{ fileSizeFormat(memory_usage || 0) || '-' }}/{{
-            fileSizeFormat(memory_limit || 0) || '-'
+        <div class="van-ellipsis cpu"> cpu: {{ cpu?.toFixed(1) || 0 }}% </div>
+        <div class="mem">
+          内存: {{ fileSizeFormat(memoryUsage || 0) || '-' }}/{{
+            fileSizeFormat(memoryLimit || 0) || '-'
           }}
         </div>
       </div>
@@ -66,9 +73,10 @@
           square
           plain
           size="mini"
-          @click="e => onActive(e, ContainerActive.start)"
-          >启动</van-button
+          @click="(e: MouseEvent) => onActive(e, ContainerActive.start)"
         >
+          启动
+        </van-button>
         <van-button
           v-if="isRunning"
           :disabled="disabled"
@@ -76,9 +84,10 @@
           square
           plain
           size="mini"
-          @click="e => onActive(e, ContainerActive.stop)"
-          >停止</van-button
+          @click="(e: MouseEvent) => onActive(e, ContainerActive.stop)"
         >
+          停止
+        </van-button>
         <van-button
           v-if="!isRestarting"
           :disabled="disabled"
@@ -86,9 +95,10 @@
           square
           plain
           size="mini"
-          @click="e => onActive(e, ContainerActive.restart)"
-          >重启</van-button
+          @click="(e: MouseEvent) => onActive(e, ContainerActive.restart)"
         >
+          重启
+        </van-button>
         <van-button
           v-if="isRunning"
           :disabled="disabled"
@@ -96,9 +106,10 @@
           square
           plain
           size="mini"
-          @click="e => onActive(e, ContainerActive.pause)"
-          >暂停</van-button
+          @click="(e: MouseEvent) => onActive(e, ContainerActive.pause)"
         >
+          暂停
+        </van-button>
         <van-button
           v-if="isPaused"
           :disabled="disabled"
@@ -106,18 +117,20 @@
           square
           plain
           size="mini"
-          @click="e => onActive(e, ContainerActive.unpause)"
-          >恢复</van-button
+          @click="(e: MouseEvent) => onActive(e, ContainerActive.unpause)"
         >
+          恢复
+        </van-button>
         <van-button
           :disabled="disabled"
           :color="buttonColorMap.delete"
           square
           plain
           size="mini"
-          @click="e => onActive(e, ContainerActive.remove)"
-          >删除</van-button
+          @click="(e: MouseEvent) => onActive(e, ContainerActive.remove)"
         >
+          删除
+        </van-button>
       </div>
     </div>
   </div>
@@ -126,7 +139,7 @@
 import dayjs from 'dayjs';
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
-import { showSuccessToast, showConfirmDialog, showLoadingToast, showFailToast } from 'vant';
+import { showSuccessToast, showConfirmDialog, showLoadingToast } from 'vant';
 
 import { fileSizeFormat } from '@/utils/utils';
 import { activeContainer } from '@/apis/container';
@@ -135,32 +148,22 @@ import { buttonColorMap, statusColorMap, statusLabelMap } from '@/constants/cont
 
 const router = useRouter();
 
-const props = defineProps({
-  name: {
-    type: String,
-    required: true,
-  },
-  disabled: Boolean,
-  icon: String,
-  image: String,
-  id: {
-    type: String,
-    required: true,
-  },
-  startedAt: {
-    type: String,
-    required: true,
-  },
-  status: {
-    type: String,
-    required: true,
-  },
-  created: String,
-  labels: Object,
-  cpu: Number,
-  memory_limit: Number,
-  memory_usage: Number,
-});
+interface CcontainerCardProps {
+  name: string;
+  disabled?: boolean;
+  icon?: string;
+  image?: string;
+  id: string;
+  startedAt: string;
+  status: string;
+  created?: string;
+  labels?: Record<string, string>;
+  cpu?: number;
+  memoryLimit?: number;
+  memoryUsage?: number;
+}
+
+const props = defineProps<CcontainerCardProps>();
 
 const emit = defineEmits(['reload']);
 
@@ -175,7 +178,6 @@ const isRestarting = computed(() => props.status === 'restarting');
 
 const onActive = async (e: MouseEvent, type: ContainerActive) => {
   e.stopPropagation();
-  const toast = showLoadingToast('执行中...');
   try {
     if (type === ContainerActive.remove) {
       await showConfirmDialog({
@@ -183,16 +185,15 @@ const onActive = async (e: MouseEvent, type: ContainerActive) => {
         message: '容器将从机器上移除，（镜像、配置文件不会丢失）',
       });
     }
+    showLoadingToast({ message: '执行中...', duration: 0, forbidClick: true });
     const res = await activeContainer(props.id, type);
-    toast.close();
+
     if (res.success) {
       emit('reload');
       showSuccessToast('操作成功');
-    } else {
-      showFailToast('操作失败！' + res.msg);
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 };
 

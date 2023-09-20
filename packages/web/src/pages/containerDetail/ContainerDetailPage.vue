@@ -12,26 +12,27 @@
       :speed="100"
     >
       <span class="material-icons-outlined icon"> memory </span>
-      <div class="value">{{ cpuRate }}%</div>
-      <div class="text">CPU使用率</div>
+      <div class="value"> {{ cpuRate }}% </div>
+      <div class="text"> CPU使用率 </div>
     </van-circle>
-    <div
-      ><van-tag
+    <div>
+      <van-tag
         size="large"
         :color="statusColor"
-        >{{ statusLabel }}</van-tag
-      ></div
-    >
+      >
+        {{ statusLabel }}
+      </van-tag>
+    </div>
     <van-circle
       v-model:current-rate="memoryCurrentRate"
       :rate="memoryRate"
       :speed="100"
     >
       <span class="material-icons-outlined icon"> keyboard </span>
-      <div class="value memory"
-        >{{ fileSizeFormat(memoryUsage) || '-' }} / {{ fileSizeFormat(memoryLimit) || '-' }}
+      <div class="value memory">
+        {{ fileSizeFormat(memoryUsage) || '-' }} / {{ fileSizeFormat(memoryLimit) || '-' }}
       </div>
-      <div class="text">内存使用量</div>
+      <div class="text"> 内存使用量 </div>
     </van-circle>
   </div>
   <van-tabs v-model:active="activeTab">
@@ -39,7 +40,7 @@
       class="tab"
       title="基本信息"
     >
-      <base-info
+      <BaseInfoCard
         :name="containerDetail.Name?.slice(1)"
         :image="containerDetail.Config?.Image"
         :start-time="containerDetail.State?.StartedAt"
@@ -53,31 +54,31 @@
       class="tab"
       title="挂载"
     >
-      <mount :list="containerDetail.Mounts" />
+      <MountTab :list="containerDetail.Mounts" />
     </van-tab>
     <van-tab
       class="tab"
       title="端口"
     >
-      <port :data="containerDetail.HostConfig?.PortBindings" />
+      <PortTab :data="containerDetail.HostConfig?.PortBindings" />
     </van-tab>
     <van-tab
       class="tab"
       title="网络"
     >
-      <network :networks="containerDetail.NetworkSettings?.Networks" />
+      <NetworkTab :networks="containerDetail.NetworkSettings?.Networks" />
     </van-tab>
     <van-tab
       class="tab"
       title="变量"
     >
-      <env-var :envs="containerDetail.Config?.Env" />
+      <EnvVarTab :envs="containerDetail.Config?.Env" />
     </van-tab>
     <van-tab
       class="tab"
       title="日志"
     >
-      <log :id="id" />
+      <LogTab :id="id" />
     </van-tab>
   </van-tabs>
 </template>
@@ -85,16 +86,16 @@
 import { ref, onMounted, watchEffect, computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { getContainerDetail, getContainerStats } from '@/apis/container';
-import { Container } from '@common/types/container';
+import type { Container } from '@common/types/container';
 import { restartPolicyList } from '@common/constants/const';
 import { fileSizeFormat } from '@/utils/utils';
 import { statusColorMap, statusLabelMap } from '@/constants/container';
-import BaseInfo from './BaseInfo.vue';
-import EnvVar from './EnvVar.vue';
-import Log from './Log.vue';
-import Mount from './Mount.vue';
-import Network from './Network.vue';
-import Port from './Port.vue';
+import BaseInfoCard from './BaseInfoCard.vue';
+import EnvVarTab from './EnvVarTab.vue';
+import LogTab from './LogTab.vue';
+import MountTab from './MountTab.vue';
+import NetworkTab from './NetworkTab.vue';
+import PortTab from './PortTab.vue';
 
 const cpuCurrentRate = ref(0);
 const memoryCurrentRate = ref(0);
@@ -136,7 +137,7 @@ const getStats = async () => {
 };
 
 onMounted(async () => {
-  if (!id) {
+  if (!id.value) {
     return;
   }
   const res = await getContainerDetail(id.value);
@@ -147,7 +148,7 @@ onMounted(async () => {
 });
 
 watchEffect(cleanUp => {
-  if (!id || containerDetail.value.State?.Status !== 'running') {
+  if (!id.value || containerDetail.value.State?.Status !== 'running') {
     return;
   }
   const timer = setInterval(getStats, 5000);

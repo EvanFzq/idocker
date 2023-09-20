@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { DockerService } from '../docker';
 import { ImageOption } from '@common/types/image';
 
@@ -17,24 +17,68 @@ export class ImageService {
     const imageTag = image.indexOf(':') > 0 ? image : image + ':latest';
     try {
       const image = this.dockerService.docker.getImage(imageTag);
-      console.log(image);
-
       if (!image || !image.id) {
         return new Promise<void>((resolve, reject) => {
           this.dockerService.docker.pull(imageTag, (err, stream) => {
+            function onFinished(err) {
+              if (err) {
+                reject(err);
+              } else {
+                resolve();
+              }
+            }
             if (err) {
               reject(err);
             } else {
-              function onFinished(err, output) {
-                resolve();
-              }
               this.dockerService.docker.modem.followProgress(stream, onFinished);
             }
           });
         });
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
+  }
+  async getImageList() {
+    let imageList = await this.dockerService.docker.listImages();
+    const containerList = await this.dockerService.docker.listContainers({
+      all: true,
+    });
+    imageList = imageList.map(image => {
+      let containerNum = 0;
+      const [imageName] = image.RepoTags[0].split(':');
+      containerList.forEach(container => {
+        const [containerImage] = container.Image.split(':');
+        if (imageName === containerImage) {
+          containerNum++;
+        }
+      });
+      return {
+        ...image,
+        Containers: containerNum,
+        Name: imageName,
+        Tags: image.RepoTags.map(tag => tag.slice(imageName.length + 1)),
+      };
+    });
+    return imageList;
+  }
+  async removeImage(id: string) {
+    const image = this.dockerService.docker.getImage(id);
+    const imageDetail = await image.inspect();
+    const containerList = await this.dockerService.docker.listContainers({
+      all: true,
+    });
+    const [imageName] = imageDetail.RepoTags[0].split(':');
+    containerList.forEach(container => {
+      const [containerImage] = container.Image.split(':');
+      if (imageName === containerImage) {
+        throw new HttpException(
+          '镜像存在容器实例，无法删除，请先移除容器',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+    });
+    await image.remove();
+    return;
   }
 }

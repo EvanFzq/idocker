@@ -6,21 +6,21 @@ import { ChangePasswordDto } from './dto';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) {}
 
-    @UseGuards(LoginAuthGuard)
-    @Public()
-    @Post('login')
-    async login(@Request() req) {
-        const token = await this.authService.jwt(req.user);
-        console.log(token);
-        return {
-            token,
-        };
-    }
+  @UseGuards(LoginAuthGuard)
+  @Public()
+  @Post('login')
+  async login(@Request() req) {
+    const token = await this.authService.jwt(req.user);
+    console.info(token);
+    return {
+      token,
+    };
+  }
 
-    @Put('password')
-    async changePassword(@Body() body: ChangePasswordDto) {
-        await this.authService.changePassword(body.currentPassword, body.newPassword);
-    }
+  @Put('password')
+  async changePassword(@Body() body: ChangePasswordDto) {
+    await this.authService.changePassword(body.currentPassword, body.newPassword);
+  }
 }

@@ -24,7 +24,7 @@ export interface Container {
   MountLabel: string;
   ProcessLabel: string;
   AppArmorProfile: string;
-  ExecIDs: any;
+  ExecIDs: unknown;
   HostConfig: HostConfig;
   GraphDriver: GraphDriver;
   Mounts: Mount[];
@@ -55,25 +55,25 @@ export interface HostConfig {
   RestartPolicy: RestartPolicy;
   AutoRemove: boolean;
   VolumeDriver: string;
-  VolumesFrom: any;
+  VolumesFrom: unknown;
   ConsoleSize: number[];
-  CapAdd: any;
-  CapDrop: any;
+  CapAdd: unknown;
+  CapDrop: unknown;
   CgroupnsMode: string;
-  Dns: any[];
-  DnsOptions: any[];
-  DnsSearch: any[];
-  ExtraHosts: any;
-  GroupAdd: any;
+  Dns: unknown[];
+  DnsOptions: unknown[];
+  DnsSearch: unknown[];
+  ExtraHosts: unknown;
+  GroupAdd: unknown;
   IpcMode: string;
   Cgroup: string;
-  Links: any;
+  Links: unknown;
   OomScoreAdj: number;
   PidMode: string;
   Privileged: boolean;
   PublishAllPorts: boolean;
   ReadonlyRootfs: boolean;
-  SecurityOpt: any;
+  SecurityOpt: unknown;
   UTSMode: string;
   UsernsMode: string;
   ShmSize: number;
@@ -84,26 +84,26 @@ export interface HostConfig {
   NanoCpus: number;
   CgroupParent: string;
   BlkioWeight: number;
-  BlkioWeightDevice: any[];
-  BlkioDeviceReadBps: any[];
-  BlkioDeviceWriteBps: any[];
-  BlkioDeviceReadIOps: any[];
-  BlkioDeviceWriteIOps: any[];
+  BlkioWeightDevice: unknown[];
+  BlkioDeviceReadBps: unknown[];
+  BlkioDeviceWriteBps: unknown[];
+  BlkioDeviceReadIOps: unknown[];
+  BlkioDeviceWriteIOps: unknown[];
   CpuPeriod: number;
   CpuQuota: number;
   CpuRealtimePeriod: number;
   CpuRealtimeRuntime: number;
   CpusetCpus: string;
   CpusetMems: string;
-  Devices: any[];
-  DeviceCgroupRules: any;
-  DeviceRequests: any;
+  Devices: unknown[];
+  DeviceCgroupRules: unknown;
+  DeviceRequests: unknown;
   MemoryReservation: number;
   MemorySwap: number;
-  MemorySwappiness: any;
-  OomKillDisable: any;
-  PidsLimit: any;
-  Ulimits: any;
+  MemorySwappiness: unknown;
+  OomKillDisable: unknown;
+  PidsLimit: unknown;
+  Ulimits: unknown;
   CpuCount: number;
   CpuPercent: number;
   IOMaximumIOps: number;
@@ -172,7 +172,7 @@ export interface Config2 {
   Volumes: Volumes;
   WorkingDir: string;
   Entrypoint: string[];
-  OnBuild: any;
+  OnBuild: unknown;
   Labels: Labels;
 }
 
@@ -194,8 +194,8 @@ export interface NetworkSettings {
   LinkLocalIPv6PrefixLen: number;
   Ports: Ports;
   SandboxKey: string;
-  SecondaryIPAddresses: any;
-  SecondaryIPv6Addresses: any;
+  SecondaryIPAddresses: unknown;
+  SecondaryIPv6Addresses: unknown;
   EndpointID: string;
   Gateway: string;
   GlobalIPv6Address: string;
@@ -222,9 +222,9 @@ export interface Networks {
 }
 
 export interface Network {
-  IPAMConfig: any;
-  Links: any;
-  Aliases: any;
+  IPAMConfig: unknown;
+  Links: unknown;
+  Aliases: unknown;
   NetworkID: string;
   EndpointID: string;
   Gateway: string;
@@ -234,7 +234,7 @@ export interface Network {
   GlobalIPv6Address: string;
   GlobalIPv6PrefixLen: number;
   MacAddress: string;
-  DriverOpts: any;
+  DriverOpts: unknown;
 }
 
 export interface MountConfig {

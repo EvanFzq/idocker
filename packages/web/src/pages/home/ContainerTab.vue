@@ -2,11 +2,11 @@
   <div class="list">
     <ContainerCard
       v-for="item in containerList"
-      :key="item.id"
       :id="item.id"
+      :key="item.id"
       :name="item.name"
       :image="item.image"
-      :startedAt="item.startedAt"
+      :started-at="item.startedAt"
       :status="item.status"
       :created="item.created"
       :labels="item.labels"
@@ -26,7 +26,7 @@ import { getContainerList, getContainerStats } from '@/apis';
 import { onMounted, ref, onUnmounted } from 'vue';
 
 // import { } from '@/types/container'
-import { ContainerFormat } from '@/types/container';
+import type { ContainerFormat } from '@/types/container';
 
 import ContainerCard from '@/components/ContainerCard.vue';
 
@@ -100,6 +100,7 @@ onUnmounted(() => {
   justify-content: flex-start;
   align-items: flex-start;
 }
+
 .no-more {
   width: 100%;
   font-size: 10px;

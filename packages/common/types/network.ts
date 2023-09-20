@@ -18,7 +18,7 @@ export interface Network {
 
 export interface Ipam {
   Driver: string;
-  Options: any;
+  Options: unknown;
   Config: Config[];
 }
 

@@ -1,7 +1,5 @@
 import os from 'os';
 import path from 'path';
-console.log(os.type());
-console.log(os.platform());
 
 const platform = os.type();
 export const isLinux = platform === 'Linux';

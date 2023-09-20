@@ -10,6 +10,8 @@
     "build:server-w": "cd ./packages/server && vite build -w",
     "build:server": "cd ./packages/server && vite build",
     "build": "yarn build:server && yarn build:web",
+    "prepare": "husky install",
+    "lint": "npx eslint --ext .vue,.ts --fix packages/common packages/server/src packages/web/src",
     "image": "yarn build && docker buildx build -t evanfzq/docker-mobile:latest --platform=linux/arm,linux/arm64,linux/amd64 . --push",
     "start": "pm2-runtime start pm2.config.js"
   },
@@ -44,12 +46,19 @@
     "@types/dockerode": "^3.3.19",
     "@types/lodash-es": "^4.17.9",
     "@types/node": "^20.6.0",
+    "@typescript-eslint/eslint-plugin": "^6.7.2",
+    "@typescript-eslint/parser": "^6.7.2",
     "@vitejs/plugin-vue": "^4.2.3",
     "electron-vite": "^1.0.27",
+    "eslint": "^8.49.0",
+    "eslint-plugin-vue": "^9.17.0",
+    "husky": "^8.0.3",
     "less": "^4.2.0",
+    "prettier": "^3.0.3",
     "typescript": "^5.0.2",
     "vite": "^4.4.5",
     "vite-plugin-pwa": "^0.16.5",
+    "vue-eslint-parser": "^9.3.1",
     "vue-tsc": "^1.8.5"
   }
 }

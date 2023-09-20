@@ -1,7 +1,8 @@
 <template>
   <van-cell-group
-    class="mount-card"
     v-for="(mount, index) in mountList"
+    :key="index"
+    class="mount-card"
     inset
     style="margin-top: 16px"
   >
@@ -14,8 +15,8 @@
           v-model="mount.type"
           direction="horizontal"
         >
-          <van-radio name="bind">路径</van-radio>
-          <van-radio name="volume">卷</van-radio>
+          <van-radio name="bind"> 路径 </van-radio>
+          <van-radio name="volume"> 卷 </van-radio>
         </van-radio-group>
       </template>
     </van-field>
@@ -31,15 +32,15 @@
     />
     <van-field
       v-if="mount.type === 'volume'"
-      required
       v-model="mount.volume"
+      required
       is-link
       readonly
       :name="'mounts[' + index + '].volume'"
       label="卷"
       placeholder="点击选择卷"
-      @click="showVolumePicker = true"
       :rules="[{ required: true, message: '请选择卷' }]"
+      @click="showVolumePicker = true"
     />
     <van-popup
       v-model:show="showVolumePicker"
@@ -47,7 +48,7 @@
     >
       <van-picker
         :columns="volumeList"
-        @confirm="value => onVolumeConfirm(index, value)"
+        @confirm="(value: PickerValue) => onVolumeConfirm(index, value)"
         @cancel="showVolumePicker = false"
       />
     </van-popup>
@@ -83,14 +84,19 @@
       size="small"
       class="add-mount-btn"
       @click="onAddMount"
-      >新增挂载配置</van-button
     >
+      新增挂载配置
+    </van-button>
   </div>
 </template>
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { MountConfig } from '@common/types/container';
+import type { MountConfig } from '@common/types/container';
 import { getVolumeList } from '@/apis/volume';
+
+interface PickerValue {
+  selectedValues: string[];
+}
 
 const mountList = ref<MountConfig[]>([]);
 const volumeList = ref<{ text: string; value: string }[]>([]);
@@ -119,7 +125,7 @@ const onDeleteMount = (index: number) => {
   mountList.value.splice(index, 1);
 };
 
-const onVolumeConfirm = (index: number, { selectedValues }: { selectedValues: string[] }) => {
+const onVolumeConfirm = (index: number, { selectedValues }: PickerValue) => {
   mountList.value[index].volume = selectedValues[0];
   showVolumePicker.value = false;
 };

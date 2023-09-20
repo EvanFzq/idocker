@@ -3,25 +3,29 @@
   "env": {
     "es2021": true,
     "node": true,
-    "browser": false
+    "browser": true
   },
   "extends": [
     "eslint:recommended",
-    /** @see https://github.com/typescript-eslint/typescript-eslint/tree/master/packages/eslint-plugin#recommended-configs */
+    "plugin:vue/vue3-recommended",
     "plugin:@typescript-eslint/recommended"
   ],
-  "parser": "@typescript-eslint/parser",
+  "parser": "vue-eslint-parser",
   "parserOptions": {
-    "ecmaVersion": 12,
+    "parser": "@typescript-eslint/parser",
     "sourceType": "module"
   },
   "plugins": [
+    "vue",
     "@typescript-eslint"
   ],
   "ignorePatterns": [
     "node_modules/**",
     "**/dist/**"
   ],
+  "globals": {
+    "NodeJS": "readonly"
+  },
   "rules": {
     "@typescript-eslint/no-unused-vars": [
       "warn",
@@ -33,32 +37,32 @@
     "@typescript-eslint/no-var-requires": "off",
     "@typescript-eslint/consistent-type-imports": "error",
     "@typescript-eslint/no-explicit-any": "warn",
-    /**
-     * Having a semicolon helps the optimizer interpret your code correctly.
-     * This avoids rare errors in optimized code.
-     * @see https://twitter.com/alex_kozack/status/1364210394328408066
-     */
     "semi": [
       "error",
       "always"
     ],
-    /**
-     * This will make the history of changes in the hit a little cleaner
-     */
+    "no-console": [
+      "warn",
+      {
+        "allow": [
+          "error",
+          "warn",
+          "info"
+        ]
+      }
+    ],
     "comma-dangle": [
       "warn",
       "always-multiline"
     ],
-    /**
-     * Just for beauty
-     */
     "quotes": [
       "warn",
       "single",
       {
         "avoidEscape": true
       }
-    ]
+    ],
+    "vue/singleline-html-element-content-newline": "off"
   },
   "overrides": [
     {

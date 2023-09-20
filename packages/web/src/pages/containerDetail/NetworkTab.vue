@@ -2,6 +2,7 @@
   <div class="network">
     <van-cell-group
       v-for="(network, key) in networks"
+      :key="network.NetworkID"
       inset
     >
       <van-cell
@@ -44,6 +45,6 @@
   </div>
 </template>
 <script lang="ts" setup>
-import { Networks } from '@common/types/container';
+import type { Networks } from '@common/types/container';
 defineProps<{ networks?: Networks }>();
 </script>

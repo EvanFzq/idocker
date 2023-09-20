@@ -1,4 +1,5 @@
-import { showToast } from 'vant';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { showFailToast } from 'vant';
 import axios from 'axios';
 import type { AxiosRequestConfig } from 'axios';
 
@@ -31,7 +32,7 @@ _fetch.interceptors.response.use(
     // 2xx 范围内的状态码都会触发该函数。
     // 对响应数据做点什么
     if (res.status !== 200 || res.data?.code !== 0) {
-      showToast(res.data?.msg || '请求错误！');
+      showFailToast(res.data?.msg || '请求错误！');
       return {
         code: res.data?.code || res.status || 500,
         success: false,
@@ -44,16 +45,14 @@ _fetch.interceptors.response.use(
     // 超出 2xx 范围的状态码都会触发该函数。
     // 对响应错误做点什么
     if (error?.response?.status === 401 && location.pathname !== '/login') {
-      showToast({
+      showFailToast({
         message: '未登录，即将前往登录',
         onClose() {
           location.href = '/login';
         },
       });
     } else {
-      console.log(error);
-
-      showToast(error?.response?.data?.msg || '请求错误！');
+      showFailToast(error?.response?.data?.msg || '请求错误！');
     }
     return Promise.resolve({
       code: error.code || 500,

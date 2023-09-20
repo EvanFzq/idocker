@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Post, Put } from '@nestjs/common';
+import { Body, Controller, Post, Put } from '@nestjs/common';
 import { ContainerService } from './service';
 import {
   ContainerStatsDto,
@@ -13,7 +13,7 @@ export class ContainerController {
 
   @Post('new')
   async createContainer(@Body() body: CreateContainerDto) {
-    return this.containerService.createContainer(body)
+    return this.containerService.createContainer(body);
   }
 
   @Post('list')

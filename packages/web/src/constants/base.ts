@@ -1,1 +1,1 @@
-export const isDev = import.meta.env.VITE_ENV === "dev";
+export const isDev = import.meta.env.VITE_ENV === 'dev';

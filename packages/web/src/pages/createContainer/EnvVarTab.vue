@@ -1,7 +1,8 @@
 <template>
   <van-cell-group
-    class="env-card"
     v-for="(env, index) in envList"
+    :key="index"
+    class="env-card"
     inset
     style="margin-top: 16px; padding-right: 36px"
   >
@@ -35,8 +36,9 @@
       size="small"
       class="add-env-btn"
       @click="onAddEnv"
-      >新增环境变量</van-button
     >
+      新增环境变量
+    </van-button>
   </div>
 </template>
 <script setup lang="ts">

@@ -1,18 +1,23 @@
 import { IsBoolean, IsInt, IsOptional, IsString } from 'class-validator';
 
 export class SearchImageDto {
-    @IsString()
-    keyword: string;
+  @IsString()
+  keyword: string;
 
-    @IsInt()
-    @IsOptional()
-    limit?: number;
+  @IsInt()
+  @IsOptional()
+  limit?: number;
 
-    @IsBoolean()
-    @IsOptional()
-    official?: boolean;
+  @IsBoolean()
+  @IsOptional()
+  official?: boolean;
 
-    @IsInt()
-    @IsOptional()
-    stars?: number;
+  @IsInt()
+  @IsOptional()
+  stars?: number;
+}
+
+export class ImageUpdateOrPullDto {
+  @IsString()
+  name: string;
 }

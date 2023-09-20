@@ -16,7 +16,7 @@ import { ConfigModule, ConfigService } from '@/modules/config';
             imports: [ConfigModule],
             inject: [ConfigService],
             async useFactory(configService: ConfigService) {
-                let secret: string = configService.getConfig('secret', uuidV4());
+                const secret: string = configService.getConfig('secret', uuidV4());
 
                 return {
                     secret,

@@ -1,7 +1,8 @@
 <template>
   <van-cell-group
-    class="port-card"
     v-for="(port, index) in portList"
+    :key="index"
+    class="port-card"
     inset
     style="margin-top: 16px"
   >
@@ -32,8 +33,8 @@
           v-model="port.protocol"
           direction="horizontal"
         >
-          <van-radio name="tcp">TCP</van-radio>
-          <van-radio name="udp">UDP</van-radio>
+          <van-radio name="tcp"> TCP </van-radio>
+          <van-radio name="udp"> UDP </van-radio>
         </van-radio-group>
       </template>
     </van-field>
@@ -51,13 +52,14 @@
       size="small"
       class="add-port-btn"
       @click="onAddPort"
-      >新增端口配置</van-button
     >
+      新增端口配置
+    </van-button>
   </div>
 </template>
 <script setup lang="ts">
 import { ref } from 'vue';
-import { PortConfig } from '@common/types/network';
+import type { PortConfig } from '@common/types/network';
 
 const portList = ref<PortConfig[]>([]);
 
