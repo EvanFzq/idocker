@@ -9,25 +9,25 @@ import { AuthController } from './controller';
 import { ConfigModule, ConfigService } from '@/modules/config';
 
 @Module({
-    imports: [
-        PassportModule,
-        ConfigModule,
-        JwtModule.registerAsync({
-            imports: [ConfigModule],
-            inject: [ConfigService],
-            async useFactory(configService: ConfigService) {
-                const secret: string = configService.getConfig('secret', uuidV4());
+  imports: [
+    PassportModule,
+    ConfigModule,
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      async useFactory(configService: ConfigService) {
+        const secret: string = configService.getConfig('secret', uuidV4());
 
-                return {
-                    secret,
-                    signOptions: {
-                        expiresIn: '3600s',
-                    },
-                };
-            },
-        }),
-    ],
-    controllers: [AuthController],
-    providers: [AuthService, LocalStrategy, JwtStrategy],
+        return {
+          secret,
+          signOptions: {
+            expiresIn: '3600s',
+          },
+        };
+      },
+    }),
+  ],
+  controllers: [AuthController],
+  providers: [AuthService, LocalStrategy, JwtStrategy],
 })
 export class AuthModule {}
