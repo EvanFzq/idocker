@@ -1,6 +1,6 @@
 <template>
   <van-nav-bar
-    title="镜像列表"
+    :title="title"
     left-text="返回"
     left-arrow
     class="title"
@@ -9,6 +9,10 @@
 </template>
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
+import type { NavBarProps } from 'vant';
+
+defineProps<Partial<NavBarProps>>();
+
 const router = useRouter();
 const onClickLeft = () => {
   router.back();

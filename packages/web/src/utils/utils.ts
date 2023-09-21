@@ -1,4 +1,10 @@
 import { VolumeUnit, VolumeUnitSize, NumberLevel } from '@common/constants/enum';
+import dayjs from 'dayjs';
+import type { Dayjs } from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import 'dayjs/locale/zh-cn';
+
+dayjs.locale('zh-cn');
 
 export const fileSizeFormat = (size: number) => {
   let str = '';
@@ -20,4 +26,14 @@ export const numberFormat = (num: number) => {
     }
   });
   return str;
+};
+
+export const timeLongFormat = (
+  date: number | string | Dayjs,
+  baseDate?: number | string | Dayjs,
+) => {
+  dayjs.extend(relativeTime);
+  date = dayjs(date);
+  baseDate = baseDate ? dayjs(baseDate) : dayjs();
+  return date.from(baseDate);
 };

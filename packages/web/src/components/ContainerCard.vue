@@ -54,7 +54,7 @@
           <van-icon
             name="clock-o"
             style="margin-right: 4px"
-          />{{ dayjs(startedAt).format('YYYY-MM-DD HH:mm:ss') }}
+          />{{ timeLongFormat(startedAt) }}
         </div>
       </div>
       <div class="middle">
@@ -136,12 +136,11 @@
   </div>
 </template>
 <script setup lang="ts">
-import dayjs from 'dayjs';
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { showSuccessToast, showConfirmDialog, showLoadingToast } from 'vant';
 
-import { fileSizeFormat } from '@/utils/utils';
+import { fileSizeFormat, timeLongFormat } from '@/utils/utils';
 import { activeContainer } from '@/apis/container';
 import { ContainerActive } from '@common/constants/enum';
 import { buttonColorMap, statusColorMap, statusLabelMap } from '@/constants/container';

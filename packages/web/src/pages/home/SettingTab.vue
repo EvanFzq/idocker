@@ -23,6 +23,11 @@ SettingTab
         is-link
         to="/image/list"
       />
+      <van-cell
+        title="网络列表"
+        is-link
+        to="/network/list"
+      />
     </van-cell-group>
     <div class="btns">
       <van-button
