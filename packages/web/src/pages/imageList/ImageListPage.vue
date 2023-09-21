@@ -31,6 +31,7 @@
         v-model="pullImageName"
         label="镜像名"
         required
+        name="pullImageName"
         placeholder="请输入镜像名"
         class="pull-image-field"
         :rules="[{ required: true, message: '请输入镜像名' }]"
@@ -69,8 +70,7 @@ const showPullModal = ref(false);
 const pullModalForm = ref<FormInstance>();
 const pullImageName = ref('');
 const actions = computed(() => {
-  const disabledRemove = !!imageList.value.find(image => image.Id === actionImage.value?.Id)
-    ?.Containers;
+  const disabledRemove = !!actionImage.value?.Containers;
   return [
     {
       name: '更新',
@@ -145,6 +145,8 @@ onMounted(async () => {
 <style scoped lang="less">
 .image-list {
   flex: auto;
+  height: 0;
+  overflow-x: auto;
   margin-bottom: 72px;
 }
 .pull-image-btn-row {

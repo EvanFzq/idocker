@@ -1,18 +1,14 @@
-import { IsBoolean, IsInt, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsOptional, IsString } from 'class-validator';
 
-export class SearchNetworkDto {
+export class AddNetworkDto {
   @IsString()
-  keyword: string;
-
-  @IsInt()
-  @IsOptional()
-  limit?: number;
+  name: string;
 
   @IsBoolean()
   @IsOptional()
-  official?: boolean;
+  enableIPv6?: boolean;
 
-  @IsInt()
+  @IsBoolean()
   @IsOptional()
-  stars?: number;
+  internal?: boolean;
 }

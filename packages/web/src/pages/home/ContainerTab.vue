@@ -104,7 +104,7 @@ onUnmounted(() => {
 .no-more {
   width: 100%;
   font-size: 10px;
-  margin: 12px 12px 48px;
+  margin: 12px 12px 72px;
   text-align: center;
 }
 </style>

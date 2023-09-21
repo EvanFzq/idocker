@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DockerService } from '../docker';
+import { AddNetworkDto } from './dto';
 
 @Injectable()
 export class NetworkService {
@@ -20,5 +21,16 @@ export class NetworkService {
       });
       return { ...network, Containers: containerNum };
     });
+  }
+  async addNetwork(data: AddNetworkDto) {
+    return await this.dockerService.docker.createNetwork({
+      Name: data.name,
+      EnableIPv6: data.enableIPv6,
+      Internal: data.internal,
+      CheckDuplicate: true,
+    });
+  }
+  async removeNetwork(id: string) {
+    return await this.dockerService.docker.getNetwork(id).remove();
   }
 }

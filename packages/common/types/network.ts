@@ -36,3 +36,9 @@ export interface PortConfig {
   container?: number;
   protocol: 'tcp' | 'udp';
 }
+
+export interface AddNetworkParams {
+  name: string;
+  enableIPv6?: boolean;
+  internal?: boolean;
+}

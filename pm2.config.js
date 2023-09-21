@@ -1,6 +1,8 @@
 module.exports = {
-    apps: [{
-        name: "docker-mobile",
-        script: "./packages/server/dist/index.cjs",
-    }]
-}
+  apps: [
+    {
+      name: 'docker-mobile',
+      script: './packages/server/dist/index.cjs',
+    },
+  ],
+};

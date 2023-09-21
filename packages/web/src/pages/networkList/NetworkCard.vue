@@ -15,6 +15,16 @@
       </div>
       <div>创建时间：{{ timeLongFormat(network.Created) }}</div>
     </div>
+    <div class="row">
+      <div>
+        <span>IPv6：</span>
+        <span>{{ network.EnableIPv6 ? '是' : '否' }}</span>
+      </div>
+      <div>
+        <span>内部网络：</span>
+        <span>{{ network.Internal ? '是' : '否' }}</span>
+      </div>
+    </div>
   </div>
 </template>
 <script setup lang="ts">
