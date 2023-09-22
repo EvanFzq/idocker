@@ -5,6 +5,7 @@ import {
   ContainerActiveDto,
   ContainerDetailDto,
   CreateContainerDto,
+  ContainerListDto,
 } from './dto';
 
 @Controller('container')
@@ -17,8 +18,18 @@ export class ContainerController {
   }
 
   @Post('list')
-  async getContainerList() {
-    const list = await this.containerService.getContainerList();
+  async getContainerList(@Body() body: ContainerListDto) {
+    let list = await this.containerService.getContainerList();
+    list = list
+      .filter(item => !body.imageId || item.ImageID === body.imageId)
+      .filter(
+        item =>
+          !body.networkId ||
+          Object.values(item.NetworkSettings.Networks).some(
+            network => network.NetworkID === body.networkId,
+          ),
+      );
+
     return Promise.all(list.map(item => this.containerService.getContainerDetail(item.Id)));
   }
   @Post('detail')

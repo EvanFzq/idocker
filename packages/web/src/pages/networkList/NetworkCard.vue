@@ -7,11 +7,11 @@
       </div>
     </div>
     <div class="row">
-      <div>
+      <div @click="onClickContainers">
         <span>容器数量：</span>
-        <span :style="network.Containers ? 'color:green' : 'color:red'">{{
-          network.Containers
-        }}</span>
+        <span :style="network.Containers ? 'color:green;text-decoration: underline;' : 'color:red'">
+          {{ network.Containers }}
+        </span>
       </div>
       <div>创建时间：{{ timeLongFormat(network.Created) }}</div>
     </div>
@@ -30,14 +30,26 @@
 <script setup lang="ts">
 import type { Network } from '@common/types/network';
 import { timeLongFormat } from '@/utils/utils';
+import { useRouter } from 'vue-router';
 
-defineProps<{
+const props = defineProps<{
   network: Network;
 }>();
 const emit = defineEmits(['click']);
+const router = useRouter();
 
 const onClick = () => {
   emit('click');
+};
+const onClickContainers = () => {
+  router.push({
+    path: '/container/list',
+    query: {
+      type: 'network',
+      id: props.network.Id,
+      name: props.network.Name,
+    },
+  });
 };
 </script>
 <style scoped lang="less">

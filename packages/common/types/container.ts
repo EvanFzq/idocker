@@ -257,6 +257,11 @@ export interface CreateContainerParams {
   envs: NewEnv[];
 }
 
+export interface ContainerListParams {
+  networkId?: string;
+  imageId?: string;
+}
+
 export interface NewPort {
   host: string;
   container: string;

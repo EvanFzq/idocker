@@ -7,9 +7,11 @@
       </div>
     </div>
     <div class="row">
-      <div>
+      <div @click="onClickContainers">
         <span>容器数量：</span>
-        <span :style="image.Containers ? 'color:green' : 'color:red'">{{ image.Containers }}</span>
+        <span :style="image.Containers ? 'color:green;text-decoration: underline;' : 'color:red'">{{
+          image.Containers
+        }}</span>
       </div>
       <div>创建时间：{{ timeLongFormat(dayjs.unix(image.Created)) }}</div>
     </div>
@@ -30,16 +32,28 @@
 </template>
 <script setup lang="ts">
 import dayjs from 'dayjs';
+import { useRouter } from 'vue-router';
 import type { ImageItem } from '@common/types/image';
 import { fileSizeFormat, timeLongFormat } from '@/utils/utils';
 
-defineProps<{
+const props = defineProps<{
   image: ImageItem;
 }>();
 const emit = defineEmits(['click']);
+const router = useRouter();
 
 const onClick = () => {
   emit('click');
+};
+const onClickContainers = () => {
+  router.push({
+    path: '/container/list',
+    query: {
+      type: 'image',
+      id: props.image.Id,
+      name: props.image.Name,
+    },
+  });
 };
 </script>
 <style scoped lang="less">

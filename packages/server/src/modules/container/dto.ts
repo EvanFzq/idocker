@@ -29,6 +29,16 @@ export class ContainerActiveDto {
   type: ContainerActive;
 }
 
+export class ContainerListDto {
+  @IsString()
+  @IsOptional()
+  imageId?: string;
+
+  @IsString()
+  @IsOptional()
+  networkId?: string;
+}
+
 export class NewPort {
   @IsNumberString()
   host: string;
