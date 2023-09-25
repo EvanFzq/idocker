@@ -123,7 +123,7 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
-import { showLoadingToast, showSuccessToast } from 'vant';
+import { showFailToast, showLoadingToast, showSuccessToast } from 'vant';
 import type { FormInstance } from 'vant';
 import TitleBar from '@/components/TitleBar.vue';
 import { getNetworkList, addNetwork, removeNetwork } from '@/apis/network';
@@ -169,12 +169,28 @@ const getDataList = async () => {
 onMounted(async () => {
   getDataList();
 });
+
 const onNetworkClick = (network: Network) => {
   actionNetwork.value = network;
   showAction.value = true;
 };
+
 const onAddNetworkConfirm = async () => {
   await addModalForm.value?.validate();
+  if (
+    (networkForm.value.gateway || networkForm.value.subnet) &&
+    !(networkForm.value.gateway && networkForm.value.subnet)
+  ) {
+    showFailToast('网关和子网需同时存在！');
+    return;
+  }
+  if (
+    (networkForm.value.IPv6gateway || networkForm.value.IPv6subnet) &&
+    !(networkForm.value.IPv6gateway && networkForm.value.IPv6subnet)
+  ) {
+    showFailToast('网关和子网需同时存在！');
+    return;
+  }
   showLoadingToast({ message: '创建中...', duration: 0, forbidClick: true });
   const res = await addNetwork(networkForm.value);
   if (res.success) {
@@ -183,6 +199,7 @@ const onAddNetworkConfirm = async () => {
     getDataList();
   }
 };
+
 const onRemoveNetwork = async () => {
   if (!actionNetwork.value) {
     return;

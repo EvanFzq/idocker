@@ -24,17 +24,20 @@ export class NetworkService {
   }
   async addNetwork(data: AddNetworkDto) {
     const IPAMConfig: Record<string, string>[] = [];
+    const labels: Record<string, string> = {};
     if (data.gateway && data.subnet) {
       IPAMConfig.push({
         Subnet: data.subnet,
         Gateway: data.gateway,
       });
+      labels.Subnet = data.subnet;
     }
     if (data.enableIPv6 && data.IPv6gateway && data.IPv6subnet) {
       IPAMConfig.push({
         Subnet: data.IPv6subnet,
         Gateway: data.IPv6gateway,
       });
+      labels.IPv6subnet = data.IPv6subnet;
     }
     return await this.dockerService.docker.createNetwork({
       Name: data.name,
@@ -45,6 +48,7 @@ export class NetworkService {
         Driver: 'default',
         Config: IPAMConfig,
       },
+      Labels: labels,
     });
   }
   async removeNetwork(id: string) {

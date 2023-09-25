@@ -10,5 +10,8 @@ export const messageFormat = msg => {
   if (msg.indexOf("It does not belong to any of this network's subnets") >= 0) {
     return 'IP不属于该网络子网';
   }
+  if (msg.indexOf('Requested address is out of range') >= 0) {
+    return 'Ip地址超出子网范围';
+  }
   return messageMap[msg] || msg;
 };
