@@ -1,6 +1,10 @@
 <template>
   <div class="page">
-    <router-view />
+    <router-view v-slot="{ Component }">
+      <keep-alive :include="['HomePage']">
+        <component :is="Component" />
+      </keep-alive>
+    </router-view>
   </div>
 </template>
 
