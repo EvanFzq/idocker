@@ -17,6 +17,16 @@
     </div>
     <div class="row">
       <div>
+        <span>网关：</span>
+        <span>{{ network.IPAM.Config?.[0]?.Gateway }}</span>
+      </div>
+      <div>
+        <span>子网掩码：</span>
+        <span>{{ network.IPAM.Config?.[0]?.Subnet }}</span>
+      </div>
+    </div>
+    <div class="row">
+      <div>
         <span>IPv6：</span>
         <span>{{ network.EnableIPv6 ? '是' : '否' }}</span>
       </div>

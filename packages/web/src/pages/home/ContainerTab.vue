@@ -40,8 +40,8 @@ const getList = async () => {
     const list = res.data.map(item => ({
       id: item.Id,
       name: item.Name.slice(1),
-      disabled: item.disabled,
       image: item.Config.Image,
+      disabled: item.Config.Image.indexOf('evanfzq/docker-mobile') >= 0,
       status: item.State.Status,
       startedAt: item.State.StartedAt,
       created: item.Created,

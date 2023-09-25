@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DockerService } from '../docker';
-import { AddNetworkDto } from './dto';
+import { AddNetworkDto, AddContainerToNetworkDto } from './dto';
 
 @Injectable()
 export class NetworkService {
@@ -23,14 +23,51 @@ export class NetworkService {
     });
   }
   async addNetwork(data: AddNetworkDto) {
+    const IPAMConfig: Record<string, string>[] = [];
+    if (data.gateway && data.subnet) {
+      IPAMConfig.push({
+        Subnet: data.subnet,
+        Gateway: data.gateway,
+      });
+    }
+    if (data.enableIPv6 && data.IPv6gateway && data.IPv6subnet) {
+      IPAMConfig.push({
+        Subnet: data.IPv6subnet,
+        Gateway: data.IPv6gateway,
+      });
+    }
     return await this.dockerService.docker.createNetwork({
       Name: data.name,
       EnableIPv6: data.enableIPv6,
       Internal: data.internal,
       CheckDuplicate: true,
+      IPAM: {
+        Driver: 'default',
+        Config: IPAMConfig,
+      },
     });
   }
   async removeNetwork(id: string) {
     return await this.dockerService.docker.getNetwork(id).remove();
+  }
+  async addContainerToNetwork(data: AddContainerToNetworkDto) {
+    const network = this.dockerService.docker.getNetwork(data.networkId);
+    await network.connect({
+      Container: data.containerId,
+      EndpointConfig: {
+        IPAMConfig: {
+          IPv4Address: data.ip,
+          IPv6Address: data.ipv6,
+        },
+      },
+    });
+    return;
+  }
+  async removeContainerToNetwork(networkId: string, containerId: string) {
+    const network = this.dockerService.docker.getNetwork(networkId);
+    await network.disconnect({
+      Container: containerId,
+    });
+    return;
   }
 }

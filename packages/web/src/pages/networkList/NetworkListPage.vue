@@ -42,6 +42,22 @@
         :rules="[{ required: true, message: '请输入网络名' }]"
       />
       <van-field
+        v-model="networkForm.gateway"
+        name="gateway"
+        label="网关"
+        autocomplete="off"
+        placeholder="示例：172.20.0.1"
+        class="add-network-field"
+      />
+      <van-field
+        v-model="networkForm.subnet"
+        name="subnet"
+        label="子网"
+        autocomplete="off"
+        placeholder="示例：172.20.0.0/16"
+        class="add-network-field"
+      />
+      <van-field
         label="启用IPv6"
         name="enableIPv6"
       >
@@ -49,6 +65,24 @@
           <van-switch v-model="networkForm.enableIPv6" />
         </template>
       </van-field>
+      <van-field
+        v-if="networkForm.enableIPv6"
+        v-model="networkForm.IPv6gateway"
+        name="IPv6gateway"
+        label="IPv6网关"
+        autocomplete="off"
+        placeholder="示例：2001:db8:abcd::1011"
+        class="add-network-field"
+      />
+      <van-field
+        v-if="networkForm.enableIPv6"
+        v-model="networkForm.IPv6subnet"
+        name="IPv6subnet"
+        label="IPv6子网"
+        autocomplete="off"
+        placeholder="示例：2001:db8:abcd::/64"
+        class="add-network-field"
+      />
       <van-field name="internal">
         <template #label>
           <span>内部网络</span>
@@ -103,7 +137,11 @@ const actionNetwork = ref<Network | null>(null);
 const addModalForm = ref<FormInstance>();
 const networkForm = ref<AddNetworkParams>({
   name: '',
+  gateway: '',
+  subnet: '',
   enableIPv6: false,
+  IPv6gateway: '',
+  IPv6subnet: '',
   internal: false,
 });
 

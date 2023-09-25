@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Param, Post } from '@nestjs/common';
 import { NetworkService } from './service';
-import { AddNetworkDto } from './dto';
+import { AddNetworkDto, AddContainerToNetworkDto, RemoveContainerToNetworkDto } from './dto';
 
 @Controller('network')
 export class NetworkController {
@@ -14,6 +14,16 @@ export class NetworkController {
   @Post()
   async addNetwork(@Body() body: AddNetworkDto) {
     return this.networkService.addNetwork(body);
+  }
+
+  @Post('container')
+  async addContainerToNetwork(@Body() body: AddContainerToNetworkDto) {
+    return this.networkService.addContainerToNetwork(body);
+  }
+
+  @Delete('container')
+  async removeContainerToNetwork(@Body() body: RemoveContainerToNetworkDto) {
+    return this.networkService.removeContainerToNetwork(body.networkId, body.containerId);
   }
 
   @Delete('/:id')

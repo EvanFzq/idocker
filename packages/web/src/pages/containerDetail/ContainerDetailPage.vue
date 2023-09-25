@@ -194,5 +194,6 @@ const onClickLeft = () => history.back();
 
 .tab {
   padding-top: 12px;
+  margin-bottom: 12px;
 }
 </style>

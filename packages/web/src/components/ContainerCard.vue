@@ -57,10 +57,7 @@
           />{{ timeLongFormat(startedAt) }}
         </div>
       </div>
-      <div
-        v-if="typeof cpu === 'number' || typeof memoryUsage === 'number'"
-        class="middle"
-      >
+      <div class="middle">
         <div class="van-ellipsis cpu"> cpu: {{ cpu?.toFixed(1) || 0 }}% </div>
         <div class="mem">
           内存: {{ fileSizeFormat(memoryUsage || 0) || '-' }}/{{

@@ -4,6 +4,7 @@
       v-for="(network, key) in networks"
       :key="network.NetworkID"
       inset
+      class="network-item"
     >
       <van-cell
         title="类型"
@@ -48,3 +49,10 @@
 import type { Networks } from '@common/types/container';
 defineProps<{ networks?: Networks }>();
 </script>
+<style scoped lang="less">
+.network {
+  .network-item {
+    margin-bottom: 12px;
+  }
+}
+</style>

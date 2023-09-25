@@ -39,6 +39,10 @@ export interface PortConfig {
 
 export interface AddNetworkParams {
   name: string;
+  gateway?: string;
+  subnet?: string;
   enableIPv6?: boolean;
+  IPv6gateway?: string;
+  IPv6subnet?: string;
   internal?: boolean;
 }

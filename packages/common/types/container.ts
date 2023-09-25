@@ -7,7 +7,6 @@ export interface ContainerStats {
 
 export interface Container {
   Id: string;
-  disabled?: boolean;
   Created: string;
   Path: string;
   Args: string[];

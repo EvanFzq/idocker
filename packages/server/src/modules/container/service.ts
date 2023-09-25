@@ -43,14 +43,8 @@ export class ContainerService {
     }
   }
   async getContainerList() {
-    const list = await this.dockerService.docker.listContainers({
+    return await this.dockerService.docker.listContainers({
       all: true,
-    });
-    return list.map(item => {
-      if (item.Id.startsWith(this.dockerService.currentContainerId)) {
-        return { ...item, disabled: true };
-      }
-      return item;
     });
   }
   async getContainerDetail(id: string) {
