@@ -7,4 +7,4 @@ services:  # 为project定义服务
       - 3680:3580
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /Users/evan/Documents/docker-mobile:/docker-mobile
+      - /Users/evan/Documents/docker/docker-mobile:/docker-mobile
