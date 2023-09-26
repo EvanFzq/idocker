@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.0.1](///compare/v1.0.0...v1.0.1) (2023-09-26)
+
+
+### Bug Fixes
+
+* 修复配置文件目录生成错误 618602e
+
 ## 1.0.0 (2023-09-26)
 
 

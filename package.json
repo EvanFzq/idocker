@@ -1,7 +1,7 @@
 {
   "name": "docker-mobile",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "scripts": {
     "dev": "yarn dev:web & yarn dev:server",
     "dev:web": "vite -c ./packages/web/vite.config.ts",
