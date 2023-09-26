@@ -12,7 +12,7 @@ import path from 'path';
 import { Stream } from 'node:stream';
 
 export const mkdir = async (dirPath: string) => {
-  const fullPaths = dirPath.split(/[/\\]+/);
+  const fullPaths = dirPath.split(/[/\\]+/).map(item => (item === '' ? '/' : item));
   const dirPaths = [...fullPaths];
   while (dirPaths.length > 0) {
     try {
@@ -30,7 +30,7 @@ export const mkdir = async (dirPath: string) => {
   }
 };
 export const mkdirSync = (dirPath: string) => {
-  const fullPaths = dirPath.split(/[/\\]+/);
+  const fullPaths = dirPath.split(/[/\\]+/).map(item => (item === '' ? '/' : item));
   const dirPaths = [...fullPaths];
   while (dirPaths.length > 0) {
     try {
