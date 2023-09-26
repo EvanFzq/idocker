@@ -53,19 +53,29 @@ docker run -name docker-mobile -d -p 3580:3580 -v /var/run/docker.sock:/var/run/
 ```
 
 ## 配置文件
-配置文件在容器的`/docker-mobile/config`目录下，文件名为`config.json`
+配置文件在容器的`/docker-mobile/config`目录下，
+### 用户配置
+文件名为`userConfig.yml`
 
 内容如下
-```js
-{
-    "secret": "ae1100e7-6a15-407b-85ac-87862599ba50", // 用户登录信息加密的密钥，服务自行管理，无需修改
-    "username": "admin", //登录用户名，可修改
-    "password": "1995feng320", //登录密码，可修改
-    "passwordMaxRetryNum":10, //密码最大尝试次数，可修改，输入错误次数大于该次数后密码将被重置为随机值，需要后台自行修改密码以便登录（该设置为安全设置，避免暴力破解密码）
-    "passwordRetryNum": 0 //密码已尝试次数，服务自行管理，无需修改
-}
+```yml
+# 登录用户名
+username: admin 
+#密码最大尝试次数，可修改，输入错误次数大于该次数后密码将被重置为随机值，需要后台自行修改密码以便登录（该设置为安全设置，避免暴力破解密码）
+passwordMaxRetryNum: 10
 ```
 **修改配置前请先停止容器**
+### 系统配置
+文件名为`systemConfig.yml`
+
+一般情况下系统配置用户无需改动，由程序自行管理
+
+### 重置密码
+针对忘记密码的情况，可通过下面步骤进行重置
+
+- 停止服务
+- 删除系统配置`systemConfig.yml`的`passwordHash`字段
+- 启动服务，通过查看docker容器日志获取重置后的用户名和密码
 
 # 警告
 **该容器拥有宿主机器`docker`的所有权限，请谨慎将容器的端口暴露到外网，暴露到外网使用时请务必使用`https`访问，避免明文传输账户密码被中间人攻击导致的密码泄漏**
