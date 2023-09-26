@@ -1,63 +1,91 @@
 import { Injectable } from '@nestjs/common';
-import { accessSync, mkdirSync, readFileSync, writeFileSync, constants, promises as fs } from 'fs';
-import { rootDirPath, configDirPath, configFilePath } from './contants';
-import { Config } from './type';
+import { accessSync, readFileSync, writeFileSync, constants, promises as fs } from 'fs';
+import { configDirPath, userConfigFilePath, systemConfigFilePath } from './contants';
+import { UserConfig, SystemConfig } from './type';
+import { mkdirSync } from '@/utils/fs';
+import { parse, stringify } from 'yaml';
 
 @Injectable()
 export class ConfigService {
-  private config: Partial<Config>;
+  private userConfig: Partial<UserConfig>;
+  private systemConfig: Partial<SystemConfig>;
   constructor() {
-    this.config = {
+    this.userConfig = {
+      username: 'admin',
       passwordMaxRetryNum: 10,
-      passwordRetryNum: 0,
     };
+    this.systemConfig = {};
     this.init();
   }
   private init() {
-    // 建立root文件夹
-    try {
-      accessSync(rootDirPath, constants.W_OK);
-    } catch (error) {
-      mkdirSync(rootDirPath);
-    }
     // 建立config文件夹
+    mkdirSync(configDirPath);
+    // 建立用户配置文件或读取配置文件
     try {
-      accessSync(configDirPath, constants.W_OK);
-    } catch (error) {
-      mkdirSync(configDirPath);
-    }
-    // 建立配置文件或读取配置文件
-    try {
-      accessSync(configFilePath, constants.W_OK);
-      this.config = {
-        ...this.config,
-        ...JSON.parse(readFileSync(configFilePath, { encoding: 'utf-8' }) || '{}'),
+      accessSync(userConfigFilePath, constants.W_OK);
+      this.userConfig = {
+        ...this.userConfig,
+        ...parse(readFileSync(userConfigFilePath, { encoding: 'utf-8' })),
       };
     } catch (error) {
-      writeFileSync(configFilePath, JSON.stringify(this.config));
+      writeFileSync(userConfigFilePath, stringify(this.userConfig));
+    }
+    // 建立系统配置文件或读取配置文件
+    try {
+      accessSync(systemConfigFilePath, constants.W_OK);
+      this.systemConfig = {
+        ...this.systemConfig,
+        ...parse(readFileSync(systemConfigFilePath, { encoding: 'utf-8' })),
+      };
+    } catch (error) {
+      writeFileSync(systemConfigFilePath, stringify(this.systemConfig));
     }
   }
-  getConfig<T>(key: keyof Config, defaultValue?: T): T {
-    const value = this.config[key];
+  getUserConfig<T>(key: keyof UserConfig, defaultValue?: T): T {
+    const value = this.userConfig[key];
     if (value !== undefined) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return value as any;
     }
     if (defaultValue !== undefined) {
-      this.setConfig(key, defaultValue).catch(error => {
+      this.setUserConfig(key, defaultValue).catch(error => {
         console.error(error);
       });
       return defaultValue;
     }
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async setConfig(key: keyof Config, value: any) {
-    const originalValue = this.config[key];
-    this.config[key as string] = value;
+  async setUserConfig(key: keyof UserConfig, value: any) {
+    const originalValue = this.userConfig[key];
+    this.userConfig[key as string] = value;
     try {
-      await fs.writeFile(configFilePath, JSON.stringify(this.config));
+      await fs.writeFile(userConfigFilePath, stringify(this.userConfig));
     } catch (error) {
-      this.config[key as string] = originalValue;
+      this.userConfig[key as string] = originalValue;
+      return Promise.reject(error);
+    }
+  }
+  getSystemConfig<T>(key: keyof SystemConfig, defaultValue?: T): T {
+    const value = this.systemConfig[key];
+    if (value !== undefined) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      return value as any;
+    }
+    if (defaultValue !== undefined) {
+      this.setSystemConfig(key, defaultValue).catch(error => {
+        console.error(error);
+      });
+      return defaultValue;
+    }
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async setSystemConfig(key: keyof SystemConfig, value: any) {
+    const originalValue = this.systemConfig[key];
+    this.systemConfig[key as string] = value;
+    try {
+      await fs.writeFile(systemConfigFilePath, stringify(this.systemConfig));
+    } catch (error) {
+      this.systemConfig[key as string] = originalValue;
       return Promise.reject(error);
     }
   }

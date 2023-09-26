@@ -1,7 +1,10 @@
-export interface Config {
-  secret: number;
+export interface UserConfig {
   username: string;
-  password: string;
   passwordMaxRetryNum: number;
+}
+export interface SystemConfig {
+  secret: number;
   passwordRetryNum: number;
+  salt: string;
+  passwordHash: string;
 }
