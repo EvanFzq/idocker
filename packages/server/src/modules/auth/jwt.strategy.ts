@@ -7,7 +7,7 @@ import { ConfigService } from '../config';
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly configService: ConfigService) {
-    const secret: string = configService.getConfig('secret', uuidV4());
+    const secret: string = configService.getSystemConfig('secret', uuidV4());
     super({
       jwtFromRequest: ExtractJwt.fromHeader('token'),
       ignoreExpiration: false,
