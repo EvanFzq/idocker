@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.1.0](///compare/v1.0.1...v1.1.0) (2023-09-27)
+
+
+### Features
+
+* 新增数据卷管理 d5c72da
+* 优化pm2日志输出 fcd8590
+
 ### [1.0.1](///compare/v1.0.0...v1.0.1) (2023-09-26)
 
 
