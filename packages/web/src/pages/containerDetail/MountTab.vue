@@ -12,10 +12,10 @@
       />
       <van-cell
         title="类型"
-        :value="item.Type === 'bind' ? '路径' : '卷'"
+        :value="item.Type === 'bind' ? '路径' : '数据卷'"
       />
       <van-cell
-        :title="item.Type === 'bind' ? '主机路径' : '卷'"
+        :title="item.Type === 'bind' ? '主机路径' : '数据卷'"
         :value="item.Type === 'bind' ? item.Source : item.Name"
       />
       <van-cell

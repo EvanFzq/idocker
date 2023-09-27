@@ -41,7 +41,7 @@ export class AuthService {
         // 密码尝试次数超出最大尝试次数，重置密码为随机密码
         const resetPassword = uuidV4().split('-').join('').slice(0, 8);
         console.info('resetPassword: ', resetPassword);
-        this.configService.setSystemConfig('passwordHash', hash(password + salt));
+        this.configService.setSystemConfig('passwordHash', hash(resetPassword + salt));
       } else {
         // 密码尝试次数未超出最大尝试次数，尝试次数+1
         await this.configService.setSystemConfig('passwordRetryNum', passwordRetryNum + 1);

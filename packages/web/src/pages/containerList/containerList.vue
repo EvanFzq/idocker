@@ -149,6 +149,7 @@ const title = computed(() => {
   const containerListTitle: Record<string, string> = {
     image: `镜像 ${name} 的容器`,
     network: `网络 ${name} 的容器`,
+    volume: `数据卷 ${name} 的容器`,
   };
   return type ? containerListTitle[type as string] : '';
 });
@@ -161,6 +162,9 @@ const getList = async (type?: string) => {
     },
     ['image']: {
       imageId: id as string,
+    },
+    ['volume']: {
+      volumeName: name as string,
     },
   };
   const res = await getContainerList(type ? params[type] : undefined);

@@ -259,6 +259,7 @@ export interface CreateContainerParams {
 export interface ContainerListParams {
   networkId?: string;
   imageId?: string;
+  volumeName?: string;
 }
 
 export interface NewPort {

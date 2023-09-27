@@ -28,6 +28,11 @@ export class ContainerController {
           Object.values(item.NetworkSettings.Networks).some(
             network => network.NetworkID === body.networkId,
           ),
+      )
+      .filter(
+        item =>
+          !body.volumeName ||
+          item.Mounts.some(mount => mount.Type === 'volume' && mount.Name === body.volumeName),
       );
 
     return Promise.all(list.map(item => this.containerService.getContainerDetail(item.Id)));

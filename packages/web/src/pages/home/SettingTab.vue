@@ -28,6 +28,11 @@ SettingTab
         is-link
         to="/network/list"
       />
+      <van-cell
+        title="数据卷列表"
+        is-link
+        to="/volume/list"
+      />
     </van-cell-group>
     <div class="btns">
       <van-button

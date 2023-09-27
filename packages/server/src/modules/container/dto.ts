@@ -37,6 +37,10 @@ export class ContainerListDto {
   @IsString()
   @IsOptional()
   networkId?: string;
+
+  @IsString()
+  @IsOptional()
+  volumeName?: string;
 }
 
 export class NewPort {

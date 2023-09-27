@@ -1,18 +1,10 @@
-import { IsBoolean, IsInt, IsOptional, IsString } from 'class-validator';
+import { IsString } from 'class-validator';
 
-export class SearchVolumeDto {
+export class CreateVolumeDto {
   @IsString()
-  keyword: string;
-
-  @IsInt()
-  @IsOptional()
-  limit?: number;
-
-  @IsBoolean()
-  @IsOptional()
-  official?: boolean;
-
-  @IsInt()
-  @IsOptional()
-  stars?: number;
+  name: string;
+}
+export class RemoveVolumeDto {
+  @IsString()
+  name: string;
 }

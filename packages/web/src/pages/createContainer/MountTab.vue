@@ -16,7 +16,7 @@
           direction="horizontal"
         >
           <van-radio name="bind"> 路径 </van-radio>
-          <van-radio name="volume"> 卷 </van-radio>
+          <van-radio name="volume"> 数据卷 </van-radio>
         </van-radio-group>
       </template>
     </van-field>
@@ -37,9 +37,9 @@
       is-link
       readonly
       :name="'mounts[' + index + '].volume'"
-      label="卷"
-      placeholder="点击选择卷"
-      :rules="[{ required: true, message: '请选择卷' }]"
+      label="数据卷"
+      placeholder="点击选择数据卷"
+      :rules="[{ required: true, message: '请选择数据卷' }]"
       @click="showVolumePicker = true"
     />
     <van-popup
@@ -105,7 +105,7 @@ const showVolumePicker = ref(false);
 onMounted(async () => {
   const res = await getVolumeList();
   if (res.success) {
-    volumeList.value = res.data.Volumes.map(item => ({ text: item.Name, value: item.Name }));
+    volumeList.value = res.data.map(item => ({ text: item.Name, value: item.Name }));
   }
 });
 
