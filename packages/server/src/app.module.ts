@@ -6,6 +6,7 @@ import { ImageModule } from '@/modules/image';
 import { NetworkModule } from '@/modules/network';
 import { VolumeModule } from '@/modules/volume';
 import { AuthModule } from '@/modules/auth/module';
+import { AssetModule } from '@/modules/asset';
 import { JwtAuthGuard } from '@/guards';
 import path from 'path';
 
@@ -16,6 +17,7 @@ import path from 'path';
     ImageModule,
     NetworkModule,
     VolumeModule,
+    AssetModule,
     ServeStaticModule.forRoot({
       rootPath: path.join(__dirname, '..', '..', 'web', 'dist'),
     }),

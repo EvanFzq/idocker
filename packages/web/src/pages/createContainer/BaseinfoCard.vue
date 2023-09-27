@@ -13,6 +13,21 @@
         autocomplete="off"
         :rules="[{ required: true, message: '请填写容器名' }]"
       />
+      <van-field
+        name="icon"
+        label="图标"
+      >
+        <template #input>
+          <van-uploader
+            v-model="form.icon"
+            :max-size="10 * 1000 * 1000"
+            :max-count="1"
+            class="container-icon-upload"
+            :after-read="onIconReaded"
+            @oversize="onIconOversize"
+          />
+        </template>
+      </van-field>
       <van-popover
         v-model:show="showImagePopover"
         placement="bottom-end"
@@ -110,22 +125,38 @@
           </div>
         </template>
       </van-field>
-      <!-- 创建后启动 -->
     </van-cell-group>
+    <van-dialog
+      :show="showIconCropper"
+      title="标题"
+      :lazy-render="false"
+      show-cancel-button
+      @cancel="onIconCropperCancel"
+      @confirm="onIconCropperConfirm"
+    >
+      <div class="cropper-box">
+        <img id="container-icon-cropper" />
+      </div>
+    </van-dialog>
   </div>
 </template>
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { searchImage, getNetworkList } from '@/apis';
+import { showToast, type UploaderFileListItem } from 'vant';
+import Cropper from 'cropperjs';
+import 'cropperjs/dist/cropper.css';
+import { searchImage, getNetworkList, uploadImg } from '@/apis';
 import type { Image } from '@common/types/image';
 import { restartPolicyList } from '@common/constants/const';
 import type { Network } from '@common/types/network';
 import { numberFormat } from '@/utils/utils';
+import { dataURLtoFile } from '@/utils/utils';
 
 const emit = defineEmits(['networkChange']);
 
 const form = ref({
   name: '',
+  icon: [] as UploaderFileListItem[],
   image: '',
   network: '',
   restart: '',
@@ -134,6 +165,9 @@ const form = ref({
 const showImagePopover = ref(false);
 const showNetworkPicker = ref(false);
 const showRestartPicker = ref(false);
+const showIconCropper = ref(false);
+const iconCropper = ref<Cropper | null>(null);
+const iconFileName = ref<string | undefined>('');
 const imageList = ref<Image[]>([]);
 const networkList = ref<Network[]>([]);
 
@@ -162,14 +196,58 @@ const onSelectImage = (selectImage: Image) => {
   form.value.image = selectImage.name;
   showImagePopover.value = false;
 };
+
 const onNetworkConfirm = ({ selectedValues }: { selectedValues: string[] }) => {
   form.value.network = selectedValues[0];
   showNetworkPicker.value = false;
   emit('networkChange', selectedValues[0]);
 };
+
 const onRestartConfirm = ({ selectedValues }: { selectedValues: string[] }) => {
   form.value.restart = selectedValues[0];
   showRestartPicker.value = false;
+};
+
+const onIconOversize = () => {
+  showToast('文件大小不能超过10MB');
+};
+
+const onIconReaded = (file: UploaderFileListItem | UploaderFileListItem[]) => {
+  iconFileName.value = Array.isArray(file) ? file[0].file?.name : file.file?.name;
+  showIconCropper.value = true;
+  const image = document.getElementById('container-icon-cropper');
+  if (!image) {
+    return;
+  }
+  const src = Array.isArray(file) ? file[0].content : file.content;
+  image.setAttribute('src', src as string);
+  image.onload = () => {
+    iconCropper.value?.destroy();
+    iconCropper.value = new Cropper(image as HTMLImageElement, {
+      aspectRatio: 1,
+      autoCrop: true,
+      modal: true,
+    });
+  };
+};
+const onIconCropperCancel = () => {
+  showIconCropper.value = false;
+  form.value.icon = [];
+};
+const onIconCropperConfirm = async () => {
+  const croppedData = iconCropper.value?.getCroppedCanvas().toDataURL('image/jpeg');
+  if (croppedData) {
+    const file = dataURLtoFile(croppedData, iconFileName.value as string);
+    const res = await uploadImg(file, { name: iconFileName.value, height: 240 });
+    if (res.success) {
+      showToast({
+        type: 'success',
+        message: '上传成功',
+      });
+      form.value.icon[0] = { url: res.data };
+      showIconCropper.value = false;
+    }
+  }
 };
 </script>
 
@@ -211,5 +289,16 @@ const onRestartConfirm = ({ selectedValues }: { selectedValues: string[] }) => {
   text-align: right;
   height: 30px;
   flex: auto;
+}
+.cropper-box {
+  text-align: center;
+  margin: 12px;
+  width: 100%;
+  max-height: 100vw;
+}
+#container-icon-cropper {
+  width: 100%;
+  display: block;
+  max-width: 100%;
 }
 </style>

@@ -49,3 +49,11 @@ export enum MountType {
   Bind = 'bind',
   Volume = 'volume',
 }
+
+export enum ImageFit {
+  Cover = 'cover',
+  Contain = 'contain',
+  Fill = 'fill',
+  Inside = 'inside',
+  Outside = 'outside',
+}

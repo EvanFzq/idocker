@@ -1,13 +1,16 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, HttpException, HttpStatus } from '@nestjs/common';
 import { AppModule } from './src/app.module';
+import { json, urlencoded } from 'express';
 import { LoggerInterceptor, TransformInterceptor } from '@/interceptors';
 import { HttpExceptionFilter } from '@/filter';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, { bodyParser: false });
   console.info('server start : 127.0.0.1:3580');
 
+  app.use(json({ limit: '5mb' }));
+  app.use(urlencoded({ extended: true, limit: '5mb' }));
   app.setGlobalPrefix('/api/v1');
   app.useGlobalPipes(
     new ValidationPipe({

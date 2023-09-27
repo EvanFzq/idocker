@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { accessSync, readFileSync, writeFileSync, constants, promises as fs } from 'fs';
-import { configDirPath, userConfigFilePath, systemConfigFilePath } from './contants';
+import { configDirPath, userConfigFilePath, systemConfigFilePath } from '@/constants/fs';
 import { UserConfig, SystemConfig } from './type';
 import { mkdirSync } from '@/utils/fs';
 import { parse, stringify } from 'yaml';

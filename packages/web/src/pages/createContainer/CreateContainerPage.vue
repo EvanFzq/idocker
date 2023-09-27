@@ -86,6 +86,8 @@ const onSubmit = async (values: Record<string, string | number | boolean>) => {
     forbidClick: true,
     duration: 0,
   });
+  values.icon =
+    Array.isArray(values.icon) && values.icon.length > 0 ? values.icon[0].url : undefined;
   const params: CreateContainerParams = {} as CreateContainerParams;
   Object.entries(values).forEach(([key, value]: [string, string | number | boolean]) => {
     set(params, key, value);

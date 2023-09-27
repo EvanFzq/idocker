@@ -43,8 +43,16 @@ export class TransformInterceptor<T> implements NestInterceptor<T, IHttpData<T>>
     if (req.method === 'POST' && statusCode === HttpStatus.CREATED) {
       res.statusCode = statusCode = HttpStatus.OK;
     }
+    const ignoreList = [
+      {
+        path: '/api/v1/asset/img',
+        method: 'GET',
+      },
+    ];
 
-    if (req.originalUrl.startsWith('/file/')) {
+    if (
+      ignoreList.some(item => req.originalUrl.startsWith(item.path) && req.method === item.method)
+    ) {
       // 文件不处理
       return next.handle();
     } else {

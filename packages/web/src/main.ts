@@ -27,6 +27,7 @@ import {
   TextEllipsis,
   DropdownMenu,
   DropdownItem,
+  Uploader,
 } from 'vant';
 import { routes } from '@/constants/routes';
 import './style.css';
@@ -68,6 +69,7 @@ app.use(ActionSheet);
 app.use(TextEllipsis);
 app.use(DropdownMenu);
 app.use(DropdownItem);
+app.use(Uploader);
 
 app.mount('#app');
 

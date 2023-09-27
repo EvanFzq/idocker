@@ -21,7 +21,7 @@ import { ConfigModule, ConfigService } from '@/modules/config';
         return {
           secret,
           signOptions: {
-            expiresIn: '3600s',
+            expiresIn: '36000s',
           },
         };
       },

@@ -247,6 +247,7 @@ export interface MountConfig {
 export interface CreateContainerParams {
   command: string;
   name: string;
+  icon: string;
   image: string;
   network: string;
   restart: string;

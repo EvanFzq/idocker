@@ -23,6 +23,9 @@ export class ContainerService {
     });
     const container = await this.dockerService.docker.createContainer({
       name: params.name,
+      Labels: {
+        'docker.mobile.icon': params.icon,
+      },
       Env: params.envs?.map(env => `${env.key}=${env.value}`),
       Cmd: [params.command],
       Image: imageTag,

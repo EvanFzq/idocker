@@ -87,6 +87,10 @@ export class CreateContainerDto {
   name: string;
 
   @IsString()
+  @IsOptional()
+  icon?: string;
+
+  @IsString()
   image: string;
 
   @IsString()
