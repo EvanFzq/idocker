@@ -2,7 +2,10 @@
   <div>
     <ContainerTab v-if="active === 'container'" />
     <SettingTab v-if="active === 'setting'" />
-    <van-tabbar v-model="active">
+    <van-tabbar
+      :model-value="active"
+      @change="onTabChange"
+    >
       <van-tabbar-item
         name="container"
         icon="play-circle-o"
@@ -10,7 +13,7 @@
         容器
       </van-tabbar-item>
       <!-- <van-tabbar-item name="template" icon="records">模版</van-tabbar-item> -->
-      <van-tabbar-item>
+      <van-tabbar-item name="add">
         <div
           class="center-add"
           @click="onAddNew"
@@ -38,6 +41,12 @@ import SettingTab from './SettingTab.vue';
 const active = ref('container');
 
 const router = useRouter();
+
+const onTabChange = (value: string) => {
+  if (value !== 'add') {
+    active.value = value;
+  }
+};
 
 const onAddNew = () => {
   router.push('/container/new');
