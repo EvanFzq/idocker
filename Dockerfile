@@ -4,8 +4,7 @@ LABEL org.opencontainers.image.email=1143046586@qq.com
 
 COPY . /app
 WORKDIR /app
-
-# RUN yarn
+RUN yarn
 
 EXPOSE 3580
 

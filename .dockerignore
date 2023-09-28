@@ -4,3 +4,4 @@
 packages/server/src
 packages/web/src
 packages/common
+node_modules
