@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.0](///compare/v1.2.1...v1.3.0) (2023-10-16)
+
+
+### Features
+
+* 新增修改容器功能，修复创建容器时CMD配置错误 244b8e0
+
 ### [1.2.1](///compare/v1.2.0...v1.2.1) (2023-09-28)
 
 
