@@ -49,7 +49,7 @@ const onTabChange = (value: string) => {
 };
 
 const onAddNew = () => {
-  router.push('/container/new');
+  router.push('/container');
 };
 </script>
 

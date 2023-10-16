@@ -141,7 +141,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { showToast, type UploaderFileListItem } from 'vant';
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
@@ -151,9 +151,10 @@ import { restartPolicyList } from '@common/constants/const';
 import type { Network } from '@common/types/network';
 import { numberFormat } from '@/utils/utils';
 import { dataURLtoFile } from '@/utils/utils';
+import type { ContainerFormData } from './CreateOrEditContainerPage.vue';
 
-const emit = defineEmits(['networkChange']);
-
+const props = defineProps<{ formData: ContainerFormData }>();
+const emit = defineEmits(['valueChange']);
 const form = ref({
   name: '',
   icon: [] as UploaderFileListItem[],
@@ -162,6 +163,29 @@ const form = ref({
   restart: '',
   runAffterCreated: false,
 });
+
+watch(
+  () => props.formData,
+  () => {
+    form.value = {
+      name: props.formData.name,
+      icon: props.formData.icon,
+      image: props.formData.image,
+      network: props.formData.network,
+      restart: props.formData.restart,
+      runAffterCreated: props.formData.runAffterCreated,
+    };
+  },
+  { deep: true },
+);
+watch(
+  form,
+  () => {
+    emit('valueChange', form.value);
+  },
+  { deep: true },
+);
+
 const showImagePopover = ref(false);
 const showNetworkPicker = ref(false);
 const showRestartPicker = ref(false);
@@ -200,7 +224,6 @@ const onSelectImage = (selectImage: Image) => {
 const onNetworkConfirm = ({ selectedValues }: { selectedValues: string[] }) => {
   form.value.network = selectedValues[0];
   showNetworkPicker.value = false;
-  emit('networkChange', selectedValues[0]);
 };
 
 const onRestartConfirm = ({ selectedValues }: { selectedValues: string[] }) => {

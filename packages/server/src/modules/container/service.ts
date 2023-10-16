@@ -1,9 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import Docker from 'dockerode';
 import { ContainerStats } from '@common/types/container';
-import { ContainerActive } from '@common/constants/enum';
+import { ContainerActive, RestartPolicy } from '@common/constants/enum';
 import { DockerService } from '../docker';
-import { CreateContainerDto } from './dto';
+import { CreateContainerDto, UpdateContainerDto } from './dto';
 import { ImageService } from '../image';
 
 @Injectable()
@@ -12,6 +12,7 @@ export class ContainerService {
     private readonly dockerService: DockerService,
     private readonly imageService: ImageService,
   ) {}
+
   async createContainer(params: CreateContainerDto) {
     const imageTag = params.image.indexOf(':') > 0 ? params.image : params.image + ':latest';
 
@@ -27,12 +28,15 @@ export class ContainerService {
         'docker.mobile.icon': params.icon,
       },
       Env: params.envs?.map(env => `${env.key}=${env.value}`),
-      Cmd: [params.command],
+      Cmd: params.command && params.command.split(/\s/),
       Image: imageTag,
       HostConfig: {
         NetworkMode: params.network,
         PortBindings: portBindings,
-        RestartPolicy: { Name: params.restart, MaximumRetryCount: 5 },
+        RestartPolicy: {
+          Name: params.restart,
+          MaximumRetryCount: params.restart === RestartPolicy.OnFailure ? 5 : undefined,
+        },
         Mounts: params.mounts?.map(mount => ({
           Target: mount.container,
           Source: mount.type === 'bind' ? mount.hostBind : mount.volume,
@@ -45,11 +49,83 @@ export class ContainerService {
       await this.dockerService.docker.getContainer(container.id).start();
     }
   }
+
+  async updateContainer(params: UpdateContainerDto) {
+    const container = this.dockerService.docker.getContainer(params.id);
+    const containerDetail = await container.inspect();
+    try {
+      await container.stop();
+    } catch (error) {
+      console.error(error);
+    }
+    await container.remove({ focus: true });
+    const portBindings: Record<string, [{ HostPort: string }]> = {};
+    params.ports?.forEach(port => {
+      portBindings[`${port.container}/${port.protocol}`] = [{ HostPort: port.host }];
+    });
+    const imageTag = params.image.indexOf(':') > 0 ? params.image : params.image + ':latest';
+
+    const nextContainer = await this.dockerService.docker.createContainer({
+      name: params.name,
+      AttachStdin: containerDetail.Config.AttachStdin,
+      AttachStdout: containerDetail.Config.AttachStdout,
+      AttachStderr: containerDetail.Config.AttachStderr,
+      Tty: containerDetail.Config.Tty,
+      OpenStdin: containerDetail.Config.OpenStdin,
+      StdinOnce: containerDetail.Config.StdinOnce,
+      Env: params.envs?.map(env => `${env.key}=${env.value}`),
+      Cmd: params.command && params.command.split(/\s/),
+      Entrypoint: containerDetail.Config.Entrypoint,
+      Image: imageTag,
+      Labels: {
+        ...containerDetail.Config.Labels,
+        'docker.mobile.icon': params.icon,
+      },
+      Volumes: containerDetail.Config.Volumes,
+      WorkingDir: containerDetail.Config.WorkingDir,
+      ExposedPorts: containerDetail.Config.ExposedPorts,
+      HostConfig: {
+        Links: containerDetail.HostConfig.Links,
+        Memory: containerDetail.HostConfig.Memory,
+        MemorySwap: containerDetail.HostConfig.MemorySwap,
+        MemoryReservation: containerDetail.HostConfig.MemoryReservation,
+        KernelMemory: containerDetail.HostConfig.KernelMemory,
+        NanoCpus: containerDetail.HostConfig.NanoCpus,
+        CpuPercent: containerDetail.HostConfig.CpuPercent,
+        CpuShares: containerDetail.HostConfig.CpuShares,
+        CpuPeriod: containerDetail.HostConfig.CpuPeriod,
+        CpuRealtimePeriod: containerDetail.HostConfig.CpuRealtimePeriod,
+        CpuRealtimeRuntime: containerDetail.HostConfig.CpuRealtimeRuntime,
+        CpuQuota: containerDetail.HostConfig.CpuQuota,
+        CpusetCpus: containerDetail.HostConfig.CpusetCpus,
+        CpusetMems: containerDetail.HostConfig.CpusetMems,
+        BlkioWeight: containerDetail.HostConfig.BlkioWeight,
+        NetworkMode: params.network,
+        PortBindings: portBindings,
+        RestartPolicy: {
+          Name: params.restart,
+          MaximumRetryCount: params.restart === RestartPolicy.OnFailure ? 5 : undefined,
+        },
+        Mounts: params.mounts?.map(mount => ({
+          Target: mount.container,
+          Source: mount.type === 'bind' ? mount.hostBind : mount.volume,
+          Type: mount.type,
+          ReadOnly: mount.readonly,
+        })),
+      },
+    });
+    if (params.runAffterCreated) {
+      await nextContainer.start();
+    }
+    return nextContainer;
+  }
+
   async getContainerList() {
     return await this.dockerService.docker.listContainers({
       all: true,
     });
   }
+
   async getContainerDetail(id: string) {
     return await this.dockerService.docker.getContainer(id).inspect();
   }

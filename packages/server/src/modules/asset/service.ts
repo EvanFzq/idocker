@@ -20,6 +20,12 @@ export class AssetService {
           width: option?.width ? Number(option.width) : undefined,
           height: option?.height ? Number(option.height) : undefined,
           fit: option?.fit,
+          background: {
+            r: 255,
+            g: 255,
+            b: 255,
+            alpha: 1,
+          },
         })
         .webp()
         .toFile(imgPath);

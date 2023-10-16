@@ -90,17 +90,37 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import type { MountConfig } from '@common/types/container';
 import { getVolumeList } from '@/apis/volume';
+import type { ContainerFormData } from './CreateOrEditContainerPage.vue';
+
+const props = defineProps<{ formData: ContainerFormData }>();
 
 interface PickerValue {
   selectedValues: string[];
 }
 
-const mountList = ref<MountConfig[]>([]);
+const mountList = ref<MountConfig[]>(props.formData.mounts || []);
 const volumeList = ref<{ text: string; value: string }[]>([]);
 const showVolumePicker = ref(false);
+
+const emit = defineEmits(['valueChange']);
+
+watch(
+  () => props.formData.mounts,
+  () => {
+    mountList.value = props.formData.mounts;
+  },
+  { deep: true },
+);
+watch(
+  mountList,
+  () => {
+    emit('valueChange', { mounts: mountList.value });
+  },
+  { deep: true },
+);
 
 onMounted(async () => {
   const res = await getVolumeList();

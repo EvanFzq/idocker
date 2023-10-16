@@ -58,10 +58,29 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import type { PortConfig } from '@common/types/network';
+import type { ContainerFormData } from './CreateOrEditContainerPage.vue';
 
-const portList = ref<PortConfig[]>([]);
+const props = defineProps<{ formData: ContainerFormData }>();
+const portList = ref<PortConfig[]>(props.formData.ports || []);
+
+const emit = defineEmits(['valueChange']);
+
+watch(
+  () => props.formData.ports,
+  () => {
+    portList.value = props.formData.ports;
+  },
+  { deep: true },
+);
+watch(
+  portList,
+  () => {
+    emit('valueChange', { ports: portList.value });
+  },
+  { deep: true },
+);
 
 const onAddPort = () => {
   portList.value = [

@@ -1,5 +1,6 @@
 <template>
   <van-nav-bar
+    v-bind="props"
     :title="title"
     left-text="返回"
     left-arrow
@@ -11,7 +12,7 @@
 import { useRouter } from 'vue-router';
 import type { NavBarProps } from 'vant';
 
-defineProps<Partial<NavBarProps>>();
+const props = defineProps<Partial<NavBarProps>>();
 
 const router = useRouter();
 const onClickLeft = () => {

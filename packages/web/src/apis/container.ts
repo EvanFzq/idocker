@@ -4,6 +4,7 @@ import type { ContainerStats } from '@common/types/container';
 import type {
   Container,
   CreateContainerParams,
+  UpdateContainerParams,
   ContainerListParams,
 } from '@common/types/container';
 
@@ -28,5 +29,9 @@ export const activeContainer = async (id: string, type: ContainerActive) => {
 };
 
 export const createContainer = async (params: CreateContainerParams) => {
-  return fetch.post<void>('/container/new', params, { timeout: 0 });
+  return fetch.post<void>('/container', params, { timeout: 0 });
+};
+
+export const updateContainer = async (params: UpdateContainerParams) => {
+  return fetch.put<void>('/container', params, { timeout: 0 });
 };

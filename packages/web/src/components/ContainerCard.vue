@@ -78,7 +78,7 @@
           启动
         </van-button>
         <van-button
-          v-if="isRunning"
+          v-if="isRunning || isRestarting"
           :disabled="disabled"
           :color="buttonColorMap.exited"
           square
@@ -243,6 +243,7 @@ const onCardClick = () => {
   font-size: 16px;
   line-height: 16px;
   vertical-align: middle;
+  background-color: #fff;
 }
 
 .right {

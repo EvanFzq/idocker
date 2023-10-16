@@ -23,10 +23,10 @@
 
 <script lang="ts" setup>
 import { getContainerList, getContainerStats } from '@/apis';
-import { onMounted, ref, onUnmounted } from 'vue';
+import { onMounted, ref, onUnmounted, onActivated, onDeactivated } from 'vue';
 
-// import { } from '@/types/container'
 import type { ContainerFormat } from '@/types/container';
+import { isSelf } from '@/utils/docker';
 
 import ContainerCard from '@/components/ContainerCard.vue';
 
@@ -41,15 +41,15 @@ const getList = async () => {
       id: item.Id,
       name: item.Name.slice(1),
       image: item.Config.Image,
-      disabled: item.Config.Image.indexOf('evanfzq/docker-mobile') >= 0,
+      disabled: isSelf(item),
       status: item.State.Status,
       startedAt: item.State.StartedAt,
       created: item.Created,
       labels: item.Config.Labels,
       icon:
+        item.Config.Labels['docker.mobile.icon'] ||
         item.Config.Labels['com.docker.desktop.extension.icon'] ||
-        item.Config.Labels['net.unraid.docker.icon'] ||
-        item.Config.Labels['docker.mobile.icon'],
+        item.Config.Labels['net.unraid.docker.icon'],
     }));
     return list;
   } else {
@@ -89,7 +89,16 @@ onMounted(async () => {
   }, 5000);
 });
 
+onActivated(async () => {
+  statsTimer = setInterval(async () => {
+    getData();
+  }, 5000);
+});
+
 onUnmounted(() => {
+  clearInterval(statsTimer);
+});
+onDeactivated(() => {
   clearInterval(statsTimer);
 });
 </script>

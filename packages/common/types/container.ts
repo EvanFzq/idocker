@@ -257,6 +257,8 @@ export interface CreateContainerParams {
   envs: NewEnv[];
 }
 
+export type UpdateContainerParams = CreateContainerParams & { id: string };
+
 export interface ContainerListParams {
   networkId?: string;
   imageId?: string;

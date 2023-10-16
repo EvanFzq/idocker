@@ -42,14 +42,34 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
+import type { ContainerFormData } from './CreateOrEditContainerPage.vue';
+
+const props = defineProps<{ formData: ContainerFormData }>();
 
 interface Env {
   key: string;
   value: string;
 }
 
-const envList = ref<Env[]>([]);
+const envList = ref<Env[]>(props.formData.envs || []);
+
+const emit = defineEmits(['valueChange']);
+
+watch(
+  () => props.formData.envs,
+  () => {
+    envList.value = props.formData.envs;
+  },
+  { deep: true },
+);
+watch(
+  envList,
+  () => {
+    emit('valueChange', { envs: envList.value });
+  },
+  { deep: true },
+);
 
 const onAddEnv = () => {
   envList.value = [

@@ -1,9 +1,8 @@
 <template>
-  <van-nav-bar
+  <TitleBar
     :title="containerDetail.Name?.slice(1)"
-    left-text="返回"
-    left-arrow
-    @click-left="onClickLeft"
+    :right-text="isSelf(containerDetail) ? undefined : '修改'"
+    @click-right="onClickEdit"
   />
   <div class="dashbord">
     <van-circle
@@ -85,12 +84,14 @@
 </template>
 <script lang="ts" setup>
 import { ref, onMounted, watchEffect, computed } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { getContainerDetail, getContainerStats } from '@/apis/container';
 import type { Container } from '@common/types/container';
 import { restartPolicyList } from '@common/constants/const';
 import { fileSizeFormat } from '@/utils/utils';
+import { isSelf } from '@/utils/docker';
 import { statusColorMap, statusLabelMap } from '@/constants/container';
+import TitleBar from '@/components/TitleBar.vue';
 import BaseInfoTab from './BaseInfoTab.vue';
 import EnvVarTab from './EnvVarTab.vue';
 import LogTab from './LogTab.vue';
@@ -119,7 +120,9 @@ const statusColor = computed(
 const activeTab = ref(0);
 
 const route = useRoute();
+const router = useRouter();
 const id = computed(() => route.params.id as string);
+
 const restart = computed(
   () =>
     containerDetail.value.HostConfig?.RestartPolicy?.Name &&
@@ -148,6 +151,10 @@ onMounted(async () => {
   }
 });
 
+const onClickEdit = () => {
+  router.push({ path: '/container', query: { id: containerDetail.value.Id } });
+};
+
 watchEffect(cleanUp => {
   if (!id.value || containerDetail.value.State?.Status !== 'running') {
     return;
@@ -157,8 +164,6 @@ watchEffect(cleanUp => {
     clearInterval(timer);
   });
 });
-
-const onClickLeft = () => history.back();
 </script>
 <style scoped lang="less">
 .dashbord {

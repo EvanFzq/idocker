@@ -123,3 +123,8 @@ export class CreateContainerDto {
   @IsOptional()
   envs: NewEnv[];
 }
+
+export class UpdateContainerDto extends CreateContainerDto {
+  @IsString()
+  id: string;
+}

@@ -6,15 +6,21 @@ import {
   ContainerDetailDto,
   CreateContainerDto,
   ContainerListDto,
+  UpdateContainerDto,
 } from './dto';
 
 @Controller('container')
 export class ContainerController {
   constructor(private readonly containerService: ContainerService) {}
 
-  @Post('new')
+  @Post()
   async createContainer(@Body() body: CreateContainerDto) {
     return this.containerService.createContainer(body);
+  }
+
+  @Put()
+  async updateContainer(@Body() body: UpdateContainerDto) {
+    return this.containerService.updateContainer(body);
   }
 
   @Post('list')
