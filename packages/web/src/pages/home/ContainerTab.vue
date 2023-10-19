@@ -15,6 +15,8 @@
       :memory_limit="item.memory_limit"
       :memory_usage="item.memory_usage"
       :disabled="item.disabled"
+      :local-url="item.localUrl"
+      :internet-url="item.internetUrl"
       @reload="onReload"
     />
     <p class="no-more">没有更多了</p>
@@ -27,6 +29,7 @@ import { onMounted, ref, onUnmounted, onActivated, onDeactivated } from 'vue';
 
 import type { ContainerFormat } from '@/types/container';
 import { isSelf } from '@/utils/docker';
+import { webUrlTemplateFormat } from '@/utils/utils';
 
 import ContainerCard from '@/components/ContainerCard.vue';
 
@@ -50,6 +53,8 @@ const getList = async () => {
         item.Config.Labels['docker.mobile.icon'] ||
         item.Config.Labels['com.docker.desktop.extension.icon'] ||
         item.Config.Labels['net.unraid.docker.icon'],
+      localUrl: webUrlTemplateFormat(item.Config.Labels['docker.mobile.localUrl'], item),
+      internetUrl: webUrlTemplateFormat(item.Config.Labels['docker.mobile.internetUrl'], item),
     }));
     return list;
   } else {
@@ -84,12 +89,17 @@ onMounted(async () => {
   const list = await getList();
   containerList.value = list;
   getData();
+  clearInterval(statsTimer);
   statsTimer = setInterval(async () => {
     getData();
   }, 5000);
 });
 
 onActivated(async () => {
+  const list = await getList();
+  containerList.value = list;
+  getData();
+  clearInterval(statsTimer);
   statsTimer = setInterval(async () => {
     getData();
   }, 5000);

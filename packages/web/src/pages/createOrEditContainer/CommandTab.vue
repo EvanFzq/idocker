@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/html-quotes -->
 <template>
   <van-cell-group
     inset
@@ -10,7 +11,7 @@
       name="command"
       label="启动命令"
       type="textarea"
-      placeholder="请输入启动命令"
+      placeholder='请输入启动命令, 参数中间有空格使用双引号包裹,例：nginx -g "daemon off;"'
     />
   </van-cell-group>
 </template>

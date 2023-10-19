@@ -131,6 +131,15 @@
         >
           删除
         </van-button>
+        <van-button
+          v-if="isLocal ? !!localUrl : !!internetUrl"
+          square
+          plain
+          size="mini"
+          @click="openWeb"
+        >
+          打开
+        </van-button>
       </div>
     </div>
   </div>
@@ -160,6 +169,8 @@ interface CcontainerCardProps {
   cpu?: number;
   memoryLimit?: number;
   memoryUsage?: number;
+  localUrl?: string;
+  internetUrl?: string;
 }
 
 const props = defineProps<CcontainerCardProps>();
@@ -174,6 +185,14 @@ const isPaused = computed(() => props.status === 'paused');
 const isExited = computed(() => props.status === 'exited');
 const isCreated = computed(() => props.status === 'created');
 const isRestarting = computed(() => props.status === 'restarting');
+
+const { hostname } = location;
+// 是否是内网
+const isLocal =
+  ['localhost', '127.0.0.1', '0.0.0.0'].includes(hostname) ||
+  hostname.startsWith('192.') ||
+  hostname.startsWith('10.') ||
+  hostname.startsWith('172.');
 
 const onActive = async (e: MouseEvent, type: ContainerActive) => {
   e.stopPropagation();
@@ -198,6 +217,9 @@ const onActive = async (e: MouseEvent, type: ContainerActive) => {
 
 const onCardClick = () => {
   router.push('/container/' + props.id);
+};
+const openWeb = () => {
+  window.open(isLocal ? props.localUrl : props.internetUrl);
 };
 </script>
 <style scoped>
@@ -292,11 +314,10 @@ const onCardClick = () => {
 
 .bottom {
   display: flex;
-  /* margin-top: 12px; */
 }
 
 .bottom button {
-  width: 25%;
-  border-right: solid 1px #fff;
+  max-width: 25%;
+  flex: auto;
 }
 </style>

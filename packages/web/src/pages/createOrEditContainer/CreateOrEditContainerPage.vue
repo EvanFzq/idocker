@@ -16,6 +16,7 @@
       <van-tabs
         v-model:active="activeTab"
         class="tabs"
+        :lazy-render="false"
       >
         <van-tab
           class="tab"
@@ -57,6 +58,15 @@
             @value-change="onFieldChange"
           />
         </van-tab>
+        <van-tab
+          class="tab"
+          title="其他"
+        >
+          <OtherTab
+            :form-data="formData"
+            @value-change="onFieldChange"
+          />
+        </van-tab>
       </van-tabs>
       <div class="submit-btn van-safe-area-bottom">
         <van-button
@@ -86,6 +96,7 @@ import CommandTab from './CommandTab.vue';
 import MountTab from './MountTab.vue';
 import PortTab from './PortTab.vue';
 import EnvVarTab from './EnvVarTab.vue';
+import OtherTab from './OtherTab.vue';
 import { createContainer, updateContainer } from '@/apis';
 
 interface Env {
@@ -98,12 +109,14 @@ export interface ContainerFormData {
   icon: UploaderFileListItem[];
   image: string;
   network: string;
-  restart: string;
   runAffterCreated: boolean;
   command: string;
   envs: Env[];
   mounts: MountConfig[];
   ports: PortConfig[];
+  restart: string;
+  localUrl: string;
+  internetUrl: string;
 }
 
 const activeTab = ref(0);
@@ -116,12 +129,14 @@ const formData = ref({
   icon: [] as UploaderFileListItem[],
   image: '',
   network: '',
-  restart: '',
   runAffterCreated: false,
   command: '',
   envs: [] as Env[],
   mounts: [] as MountConfig[],
   ports: [] as PortConfig[],
+  restart: 'no',
+  localUrl: '',
+  internetUrl: '',
 });
 
 const router = useRouter();
@@ -142,7 +157,7 @@ onMounted(async () => {
       network: HostConfig.NetworkMode,
       restart: HostConfig.RestartPolicy.Name,
       runAffterCreated: true,
-      command: Config.Cmd?.join(' '),
+      command: Config.Cmd.map(item => (item.indexOf(' ') > 0 ? `"${item}"` : item))?.join(' '),
       envs: Config.Env.map(item => {
         const [key, value] = item.split('=');
         return { key, value };
@@ -171,6 +186,8 @@ onMounted(async () => {
             Config.Labels['net.unraid.docker.icon'],
         },
       ],
+      localUrl: Config.Labels['docker.mobile.localUrl'],
+      internetUrl: Config.Labels['docker.mobile.internetUrl'],
     };
   }
 });
@@ -183,7 +200,7 @@ const onFieldChange = (value: ContainerFormData) => {
 
 const onSubmit = async (values: Record<string, string | number | boolean>) => {
   showLoadingToast({
-    message: '创建中...',
+    message: '提交中...',
     forbidClick: true,
     duration: 0,
   });

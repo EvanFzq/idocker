@@ -3,6 +3,7 @@ import dayjs from 'dayjs';
 import type { Dayjs } from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import 'dayjs/locale/zh-cn';
+import type { Container } from '@common/types/container';
 
 dayjs.locale('zh-cn');
 
@@ -51,4 +52,37 @@ export const dataURLtoFile = (dataurl: string, filename: string) => {
   return new File([u8arr], filename, {
     type: 'image/jpeg',
   });
+};
+
+export const webUrlTemplateFormat = (template: string, containerDetail: Partial<Container>) => {
+  const { HostConfig, Config } = containerDetail;
+  if (!template?.trim()) return;
+
+  const arr = [...template.matchAll(/\[[a-zA-Z0-9]+\]/g)];
+  for (let i = 0; i < arr.length; i++) {
+    const item = arr[i];
+    const index = template.indexOf(item[0]);
+    if (item[0] === '[HOST]') {
+      template = `${template.slice(0, index)}${location.hostname}${template.slice(
+        index + item[0].length,
+      )}`;
+    }
+    if (item[0] === '[PROTOCOL]') {
+      template = `${template.slice(0, index)}${location.protocol}${template.slice(
+        index + item[0].length,
+      )}`;
+    }
+    if (/\[PORT\d*\]/.test(item[0])) {
+      let num = Number(item[0].slice(5, item[0].length - 1));
+      num = isNaN(num) ? 0 : num;
+      const port =
+        HostConfig?.NetworkMode === 'host'
+          ? parseInt(Object.keys(Config?.ExposedPorts || {})[num])
+          : parseInt(Object.values(HostConfig?.PortBindings || {})[num][0].HostPort);
+      if (!isNaN(port)) {
+        template = `${template.slice(0, index)}${port}${template.slice(index + item[0].length)}`;
+      }
+    }
+  }
+  return template;
 };

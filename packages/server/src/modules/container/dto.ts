@@ -122,6 +122,14 @@ export class CreateContainerDto {
   @Type(() => NewEnv)
   @IsOptional()
   envs: NewEnv[];
+
+  @IsString()
+  @IsOptional()
+  localUrl?: string;
+
+  @IsString()
+  @IsOptional()
+  internetUrl?: string;
 }
 
 export class UpdateContainerDto extends CreateContainerDto {

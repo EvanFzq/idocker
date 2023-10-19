@@ -97,25 +97,6 @@
         />
       </van-popup>
       <van-field
-        v-model="form.restart"
-        is-link
-        readonly
-        name="restart"
-        label="重启策略"
-        placeholder="点击选择重启策略"
-        @click="showRestartPicker = true"
-      />
-      <van-popup
-        v-model:show="showRestartPicker"
-        position="bottom"
-      >
-        <van-picker
-          :columns="restartPolicyList"
-          @confirm="onRestartConfirm"
-          @cancel="showRestartPicker = false"
-        />
-      </van-popup>
-      <van-field
         name="runAffterCreated"
         label="创建后启动"
       >
@@ -147,7 +128,6 @@ import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
 import { searchImage, getNetworkList, uploadImg } from '@/apis';
 import type { Image } from '@common/types/image';
-import { restartPolicyList } from '@common/constants/const';
 import type { Network } from '@common/types/network';
 import { numberFormat } from '@/utils/utils';
 import { dataURLtoFile } from '@/utils/utils';
@@ -160,7 +140,6 @@ const form = ref({
   icon: [] as UploaderFileListItem[],
   image: '',
   network: '',
-  restart: '',
   runAffterCreated: false,
 });
 
@@ -172,7 +151,6 @@ watch(
       icon: props.formData.icon,
       image: props.formData.image,
       network: props.formData.network,
-      restart: props.formData.restart,
       runAffterCreated: props.formData.runAffterCreated,
     };
   },
@@ -188,7 +166,6 @@ watch(
 
 const showImagePopover = ref(false);
 const showNetworkPicker = ref(false);
-const showRestartPicker = ref(false);
 const showIconCropper = ref(false);
 const iconCropper = ref<Cropper | null>(null);
 const iconFileName = ref<string | undefined>('');
@@ -224,11 +201,6 @@ const onSelectImage = (selectImage: Image) => {
 const onNetworkConfirm = ({ selectedValues }: { selectedValues: string[] }) => {
   form.value.network = selectedValues[0];
   showNetworkPicker.value = false;
-};
-
-const onRestartConfirm = ({ selectedValues }: { selectedValues: string[] }) => {
-  form.value.restart = selectedValues[0];
-  showRestartPicker.value = false;
 };
 
 const onIconOversize = () => {

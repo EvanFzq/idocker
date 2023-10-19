@@ -21,6 +21,22 @@
       >
         {{ statusLabel }}
       </van-tag>
+      <div class="url-list">
+        <a
+          :href="localUrl"
+          target="_blank"
+        >
+          内网地址
+          <van-icon name="arrow" />
+        </a>
+        <a
+          :href="internetUrl"
+          target="_blank"
+        >
+          外网地址
+          <van-icon name="arrow" />
+        </a>
+      </div>
     </div>
     <van-circle
       v-model:current-rate="memoryCurrentRate"
@@ -88,7 +104,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { getContainerDetail, getContainerStats } from '@/apis/container';
 import type { Container } from '@common/types/container';
 import { restartPolicyList } from '@common/constants/const';
-import { fileSizeFormat } from '@/utils/utils';
+import { fileSizeFormat, webUrlTemplateFormat } from '@/utils/utils';
 import { isSelf } from '@/utils/docker';
 import { statusColorMap, statusLabelMap } from '@/constants/container';
 import TitleBar from '@/components/TitleBar.vue';
@@ -116,6 +132,19 @@ const statusLabel = computed(
 const statusColor = computed(
   () => containerDetail.value.State?.Status && statusColorMap[containerDetail.value.State?.Status],
 );
+const localUrl = computed(() => {
+  const template = containerDetail.value.Config?.Labels['docker.mobile.localUrl'];
+  if (!template) return;
+  return webUrlTemplateFormat(template, containerDetail.value);
+});
+const internetUrl = computed(() => {
+  const template = containerDetail.value.Config?.Labels['docker.mobile.internetUrl'];
+  if (!template) return;
+  return webUrlTemplateFormat(template, containerDetail.value);
+});
+
+// 'docker.mobile.localUrl': params.localUrl,
+//         'docker.mobile.internetUrl': params.internetUrl,
 
 const activeTab = ref(0);
 
@@ -200,5 +229,14 @@ watchEffect(cleanUp => {
 .tab {
   padding-top: 12px;
   margin-bottom: 12px;
+}
+.url-list {
+  font-size: 12px;
+  margin-top: 24px;
+  a {
+    display: block;
+    text-align: center;
+    padding: 4px 0;
+  }
 }
 </style>

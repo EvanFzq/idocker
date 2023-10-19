@@ -5,6 +5,7 @@ import { ContainerActive, RestartPolicy } from '@common/constants/enum';
 import { DockerService } from '../docker';
 import { CreateContainerDto, UpdateContainerDto } from './dto';
 import { ImageService } from '../image';
+import { commandFormat } from '@/utils/utils';
 
 @Injectable()
 export class ContainerService {
@@ -26,9 +27,11 @@ export class ContainerService {
       name: params.name,
       Labels: {
         'docker.mobile.icon': params.icon,
+        'docker.mobile.localUrl': params.localUrl,
+        'docker.mobile.internetUrl': params.internetUrl,
       },
       Env: params.envs?.map(env => `${env.key}=${env.value}`),
-      Cmd: params.command && params.command.split(/\s/),
+      Cmd: commandFormat(params.command),
       Image: imageTag,
       HostConfig: {
         NetworkMode: params.network,
@@ -74,12 +77,14 @@ export class ContainerService {
       OpenStdin: containerDetail.Config.OpenStdin,
       StdinOnce: containerDetail.Config.StdinOnce,
       Env: params.envs?.map(env => `${env.key}=${env.value}`),
-      Cmd: params.command && params.command.split(/\s/),
+      Cmd: commandFormat(params.command),
       Entrypoint: containerDetail.Config.Entrypoint,
       Image: imageTag,
       Labels: {
         ...containerDetail.Config.Labels,
         'docker.mobile.icon': params.icon,
+        'docker.mobile.localUrl': params.localUrl,
+        'docker.mobile.internetUrl': params.internetUrl,
       },
       Volumes: containerDetail.Config.Volumes,
       WorkingDir: containerDetail.Config.WorkingDir,
@@ -165,6 +170,11 @@ export class ContainerService {
         await container.restart();
         break;
       case ContainerActive.remove:
+        try {
+          await container.stop();
+        } catch (error) {
+          console.error(error);
+        }
         await container.remove();
         break;
       case ContainerActive.pause:

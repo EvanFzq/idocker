@@ -11,4 +11,6 @@ export interface ContainerFormat {
   cpu?: number;
   memory_usage?: number;
   memory_limit?: number;
+  localUrl?: string;
+  internetUrl?: string;
 }
