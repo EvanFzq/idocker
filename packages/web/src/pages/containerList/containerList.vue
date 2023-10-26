@@ -173,7 +173,6 @@ const getList = async (type?: string) => {
       id: item.Id,
       name: item.Name.slice(1),
       image: item.Config.Image,
-      disabled: item.Config.Image.indexOf('evanfzq/docker-mobile') >= 0,
       status: item.State.Status,
       startedAt: item.State.StartedAt,
       created: item.Created,

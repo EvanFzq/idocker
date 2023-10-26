@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="home-page">
     <ContainerTab v-if="active === 'container'" />
     <SettingTab v-if="active === 'setting'" />
     <van-tabbar
@@ -54,6 +54,9 @@ const onAddNew = () => {
 </script>
 
 <style scoped>
+.home-page {
+  height: 100%;
+}
 .center-add {
   position: absolute;
   top: -20px;

@@ -1,7 +1,7 @@
 <template>
   <TitleBar
     :title="containerDetail.Name?.slice(1)"
-    :right-text="isSelf(containerDetail) ? undefined : '修改'"
+    right-text="修改"
     @click-right="onClickEdit"
   />
   <div class="dashbord">
@@ -21,8 +21,12 @@
       >
         {{ statusLabel }}
       </van-tag>
-      <div class="url-list">
+      <div
+        v-if="localUrl || internetUrl"
+        class="url-list"
+      >
         <a
+          v-if="localUrl"
           :href="localUrl"
           target="_blank"
         >
@@ -30,6 +34,7 @@
           <van-icon name="arrow" />
         </a>
         <a
+          v-if="internetUrl"
           :href="internetUrl"
           target="_blank"
         >
@@ -105,7 +110,7 @@ import { getContainerDetail, getContainerStats } from '@/apis/container';
 import type { Container } from '@common/types/container';
 import { restartPolicyList } from '@common/constants/const';
 import { fileSizeFormat, webUrlTemplateFormat } from '@/utils/utils';
-import { isSelf } from '@/utils/docker';
+
 import { statusColorMap, statusLabelMap } from '@/constants/container';
 import TitleBar from '@/components/TitleBar.vue';
 import BaseInfoTab from './BaseInfoTab.vue';
@@ -236,7 +241,11 @@ watchEffect(cleanUp => {
   a {
     display: block;
     text-align: center;
-    padding: 4px 0;
+    padding: 4px;
+    border-radius: 4px;
+    color: #333;
+    margin-bottom: 4px;
+    background: #fed;
   }
 }
 </style>

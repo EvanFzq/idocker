@@ -21,6 +21,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
       exception.getResponse?.() ||
       exception.json?.message ||
       'unknow error';
+    if (exception.code === 'ENOENT' && exception.syscall === 'connect') {
+      message = 'docker服务 连接失败';
+    }
     message = messageFormat(message);
     console.error('response error:', status, message, exception);
 

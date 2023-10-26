@@ -7,6 +7,7 @@ WORKDIR /app
 RUN yarn
 
 EXPOSE 3580
+LABEL docker.mobile.icon="/img/pwa-512x512.png"
 
 VOLUME /var/run/docker.sock /docker-mobile
 

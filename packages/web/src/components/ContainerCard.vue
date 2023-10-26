@@ -131,15 +131,6 @@
         >
           删除
         </van-button>
-        <van-button
-          v-if="isLocal ? !!localUrl : !!internetUrl"
-          square
-          plain
-          size="mini"
-          @click="openWeb"
-        >
-          打开
-        </van-button>
       </div>
     </div>
   </div>
@@ -186,14 +177,6 @@ const isExited = computed(() => props.status === 'exited');
 const isCreated = computed(() => props.status === 'created');
 const isRestarting = computed(() => props.status === 'restarting');
 
-const { hostname } = location;
-// 是否是内网
-const isLocal =
-  ['localhost', '127.0.0.1', '0.0.0.0'].includes(hostname) ||
-  hostname.startsWith('192.') ||
-  hostname.startsWith('10.') ||
-  hostname.startsWith('172.');
-
 const onActive = async (e: MouseEvent, type: ContainerActive) => {
   e.stopPropagation();
   try {
@@ -217,9 +200,6 @@ const onActive = async (e: MouseEvent, type: ContainerActive) => {
 
 const onCardClick = () => {
   router.push('/container/' + props.id);
-};
-const openWeb = () => {
-  window.open(isLocal ? props.localUrl : props.internetUrl);
 };
 </script>
 <style scoped>
