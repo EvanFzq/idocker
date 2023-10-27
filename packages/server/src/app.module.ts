@@ -1,6 +1,9 @@
+import path from 'path';
+
 import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { ServeStaticModule } from '@nestjs/serve-static';
+
 import { ContainerModule } from '@/modules/container';
 import { ImageModule } from '@/modules/image';
 import { NetworkModule } from '@/modules/network';
@@ -8,7 +11,6 @@ import { VolumeModule } from '@/modules/volume';
 import { AuthModule } from '@/modules/auth/module';
 import { AssetModule } from '@/modules/asset';
 import { JwtAuthGuard } from '@/guards';
-import path from 'path';
 
 @Module({
   imports: [

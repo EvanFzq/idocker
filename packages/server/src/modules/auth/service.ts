@@ -1,9 +1,11 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { v4 as uuidV4 } from 'uuid';
+
+import { hash } from '@/utils/crypto';
+
 import { UserInfo } from './type';
 import { ConfigService } from '../config';
-import { hash } from '@/utils/crypto';
 
 @Injectable()
 export class AuthService {
@@ -30,6 +32,7 @@ export class AuthService {
     const _username = this.configService.getUserConfig('username');
     const passwordHash = this.configService.getSystemConfig('passwordHash');
     const salt = this.configService.getSystemConfig('salt');
+
     if (username === _username && hash(password + salt) === passwordHash) {
       // 重置密码尝试次数为0
       await this.configService.setSystemConfig('passwordRetryNum', 0);

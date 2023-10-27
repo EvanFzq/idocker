@@ -91,8 +91,11 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted, watch } from 'vue';
+
 import type { MountConfig } from '@common/types/container';
+
 import { getVolumeList } from '@/apis/volume';
+
 import type { ContainerFormData } from './CreateOrEditContainerPage.vue';
 
 const props = defineProps<{ formData: ContainerFormData }>();

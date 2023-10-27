@@ -140,9 +140,10 @@ import { computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { showSuccessToast, showConfirmDialog, showLoadingToast } from 'vant';
 
+import { ContainerActive } from '@common/constants/enum';
+
 import { fileSizeFormat, timeLongFormat } from '@/utils/utils';
 import { activeContainer } from '@/apis/container';
-import { ContainerActive } from '@common/constants/enum';
 import { buttonColorMap, statusColorMap, statusLabelMap } from '@/constants/container';
 
 const router = useRouter();

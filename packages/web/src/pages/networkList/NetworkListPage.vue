@@ -124,10 +124,13 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { showFailToast, showLoadingToast, showSuccessToast } from 'vant';
-import type { FormInstance } from 'vant';
+
+import type { Network, AddNetworkParams } from '@common/types/network';
+
 import TitleBar from '@/components/TitleBar.vue';
 import { getNetworkList, addNetwork, removeNetwork } from '@/apis/network';
-import type { Network, AddNetworkParams } from '@common/types/network';
+
+import type { FormInstance } from 'vant';
 import NetworkCard from './NetworkCard.vue';
 
 const networkList = ref<Network[]>([]);

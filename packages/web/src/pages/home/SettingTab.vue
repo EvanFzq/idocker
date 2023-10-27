@@ -90,10 +90,12 @@ SettingTab
 </template>
 
 <script lang="ts" setup>
-import type { FormInstance } from 'vant';
 import { showSuccessToast } from 'vant';
 import { ref } from 'vue';
+
 import { changePassword } from '@/apis/user';
+
+import type { FormInstance } from 'vant';
 
 const onLogout = () => {
   sessionStorage.removeItem('token');

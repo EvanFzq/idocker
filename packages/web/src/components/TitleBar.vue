@@ -10,6 +10,7 @@
 </template>
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
+
 import type { NavBarProps } from 'vant';
 
 const props = defineProps<Partial<NavBarProps>>();

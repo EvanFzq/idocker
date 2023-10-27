@@ -17,7 +17,8 @@
   },
   "plugins": [
     "vue",
-    "@typescript-eslint"
+    "@typescript-eslint",
+    "import"
   ],
   "ignorePatterns": [
     "node_modules/**",
@@ -63,7 +64,41 @@
       }
     ],
     "vue/singleline-html-element-content-newline": "off",
-    "vue/html-self-closing": "off"
+    "vue/html-self-closing": "off",
+    "import/order": [
+      "error",
+      {
+        "groups": [
+          "builtin",
+          "external",
+          [
+            "internal",
+            "parent",
+            "sibling",
+            "index",
+            "object",
+            "type"
+          ],
+          "unknown"
+        ],
+        "pathGroups": [
+          {
+            "pattern": "@common/**",
+            "group": "internal",
+            "position": "before"
+          },
+          {
+            "pattern": "@/**",
+            "group": "internal",
+            "position": "before"
+          }
+        ],
+        "pathGroupsExcludedImportTypes": [
+          "builtin"
+        ],
+        "newlines-between": "always"
+      }
+    ]
   },
   "overrides": [
     {

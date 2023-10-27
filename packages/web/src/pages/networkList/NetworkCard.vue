@@ -38,9 +38,11 @@
   </div>
 </template>
 <script setup lang="ts">
-import type { Network } from '@common/types/network';
-import { timeLongFormat } from '@/utils/utils';
 import { useRouter } from 'vue-router';
+
+import type { Network } from '@common/types/network';
+
+import { timeLongFormat } from '@/utils/utils';
 
 const props = defineProps<{
   network: Network;

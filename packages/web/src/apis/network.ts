@@ -1,5 +1,6 @@
-import { fetch } from './fetch';
 import type { Network, AddNetworkParams } from '@common/types/network';
+
+import { fetch } from './fetch';
 
 export const getNetworkList = async () => {
   return fetch.post<Network[]>('/network/list');

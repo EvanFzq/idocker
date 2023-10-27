@@ -2,6 +2,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { PassportStrategy } from '@nestjs/passport';
 import { v4 as uuidV4 } from 'uuid';
 import { Injectable } from '@nestjs/common';
+
 import { ConfigService } from '../config';
 
 @Injectable()

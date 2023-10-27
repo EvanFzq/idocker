@@ -84,20 +84,23 @@
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue';
 import { showSuccessToast, showLoadingToast } from 'vant';
-import type { UploaderFileListItem } from 'vant';
 import { useRoute, useRouter } from 'vue-router';
 import set from 'lodash-es/set';
-import { getContainerDetail } from '@/apis/container';
+
 import type { CreateContainerParams, MountConfig } from '@common/types/container';
 import type { PortConfig } from '@common/types/network';
+
+import { getContainerDetail } from '@/apis/container';
 import TitleBar from '@/components/TitleBar.vue';
+import { createContainer, updateContainer } from '@/apis';
+
+import type { UploaderFileListItem } from 'vant';
 import BaseinfoCard from './BaseinfoCard.vue';
 import CommandTab from './CommandTab.vue';
 import MountTab from './MountTab.vue';
 import PortTab from './PortTab.vue';
 import EnvVarTab from './EnvVarTab.vue';
 import OtherTab from './OtherTab.vue';
-import { createContainer, updateContainer } from '@/apis';
 
 interface Env {
   key: string;

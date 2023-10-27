@@ -17,8 +17,9 @@
 </template>
 <script lang="ts" setup>
 import { onMounted, ref } from 'vue';
-import { getContainerLogs } from '@/apis/container';
 import dayjs from 'dayjs';
+
+import { getContainerLogs } from '@/apis/container';
 
 const props = defineProps({
   id: {

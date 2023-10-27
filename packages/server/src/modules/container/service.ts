@@ -1,11 +1,14 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import Docker from 'dockerode';
+
 import { ContainerStats } from '@common/types/container';
 import { ContainerActive, RestartPolicy } from '@common/constants/enum';
+
+import { commandFormat } from '@/utils/utils';
+
 import { DockerService } from '../docker';
 import { CreateContainerDto, UpdateContainerDto } from './dto';
 import { ImageService } from '../image';
-import { commandFormat } from '@/utils/utils';
 
 @Injectable()
 export class ContainerService {

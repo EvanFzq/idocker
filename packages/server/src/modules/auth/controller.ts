@@ -1,7 +1,12 @@
 import { Controller, Request, Post, Put, UseGuards, Body } from '@nestjs/common';
+import dayjs from 'dayjs';
+
+import { AesDecrypt } from '@common/utils/crypto';
+
 import { LoginAuthGuard } from '@/guards';
-import { AuthService } from './service';
 import { Public } from '@/decorators';
+
+import { AuthService } from './service';
 import { ChangePasswordDto } from './dto';
 
 @Controller('auth')
@@ -21,6 +26,10 @@ export class AuthController {
 
   @Put('password')
   async changePassword(@Body() body: ChangePasswordDto) {
-    await this.authService.changePassword(body.currentPassword, body.newPassword);
+    const date = dayjs().format('YYYY-MM-DD');
+    await this.authService.changePassword(
+      AesDecrypt(body.currentPassword, date),
+      AesDecrypt(body.newPassword, date),
+    );
   }
 }

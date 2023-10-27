@@ -30,14 +30,15 @@ import {
   Uploader,
   Divider,
 } from 'vant';
+
 import { routes } from '@/constants/routes';
+
+import App from './App.vue';
 import './style.css';
 import 'vant/lib/index.css';
 import 'material-icons/iconfont/material-icons.css';
-import App from './App.vue';
 
 const router = createRouter({
-  // 4. 内部提供了 history 模式的实现。为了简单起见，我们在这里使用 hash 模式。
   history: createWebHistory(),
   routes,
 });

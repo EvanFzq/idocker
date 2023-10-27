@@ -1,11 +1,13 @@
-import { Injectable } from '@nestjs/common';
-
-import sharp from 'sharp';
 import path from 'path';
-import { v4 as uuidV4 } from 'uuid';
-import { imgUploadDir } from '@/constants/fs';
-import { UploadImgDto } from './dto';
 import { unlink } from 'fs/promises';
+
+import { Injectable } from '@nestjs/common';
+import sharp from 'sharp';
+import { v4 as uuidV4 } from 'uuid';
+
+import { imgUploadDir } from '@/constants/fs';
+
+import { UploadImgDto } from './dto';
 
 @Injectable()
 export class AssetService {

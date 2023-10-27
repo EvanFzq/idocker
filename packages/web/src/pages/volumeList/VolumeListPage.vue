@@ -53,10 +53,13 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue';
 import { showLoadingToast, showSuccessToast } from 'vant';
-import type { FormInstance } from 'vant';
+
+import type { Volume } from '@common/types/volume';
+
 import TitleBar from '@/components/TitleBar.vue';
 import { getVolumeList, createVolume, removeVolume } from '@/apis/volume';
-import type { Volume } from '@common/types/volume';
+
+import type { FormInstance } from 'vant';
 import VolumeCard from './VolumeCard.vue';
 
 const volumeList = ref<Volume[]>([]);

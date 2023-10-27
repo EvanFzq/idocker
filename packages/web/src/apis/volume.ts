@@ -1,5 +1,6 @@
-import { fetch } from './fetch';
 import type { Volume } from '@common/types/volume';
+
+import { fetch } from './fetch';
 
 export const getVolumeList = async () => {
   return fetch.post<Volume[]>('/volume/list');

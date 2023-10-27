@@ -1,6 +1,7 @@
-import { fetch } from './fetch';
 import type { Image, ImageItem } from '@common/types/image';
 import type { ImageOption } from '@common/types/image';
+
+import { fetch } from './fetch';
 
 export const searchImage = async (keyword: string, option?: ImageOption) => {
   return fetch.post<Image[]>('/image/search', { keyword, ...option });

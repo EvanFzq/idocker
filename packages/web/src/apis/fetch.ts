@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { showFailToast } from 'vant';
 import axios from 'axios';
+
 import type { AxiosRequestConfig } from 'axios';
 
 export const _fetch = axios.create({

@@ -1,4 +1,5 @@
 import { IsEnum, IsOptional, IsString, IsNumberString } from 'class-validator';
+
 import { ImageFit } from '@common/constants/enum';
 
 export class UploadImgDto {

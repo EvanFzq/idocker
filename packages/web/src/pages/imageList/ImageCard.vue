@@ -33,7 +33,9 @@
 <script setup lang="ts">
 import dayjs from 'dayjs';
 import { useRouter } from 'vue-router';
+
 import type { ImageItem } from '@common/types/image';
+
 import { fileSizeFormat, timeLongFormat } from '@/utils/utils';
 
 const props = defineProps<{

@@ -106,13 +106,15 @@
 <script lang="ts" setup>
 import { ref, onMounted, watchEffect, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { getContainerDetail, getContainerStats } from '@/apis/container';
-import type { Container } from '@common/types/container';
+
 import { restartPolicyList } from '@common/constants/const';
+import type { Container } from '@common/types/container';
+
+import { getContainerDetail, getContainerStats } from '@/apis/container';
+import TitleBar from '@/components/TitleBar.vue';
+import { statusColorMap, statusLabelMap } from '@/constants/container';
 import { fileSizeFormat, webUrlTemplateFormat } from '@/utils/utils';
 
-import { statusColorMap, statusLabelMap } from '@/constants/container';
-import TitleBar from '@/components/TitleBar.vue';
 import BaseInfoTab from './BaseInfoTab.vue';
 import EnvVarTab from './EnvVarTab.vue';
 import LogTab from './LogTab.vue';

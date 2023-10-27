@@ -28,9 +28,11 @@
   </div>
 </template>
 <script setup lang="ts">
-import type { Volume } from '@common/types/volume';
-import { timeLongFormat, fileSizeFormat } from '@/utils/utils';
 import { useRouter } from 'vue-router';
+
+import type { Volume } from '@common/types/volume';
+
+import { timeLongFormat, fileSizeFormat } from '@/utils/utils';
 
 const props = defineProps<{
   volume: Volume;

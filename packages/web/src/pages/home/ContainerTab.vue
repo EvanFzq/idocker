@@ -93,13 +93,12 @@
 </template>
 
 <script lang="ts" setup>
+import { computed, onMounted, ref, onUnmounted, onActivated, onDeactivated } from 'vue';
+
 import { getContainerList, getContainerStats } from '@/apis';
-import { onMounted, ref, onUnmounted, onActivated, onDeactivated } from 'vue';
 import type { ContainerFormat } from '@/types/container';
 import { webUrlTemplateFormat } from '@/utils/utils';
-
 import ContainerCard from '@/components/ContainerCard.vue';
-import { computed } from 'vue';
 
 const containerList = ref<ContainerFormat[]>([]);
 

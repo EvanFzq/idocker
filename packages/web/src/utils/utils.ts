@@ -1,9 +1,11 @@
-import { VolumeUnit, VolumeUnitSize, NumberLevel } from '@common/constants/enum';
 import dayjs from 'dayjs';
-import type { Dayjs } from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+
 import 'dayjs/locale/zh-cn';
+import { VolumeUnit, VolumeUnitSize, NumberLevel } from '@common/constants/enum';
 import type { Container } from '@common/types/container';
+
+import type { Dayjs } from 'dayjs';
 
 dayjs.locale('zh-cn');
 

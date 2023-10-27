@@ -1,4 +1,5 @@
 import type { ImageFit } from '@common/constants/enum';
+
 import { fetch } from './fetch';
 
 export const uploadImg = async (

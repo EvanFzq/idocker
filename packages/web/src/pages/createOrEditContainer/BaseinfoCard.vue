@@ -125,12 +125,15 @@
 import { ref, onMounted, watch } from 'vue';
 import { showToast, type UploaderFileListItem } from 'vant';
 import Cropper from 'cropperjs';
+
 import 'cropperjs/dist/cropper.css';
-import { searchImage, getNetworkList, uploadImg } from '@/apis';
 import type { Image } from '@common/types/image';
 import type { Network } from '@common/types/network';
+
+import { searchImage, getNetworkList, uploadImg } from '@/apis';
 import { numberFormat } from '@/utils/utils';
 import { dataURLtoFile } from '@/utils/utils';
+
 import type { ContainerFormData } from './CreateOrEditContainerPage.vue';
 
 const props = defineProps<{ formData: ContainerFormData }>();

@@ -56,11 +56,14 @@
 </template>
 <script setup lang="ts">
 import { onMounted, ref, computed } from 'vue';
-import type { FormInstance } from 'vant';
 import { showLoadingToast, showSuccessToast } from 'vant';
+
+import type { ImageItem } from '@common/types/image';
+
 import TitleBar from '@/components/TitleBar.vue';
 import { getImageList, removeImage, updateImage, pullImage } from '@/apis/image';
-import type { ImageItem } from '@common/types/image';
+
+import type { FormInstance } from 'vant';
 import ImageCard from './ImageCard.vue';
 
 const imageList = ref<ImageItem[]>([]);

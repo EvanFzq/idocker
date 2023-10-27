@@ -1,9 +1,12 @@
-import { Injectable } from '@nestjs/common';
 import { accessSync, readFileSync, writeFileSync, constants, promises as fs } from 'fs';
-import { configDirPath, userConfigFilePath, systemConfigFilePath } from '@/constants/fs';
-import { UserConfig, SystemConfig } from './type';
-import { mkdirSync } from '@/utils/fs';
+
+import { Injectable } from '@nestjs/common';
 import { parse, stringify } from 'yaml';
+
+import { configDirPath, userConfigFilePath, systemConfigFilePath } from '@/constants/fs';
+import { mkdirSync } from '@/utils/fs';
+
+import { UserConfig, SystemConfig } from './type';
 
 @Injectable()
 export class ConfigService {

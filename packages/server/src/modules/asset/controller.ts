@@ -1,3 +1,6 @@
+import path from 'path';
+import { createReadStream } from 'fs';
+
 import {
   Controller,
   Post,
@@ -12,14 +15,14 @@ import {
   StreamableFile,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { AssetService } from './service';
+import multer from 'multer';
+
 import { imgUploadDir } from '@/constants/fs';
 import { mkdir } from '@/utils/fs';
-import { UploadImgDto } from './dto';
-import multer from 'multer';
-import path from 'path';
-import { createReadStream } from 'fs';
 import { Public } from '@/decorators';
+
+import { AssetService } from './service';
+import { UploadImgDto } from './dto';
 
 @Controller('asset')
 export class AssetController {
