@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.5.0](///compare/v1.4.0...v1.5.0) (2023-10-30)
+
+
+### Features
+
+* 密码传输进行加密，代码模块化样式优化 a87488f
+* 容器列表增加过滤和排序、允许修改自身容器、优化内外网连接展示，修复内存展示异常 1339968
+* docker Mobile 更名为 iDocker e42f2b0
+
 ## [1.4.0](///compare/v1.3.0...v1.4.0) (2023-10-19)
 
 
