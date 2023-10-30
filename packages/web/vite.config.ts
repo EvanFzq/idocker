@@ -1,9 +1,10 @@
 /* eslint-env node */
 
+import path from 'path';
+
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import { VitePWA } from 'vite-plugin-pwa';
-import path from 'path';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -14,8 +15,8 @@ export default defineConfig({
         VitePWA({
             registerType: 'autoUpdate',
             manifest: {
-                name: 'Docker Mobile',
-                short_name: 'Docker Mobile',
+                name: 'iDocker',
+                short_name: 'iDocker',
                 description: 'Docker client for Mobile',
                 theme_color: '#ffffff',
                 icons: [

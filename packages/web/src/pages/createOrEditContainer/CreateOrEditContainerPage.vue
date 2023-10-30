@@ -184,13 +184,13 @@ onMounted(async () => {
       icon: [
         {
           url:
-            Config.Labels['docker.mobile.icon'] ||
+            Config.Labels['docker.idocker.icon'] ||
             Config.Labels['com.docker.desktop.extension.icon'] ||
             Config.Labels['net.unraid.docker.icon'],
         },
       ],
-      localUrl: Config.Labels['docker.mobile.localUrl'],
-      internetUrl: Config.Labels['docker.mobile.internetUrl'],
+      localUrl: Config.Labels['docker.idocker.localUrl'],
+      internetUrl: Config.Labels['docker.idocker.internetUrl'],
     };
   }
 });

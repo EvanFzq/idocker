@@ -32,8 +32,7 @@
           <span>内网地址</span>
           <van-popover placement="right">
             <p style="max-width: 60vw; padding: 0 12px; font-size: 10px">
-              支持PROTOCOL、HOST、PORT参数。PROTOCOL、HOST为docker
-              mobile访问页地址的protocol和host。PORT为绑定给容器的第一个host端口，可使用PORTx指定为第x个端口，例：[PROTOCOL]//[HOST]:[PORT2]
+              支持PROTOCOL、HOST、PORT参数。PROTOCOL、HOST为idocker访问页地址的protocol和host。PORT为绑定给容器的第一个host端口，可使用PORTx指定为第x个端口，例：[PROTOCOL]//[HOST]:[PORT2]
             </p>
             <template #reference>
               <van-icon name="question-o" />
@@ -52,8 +51,7 @@
           <span>外网地址</span>
           <van-popover placement="right">
             <p style="max-width: 60vw; padding: 0 12px; font-size: 10px">
-              支持PROTOCOL、HOST、PORT参数。PROTOCOL、HOST为docker
-              mobile访问页地址的protocol和host。PORT为绑定给容器的第一个host端口，可使用PORTx指定为第x个端口，例：[PROTOCOL]//[HOST]:[PORT]
+              支持PROTOCOL、HOST、PORT参数。PROTOCOL、HOST为idocker访问页地址的protocol和host。PORT为绑定给容器的第一个host端口，可使用PORTx指定为第x个端口，例：[PROTOCOL]//[HOST]:[PORT]
             </p>
             <template #reference>
               <van-icon name="question-o" />

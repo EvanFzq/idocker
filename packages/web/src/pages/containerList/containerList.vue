@@ -182,7 +182,7 @@ const getList = async (type?: string) => {
       icon:
         item.Config.Labels['com.docker.desktop.extension.icon'] ||
         item.Config.Labels['net.unraid.docker.icon'] ||
-        item.Config.Labels['docker.mobile.icon'],
+        item.Config.Labels['docker.idocker.icon'],
     }));
     return list;
   } else {

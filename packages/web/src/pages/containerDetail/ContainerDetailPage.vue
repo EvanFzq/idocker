@@ -140,18 +140,18 @@ const statusColor = computed(
   () => containerDetail.value.State?.Status && statusColorMap[containerDetail.value.State?.Status],
 );
 const localUrl = computed(() => {
-  const template = containerDetail.value.Config?.Labels['docker.mobile.localUrl'];
+  const template = containerDetail.value.Config?.Labels['docker.idocker.localUrl'];
   if (!template) return;
   return webUrlTemplateFormat(template, containerDetail.value);
 });
 const internetUrl = computed(() => {
-  const template = containerDetail.value.Config?.Labels['docker.mobile.internetUrl'];
+  const template = containerDetail.value.Config?.Labels['docker.idocker.internetUrl'];
   if (!template) return;
   return webUrlTemplateFormat(template, containerDetail.value);
 });
 
-// 'docker.mobile.localUrl': params.localUrl,
-//         'docker.mobile.internetUrl': params.internetUrl,
+// 'docker.idocker.localUrl': params.localUrl,
+//         'docker.idocker.internetUrl': params.internetUrl,
 
 const activeTab = ref(0);
 

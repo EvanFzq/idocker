@@ -1,4 +1,4 @@
-# Docker Mobile （Docker移动端管理工具）
+# iDocker（Docker移动端管理工具）
 ## 前言
 很多人有在移动端管理`docker`的需求，目前市面上常见的开源`docker`管理工具都只针对桌面做了适配，在手机上操作非常不方便，所以才有了开发此项目的想法
 
@@ -26,22 +26,22 @@
 
 到宿主机对应文件目录下使用下面命令创建文件夹及`docker-compose.yml`文件
 ```
-mkdir docker-mobile
-cd docker-mobile
+mkdir idocker
+cd idocker
 touch docker-compose.yml
 ```
 使用`vim`或其他工具修改 `docker-compose.yml`文件如下，配置文件路径请自定义
 ```yml
 version: "3" # 表示该docker-compose.yml文件使用的是Version 3  
 services:  # 为project定义服务
-  docker-mobile:  # 指定服务名称
-    container_name: docker-mobile # 指定容器名
-    image: evanfzq/docker-mobile:latest  # 指定服务所使用的镜像
+  idocker:  # 指定服务名称
+    container_name: idocker # 指定容器名
+    image: evanfzq/idocker:latest  # 指定服务所使用的镜像
     ports:  # 暴露端口信息
       - 3580:3580
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock  # 与docker宿主通信的 sock 地址
-      - /host/file/path:/docker-mobile # 服务配置文件存放的地方
+      - /host/file/path:/idocker # 服务配置文件存放的地方
 ```
 在`docker-compose.yml`文件所在文件夹下执行下列命令启动服务
 ```
@@ -51,11 +51,11 @@ docker-compose up -d
 ### 2、使用`docker run`
 使用终端执行下面命令（注意修改host配置文件路径）
 ```
-docker run -name docker-mobile -d -p 3580:3580 -v /var/run/docker.sock:/var/run/docker.sock -v /host/file/path:/docker-mobile evanfzq/docker-mobile:latest
+docker run -name idocker -d -p 3580:3580 -v /var/run/docker.sock:/var/run/docker.sock -v /host/file/path:/idocker evanfzq/idocker:latest
 ```
 
 ## 配置文件
-配置文件在容器的`/docker-mobile/config`目录下，
+配置文件在容器的`/idocker/config`目录下，
 ### 用户配置
 文件名为`userConfig.yml`
 

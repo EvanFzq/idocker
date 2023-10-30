@@ -1,11 +1,11 @@
 module.exports = {
   apps: [
     {
-      name: 'docker-mobile',
+      name: 'idocker',
       script: './packages/server/dist/index.cjs',
       log_date_format: 'YYYY-MM-DD HH:mm:ss',
-      out_file: '/docker-mobile/logs/info.log',
-      error_file: '/docker-mobile/logs/error.log',
+      out_file: '/idocker/logs/info.log',
+      error_file: '/idocker/logs/error.log',
       env_production: {
         NODE_ENV: 'production',
       },

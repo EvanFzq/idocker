@@ -140,11 +140,11 @@ const getList = async () => {
       created: item.Created,
       labels: item.Config.Labels,
       icon:
-        item.Config.Labels['docker.mobile.icon'] ||
+        item.Config.Labels['docker.idocker.icon'] ||
         item.Config.Labels['com.docker.desktop.extension.icon'] ||
         item.Config.Labels['net.unraid.docker.icon'],
-      localUrl: webUrlTemplateFormat(item.Config.Labels['docker.mobile.localUrl'], item),
-      internetUrl: webUrlTemplateFormat(item.Config.Labels['docker.mobile.internetUrl'], item),
+      localUrl: webUrlTemplateFormat(item.Config.Labels['docker.idocker.localUrl'], item),
+      internetUrl: webUrlTemplateFormat(item.Config.Labels['docker.idocker.internetUrl'], item),
     }));
     return list;
   } else {

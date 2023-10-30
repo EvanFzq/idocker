@@ -29,9 +29,9 @@ export class ContainerService {
     const container = await this.dockerService.docker.createContainer({
       name: params.name,
       Labels: {
-        'docker.mobile.icon': params.icon,
-        'docker.mobile.localUrl': params.localUrl,
-        'docker.mobile.internetUrl': params.internetUrl,
+        'docker.idocker.icon': params.icon,
+        'docker.idocker.localUrl': params.localUrl,
+        'docker.idocker.internetUrl': params.internetUrl,
       },
       Env: params.envs?.map(env => `${env.key}=${env.value}`),
       Cmd: commandFormat(params.command),
@@ -85,9 +85,9 @@ export class ContainerService {
       Image: imageTag,
       Labels: {
         ...containerDetail.Config.Labels,
-        'docker.mobile.icon': params.icon,
-        'docker.mobile.localUrl': params.localUrl,
-        'docker.mobile.internetUrl': params.internetUrl,
+        'docker.idocker.icon': params.icon,
+        'docker.idocker.localUrl': params.localUrl,
+        'docker.idocker.internetUrl': params.internetUrl,
       },
       Volumes: containerDetail.Config.Volumes,
       WorkingDir: containerDetail.Config.WorkingDir,

@@ -1,10 +1,10 @@
 version: "3" # 表示该docker-compose.yml文件使用的是Version 3  
 services:  # 为project定义服务
-  docker-mobile:  # 指定服务名称
-    container_name: docker-mobile
-    image: evanfzq/docker-mobile:latest  # 指定服务所使用的镜像
+  idocker:  # 指定服务名称
+    container_name: idocker
+    image: evanfzq/idocker:latest  # 指定服务所使用的镜像
     ports:  # 暴露端口信息
       - 3680:3580
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /Users/evan/Documents/docker/docker-mobile:/docker-mobile
+      - /Users/evan/Documents/docker/idocker:/idocker
