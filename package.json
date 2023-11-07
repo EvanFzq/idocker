@@ -13,8 +13,9 @@
     "prepare": "husky install",
     "lint": "npx eslint --ext .vue,.ts --fix packages/common packages/server/src packages/web/src",
     "format": "prettier  packages/common packages/server/src packages/web/src --write",
-    "image": "yarn build && docker buildx build -t evanfzq/idocker:latest --platform=linux/arm,linux/arm64,linux/amd64 . --push",
-    "image:beta": "yarn build && docker buildx build -t evanfzq/idocker:beta --platform=linux/arm,linux/arm64,linux/amd64 . --push",
+    "image": "yarn build && docker build -t evanfzq/idocker:beta .",
+    "push": "yarn build && docker buildx build -t evanfzq/idocker:latest --platform=linux/arm,linux/arm64,linux/amd64 . --push",
+    "push:beta": "yarn build && docker buildx build -t evanfzq/idocker:beta --platform=linux/arm,linux/arm64,linux/amd64 . --push",
     "start": "pm2-runtime start pm2.config.js  --env production",
     "release": "standard-version"
   },
