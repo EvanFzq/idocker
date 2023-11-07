@@ -182,9 +182,7 @@ const onCheckUpdate = async () => {
   showToast({
     message: '后台检查中...',
   });
-  await checkImageUpdate(
-    containerList.value.filter(item => item.image.endsWith('latest')).map(item => item.image),
-  );
+  await checkImageUpdate(containerList.value.map(item => item.image));
   showToast({
     message: '检查完成！',
   });

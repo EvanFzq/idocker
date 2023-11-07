@@ -1,4 +1,4 @@
-import { ExceptionFilter, Catch, ArgumentsHost, HttpException } from '@nestjs/common';
+import { ExceptionFilter, Catch, ArgumentsHost } from '@nestjs/common';
 import { Response } from 'express';
 
 import { DockerException } from '@/constants/exception';
@@ -9,7 +9,7 @@ export class DockerExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
     const status = exception.getStatus();
-    const res = exception.getResponse() as Record<string, any>;
+    const res = exception.getResponse() as Record<string, string | number>;
     console.error('response error:', status, res.code, res.msg);
     response.status(status).json({
       code: res.code,
