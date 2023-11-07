@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Param, Post, Put } from '@nestjs/common';
 
 import { ImageService } from './service';
-import { SearchImageDto, ImageUpdateOrPullDto } from './dto';
+import { SearchImageDto, ImageUpdateOrPullDto, CheckUpdateDto } from './dto';
 
 @Controller('image')
 export class ImageController {
@@ -29,5 +29,10 @@ export class ImageController {
   @Post('list')
   async getImageList() {
     return this.imageService.getImageList();
+  }
+
+  @Post('update/check')
+  async checkImageUpdate(@Body() body: CheckUpdateDto) {
+    return this.imageService.checkImageUpdate(body.names);
   }
 }

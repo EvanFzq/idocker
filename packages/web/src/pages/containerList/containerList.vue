@@ -3,7 +3,10 @@
     v-if="title"
     :title="title"
   />
-  <div class="list">
+  <div
+    v-if="!loading"
+    class="list"
+  >
     <ContainerCard
       v-for="item in containerList"
       :id="item.id"
@@ -16,12 +19,19 @@
       :labels="item.labels"
       :icon="item.icon"
       :cpu="item.cpu"
-      :memory_limit="item.memory_limit"
-      :memory_usage="item.memory_usage"
-      :disabled="item.disabled"
+      :memory_limit="item.memoryLimit"
+      :memory_usage="item.memoryUsage"
+      :is-self="item.isSelf"
+      :can-update="item.canUpdate"
       @reload="onReload"
     />
     <p class="no-more">没有更多了</p>
+  </div>
+  <div
+    v-else
+    class="loading"
+  >
+    <van-loading />
   </div>
   <div
     v-if="type === 'network'"
@@ -111,22 +121,17 @@ import { onMounted, ref, onUnmounted, computed } from 'vue';
 import { showLoadingToast, showSuccessToast } from 'vant';
 import { useRoute } from 'vue-router';
 
-import type { ContainerListParams } from '@common/types/container';
+import type { ContainerListParams, ContainerListItem } from '@common/types/container';
 
-import {
-  getContainerList,
-  getContainerStats,
-  addContainerToNetwork,
-  removeContainerFormNetwork,
-} from '@/apis';
+import { getContainerList, addContainerToNetwork, removeContainerFormNetwork } from '@/apis';
 import ContainerCard from '@/components/ContainerCard.vue';
 import TitleBar from '@/components/TitleBar.vue';
-import type { ContainerFormat } from '@/types/container';
 
 import type { FormInstance } from 'vant';
 
-const containerList = ref<ContainerFormat[]>([]);
-const allContainerList = ref<ContainerFormat[]>([]);
+const containerList = ref<ContainerListItem[]>([]);
+const allContainerList = ref<ContainerListItem[]>([]);
+const loading = ref(false);
 const canAddContainerList = computed(() =>
   allContainerList.value.map(item => ({
     ...item,
@@ -156,73 +161,47 @@ const title = computed(() => {
   return type ? containerListTitle[type as string] : '';
 });
 
-const getList = async (type?: string) => {
+const getList = async (hasMetrics: boolean, type?: string) => {
   // 获取列表
   const params: Record<string, ContainerListParams> = {
     ['network']: {
       networkId: id as string,
+      hasMetrics,
     },
     ['image']: {
       imageId: id as string,
+      hasMetrics,
     },
     ['volume']: {
       volumeName: name as string,
+      hasMetrics,
     },
   };
-  const res = await getContainerList(type ? params[type] : undefined);
+  const res = await getContainerList(type ? params[type] : { hasMetrics });
   if (res.success) {
-    const list = res.data.map(item => ({
-      id: item.Id,
-      name: item.Name.slice(1),
-      image: item.Config.Image,
-      status: item.State.Status,
-      startedAt: item.State.StartedAt,
-      created: item.Created,
-      labels: item.Config.Labels,
-      icon:
-        item.Config.Labels['com.docker.desktop.extension.icon'] ||
-        item.Config.Labels['net.unraid.docker.icon'] ||
-        item.Config.Labels['docker.idocker.icon'],
-    }));
-    return list;
-  } else {
-    return [];
-  }
-};
-
-const getData = async () => {
-  // 获取列表同时获取cpu、内存信息
-  const list = await getList(type as string);
-  if (list.length > 0) {
-    const statsRes = await getContainerStats(list.map(item => item.id));
-    if (statsRes.success) {
-      containerList.value = list.map(item => {
-        const statsData = statsRes.data.find(stats => stats.id === item.id);
-        return {
-          ...item,
-          cpu: statsData?.cpu,
-          memory_usage: statsData?.memory_usage,
-          memory_limit: statsData?.memory_limit,
-        };
-      });
-    }
+    containerList.value = res.data;
   } else {
     containerList.value = [];
   }
+
+  return containerList.value;
 };
 
 const onReload = async () => {
-  getData();
+  loading.value = true;
+  await getList(false, type as string);
+  loading.value = false;
 };
 
 let statsTimer: NodeJS.Timeout;
 onMounted(async () => {
-  const [list, allList] = await Promise.all([getList(type as string), getList()]);
+  loading.value = true;
+  const [list, allList] = await Promise.all([getList(false, type as string), getList(false)]);
+  loading.value = false;
   containerList.value = list;
   allContainerList.value = allList;
-  getData();
   statsTimer = setInterval(async () => {
-    getData();
+    getList(true, type as string);
   }, 5000);
 });
 
@@ -230,7 +209,7 @@ onUnmounted(() => {
   clearInterval(statsTimer);
 });
 
-const onContainerPickerConfirm = (value: ContainerFormat) => {
+const onContainerPickerConfirm = (value: ContainerListItem) => {
   addForm.value.container = value.name;
   showContainerPicker.value = false;
 };
@@ -250,16 +229,16 @@ const onAddContainerConfirm = async () => {
   if (res.success) {
     showSuccessToast('添加成功');
     showAddContainer.value = false;
-    getData();
+    getList(false, type as string);
   }
 };
-const onRemoveSelectContainer = async (value: ContainerFormat) => {
+const onRemoveSelectContainer = async (value: ContainerListItem) => {
   showLoadingToast({ message: '移除中...', duration: 0, forbidClick: true });
   const res = await removeContainerFormNetwork(id as string, value.id);
   if (res.success) {
     showSuccessToast('移除成功');
     showRemoveContainer.value = false;
-    getData();
+    getList(false, type as string);
   }
 };
 </script>
@@ -271,7 +250,13 @@ const onRemoveSelectContainer = async (value: ContainerFormat) => {
   justify-content: flex-start;
   align-items: flex-start;
 }
-
+.loading {
+  flex: auto;
+  height: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 .no-more {
   width: 100%;
   font-size: 10px;

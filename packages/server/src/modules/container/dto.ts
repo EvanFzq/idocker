@@ -42,6 +42,10 @@ export class ContainerListDto {
   @IsString()
   @IsOptional()
   volumeName?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  hasMetrics?: boolean;
 }
 
 export class NewPort {
@@ -134,6 +138,11 @@ export class CreateContainerDto {
 }
 
 export class UpdateContainerDto extends CreateContainerDto {
+  @IsString()
+  id: string;
+}
+
+export class UpdateContainerImageDto {
   @IsString()
   id: string;
 }

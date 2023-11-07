@@ -5,12 +5,13 @@ import type {
   CreateContainerParams,
   UpdateContainerParams,
   ContainerListParams,
+  ContainerListItem,
 } from '@common/types/container';
 
 import { fetch } from './fetch';
 
 export const getContainerList = async (params?: ContainerListParams) => {
-  return fetch.post<Container[]>('/container/list', params);
+  return fetch.post<ContainerListItem[]>('/container/list', params);
 };
 
 export const getContainerDetail = async (id: string) => {
@@ -35,4 +36,8 @@ export const createContainer = async (params: CreateContainerParams) => {
 
 export const updateContainer = async (params: UpdateContainerParams) => {
   return fetch.put<void>('/container', params, { timeout: 0 });
+};
+
+export const updateContainerImage = async (id: string) => {
+  return fetch.put<void>('/container/image', { id }, { timeout: 0 });
 };

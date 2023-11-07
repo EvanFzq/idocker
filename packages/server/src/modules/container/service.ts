@@ -135,7 +135,12 @@ export class ContainerService {
   }
 
   async getContainerDetail(id: string) {
-    return await this.dockerService.docker.getContainer(id).inspect();
+    const detail = await this.dockerService.docker.getContainer(id).inspect();
+    return {
+      ...detail,
+      isSelf: this.dockerService.currentContainerId === detail.Id,
+      canUpdate: await this.dockerService.imageCanUpdate(detail.Config.Image, detail.Image),
+    };
   }
 
   async getContainerStats(ids: string[]): Promise<ContainerStats[]> {
@@ -151,8 +156,8 @@ export class ContainerService {
       return {
         id,
         cpu: (cpuDelta / systemDelta) * cpu_stats.online_cpus * 100,
-        memory_usage: memory_stats.usage,
-        memory_limit: memory_stats.limit,
+        memoryUsage: memory_stats.usage,
+        memoryLimit: memory_stats.limit,
       };
     });
   }
@@ -201,5 +206,38 @@ export class ContainerService {
       stdout: true,
     });
     return res.toString();
+  }
+
+  async updateContainerImage(id: string) {
+    const container = this.dockerService.docker.getContainer(id);
+    const containerDetail = await container.inspect();
+    const imageTag = containerDetail.Config.Image;
+    await this.dockerService.pullImage('local', imageTag);
+    try {
+      await container.stop();
+    } catch (error) {
+      console.error(error);
+    }
+    await container.remove({ focus: true });
+    const nextContainer = await this.dockerService.docker.createContainer({
+      name: containerDetail.Name.slice(1),
+      AttachStdin: containerDetail.Config.AttachStdin,
+      AttachStdout: containerDetail.Config.AttachStdout,
+      AttachStderr: containerDetail.Config.AttachStderr,
+      Tty: containerDetail.Config.Tty,
+      OpenStdin: containerDetail.Config.OpenStdin,
+      StdinOnce: containerDetail.Config.StdinOnce,
+      Env: containerDetail.Config.Env,
+      Cmd: containerDetail.Config.Cmd,
+      Entrypoint: containerDetail.Config.Entrypoint,
+      Image: imageTag,
+      Labels: containerDetail.Config.Labels,
+      Volumes: containerDetail.Config.Volumes,
+      WorkingDir: containerDetail.Config.WorkingDir,
+      ExposedPorts: containerDetail.Config.ExposedPorts,
+      HostConfig: containerDetail.HostConfig,
+    });
+    await nextContainer.start();
+    return { id: nextContainer.id };
   }
 }

@@ -160,7 +160,7 @@ onMounted(async () => {
       network: HostConfig.NetworkMode,
       restart: HostConfig.RestartPolicy.Name,
       runAffterCreated: true,
-      command: Config.Cmd.map(item => (item.indexOf(' ') > 0 ? `"${item}"` : item))?.join(' '),
+      command: Config.Cmd?.map(item => (item.indexOf(' ') > 0 ? `"${item}"` : item))?.join(' '),
       envs: Config.Env.map(item => {
         const [key, value] = item.split('=');
         return { key, value };

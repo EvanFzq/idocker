@@ -55,19 +55,23 @@
         </van-tab>
       </van-tabs>
       <van-divider />
-      <!-- <van-tabs shrink>
+      <van-tabs shrink>
         <van-tab title="更新">
           <van-button
             size="small"
             type="primary"
             style="margin-top: 12px"
+            @click="onCheckUpdate"
           >
             检查更新
           </van-button>
         </van-tab>
-      </van-tabs> -->
+      </van-tabs>
     </van-popup>
-    <div class="list">
+    <div
+      v-if="!loading"
+      class="list"
+    >
       <ContainerCard
         v-for="item in list"
         :id="item.id"
@@ -76,32 +80,37 @@
         :image="item.image"
         :started-at="item.startedAt"
         :status="item.status"
-        :created="item.created"
         :labels="item.labels"
         :icon="item.icon"
         :cpu="item.cpu"
-        :memory-limit="item.memory_limit"
-        :memory-usage="item.memory_usage"
-        :disabled="item.disabled"
-        :local-url="item.localUrl"
-        :internet-url="item.internetUrl"
+        :memory-limit="item.memoryLimit"
+        :memory-usage="item.memoryUsage"
+        :is-self="item.isSelf"
+        :can-update="item.canUpdate"
         @reload="onReload"
       />
       <p class="no-more">没有更多了</p>
+    </div>
+    <div
+      v-else
+      class="loading"
+    >
+      <van-loading />
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { computed, onMounted, ref, onUnmounted, onActivated, onDeactivated } from 'vue';
+import { showToast } from 'vant';
 
-import { getContainerList, getContainerStats } from '@/apis';
-import type { ContainerFormat } from '@/types/container';
-import { webUrlTemplateFormat } from '@/utils/utils';
+import type { ContainerListItem } from '@common/types/container';
+
+import { getContainerList, checkImageUpdate } from '@/apis';
 import ContainerCard from '@/components/ContainerCard.vue';
 
-const containerList = ref<ContainerFormat[]>([]);
-
+const containerList = ref<ContainerListItem[]>([]);
+const loading = ref(false);
 const showSetting = ref(false);
 const containerStatus = ref('all');
 const sortType = ref('name');
@@ -118,7 +127,7 @@ const list = computed(() => {
       case 'cpu':
         return (b.cpu || 0) - (a.cpu || 0);
       case 'memory_usage':
-        return (b.memory_usage || 0) - (a.memory_usage || 0);
+        return (b.memoryUsage || 0) - (a.memoryUsage || 0);
       default:
         return a.name.charCodeAt(0) - b.name.charCodeAt(0);
     }
@@ -127,71 +136,37 @@ const list = computed(() => {
 });
 let statsTimer: NodeJS.Timeout;
 
-const getList = async () => {
+const getList = async (hasMetrics: boolean) => {
   // 获取列表
-  const res = await getContainerList();
+  const res = await getContainerList({ hasMetrics });
   if (res.success) {
-    const list = res.data.map(item => ({
-      id: item.Id,
-      name: item.Name.slice(1),
-      image: item.Config.Image,
-      status: item.State.Status,
-      startedAt: item.State.StartedAt,
-      created: item.Created,
-      labels: item.Config.Labels,
-      icon:
-        item.Config.Labels['docker.idocker.icon'] ||
-        item.Config.Labels['com.docker.desktop.extension.icon'] ||
-        item.Config.Labels['net.unraid.docker.icon'],
-      localUrl: webUrlTemplateFormat(item.Config.Labels['docker.idocker.localUrl'], item),
-      internetUrl: webUrlTemplateFormat(item.Config.Labels['docker.idocker.internetUrl'], item),
-    }));
-    return list;
+    containerList.value = res.data;
   } else {
-    return [];
-  }
-};
-
-const getData = async () => {
-  // 获取列表同时获取cpu、内存信息
-  const list = await getList();
-  if (list.length > 0) {
-    const statsRes = await getContainerStats(list.map(item => item.id));
-    if (statsRes.success) {
-      containerList.value = list.map(item => {
-        const statsData = statsRes.data.find(stats => stats.id === item.id);
-        return {
-          ...item,
-          cpu: statsData?.cpu,
-          memory_usage: statsData?.memory_usage,
-          memory_limit: statsData?.memory_limit,
-        };
-      });
-    }
+    containerList.value = [];
   }
 };
 
 const onReload = async () => {
-  getData();
+  loading.value = true;
+  await getList(false);
+  loading.value = false;
 };
 
 onMounted(async () => {
-  const list = await getList();
-  containerList.value = list;
-  getData();
+  loading.value = true;
+  await getList(false);
+  loading.value = false;
   clearInterval(statsTimer);
   statsTimer = setInterval(async () => {
-    getData();
+    getList(true);
   }, 5000);
 });
 
 onActivated(async () => {
-  const list = await getList();
-  containerList.value = list;
-  getData();
+  await getList(false);
   clearInterval(statsTimer);
   statsTimer = setInterval(async () => {
-    getData();
+    getList(true);
   }, 5000);
 });
 
@@ -201,6 +176,19 @@ onUnmounted(() => {
 onDeactivated(() => {
   clearInterval(statsTimer);
 });
+
+const onCheckUpdate = async () => {
+  showSetting.value = false;
+  showToast({
+    message: '后台检查中...',
+  });
+  await checkImageUpdate(
+    containerList.value.filter(item => item.image.endsWith('latest')).map(item => item.image),
+  );
+  showToast({
+    message: '检查完成！',
+  });
+};
 </script>
 
 <style scoped>
@@ -209,12 +197,14 @@ onDeactivated(() => {
   display: flex;
   flex-direction: column;
 }
+
 .options {
   & > div {
     margin: 8px;
     font-size: 12px;
   }
 }
+
 .list {
   width: 100%;
   flex: auto;
@@ -226,7 +216,13 @@ onDeactivated(() => {
   align-items: flex-start;
   align-content: flex-start;
 }
-
+.loading {
+  flex: auto;
+  height: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 .no-more {
   width: 100%;
   font-size: 10px;

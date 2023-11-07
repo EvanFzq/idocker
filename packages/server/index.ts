@@ -1,9 +1,11 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, HttpException, HttpStatus } from '@nestjs/common';
-import { AppModule } from './src/app.module';
 import { json, urlencoded } from 'express';
+
 import { LoggerInterceptor, TransformInterceptor } from '@/interceptors';
-import { HttpExceptionFilter } from '@/filter';
+import { HttpExceptionFilter, DockerExceptionFilter } from '@/filter';
+
+import { AppModule } from './src/app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bodyParser: false });
@@ -25,6 +27,7 @@ async function bootstrap() {
   app.useGlobalInterceptors(new LoggerInterceptor());
   app.useGlobalInterceptors(new TransformInterceptor());
   app.useGlobalFilters(new HttpExceptionFilter());
+  app.useGlobalFilters(new DockerExceptionFilter());
   await app.listen(3580);
 }
 bootstrap();

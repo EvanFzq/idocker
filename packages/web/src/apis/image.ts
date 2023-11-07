@@ -22,3 +22,7 @@ export const updateImage = async (name: string) => {
 export const pullImage = async (name: string) => {
   return fetch.post<void>('/image', { name }, { timeout: 0 });
 };
+
+export const checkImageUpdate = async (names: string[]) => {
+  return fetch.post<void>('/image/update/check', { names }, { timeout: 0 });
+};

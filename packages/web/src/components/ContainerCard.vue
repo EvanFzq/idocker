@@ -36,9 +36,17 @@
     </div>
     <div class="right">
       <div class="top">
+        <van-icon
+          v-if="canUpdate"
+          name="upgrade"
+          color="red"
+          class="upgrade"
+          @click="onUpdateImage"
+        />
         <div class="van-ellipsis name">
           {{ name }}
         </div>
+
         <van-tag
           class="status"
           :color="statusColor"
@@ -68,7 +76,7 @@
       <div class="bottom">
         <van-button
           v-if="isExited || isCreated"
-          :disabled="disabled"
+          :disabled="isSelf"
           :color="buttonColorMap.running"
           square
           plain
@@ -79,7 +87,7 @@
         </van-button>
         <van-button
           v-if="isRunning || isRestarting"
-          :disabled="disabled"
+          :disabled="isSelf"
           :color="buttonColorMap.exited"
           square
           plain
@@ -90,7 +98,7 @@
         </van-button>
         <van-button
           v-if="!isRestarting"
-          :disabled="disabled"
+          :disabled="isSelf"
           :color="buttonColorMap.restart"
           square
           plain
@@ -101,7 +109,7 @@
         </van-button>
         <van-button
           v-if="isRunning"
-          :disabled="disabled"
+          :disabled="isSelf"
           :color="buttonColorMap.paused"
           square
           plain
@@ -112,7 +120,7 @@
         </van-button>
         <van-button
           v-if="isPaused"
-          :disabled="disabled"
+          :disabled="isSelf"
           :color="buttonColorMap.running"
           square
           plain
@@ -122,7 +130,7 @@
           恢复
         </van-button>
         <van-button
-          :disabled="disabled"
+          :disabled="isSelf"
           :color="buttonColorMap.delete"
           square
           plain
@@ -143,26 +151,24 @@ import { showSuccessToast, showConfirmDialog, showLoadingToast } from 'vant';
 import { ContainerActive } from '@common/constants/enum';
 
 import { fileSizeFormat, timeLongFormat } from '@/utils/utils';
-import { activeContainer } from '@/apis/container';
+import { activeContainer, updateContainerImage } from '@/apis/container';
 import { buttonColorMap, statusColorMap, statusLabelMap } from '@/constants/container';
 
 const router = useRouter();
 
 interface CcontainerCardProps {
   name: string;
-  disabled?: boolean;
   icon?: string;
   image?: string;
   id: string;
-  startedAt: string;
+  startedAt: number;
   status: string;
-  created?: string;
   labels?: Record<string, string>;
   cpu?: number;
   memoryLimit?: number;
   memoryUsage?: number;
-  localUrl?: string;
-  internetUrl?: string;
+  isSelf?: boolean;
+  canUpdate?: boolean;
 }
 
 const props = defineProps<CcontainerCardProps>();
@@ -201,6 +207,20 @@ const onActive = async (e: MouseEvent, type: ContainerActive) => {
 
 const onCardClick = () => {
   router.push('/container/' + props.id);
+};
+
+const onUpdateImage = async (e: MouseEvent) => {
+  e.stopPropagation();
+  await showConfirmDialog({
+    title: '确认更新容器镜像吗？',
+    message: '可能存在不兼容情况，请关注容器更新日志',
+  });
+  showLoadingToast({ message: '执行中...', duration: 0, forbidClick: true });
+  const res = await updateContainerImage(props.id);
+  if (res.success) {
+    emit('reload');
+    showSuccessToast('更新成功');
+  }
 };
 </script>
 <style scoped>
@@ -259,7 +279,11 @@ const onCardClick = () => {
   justify-content: space-between;
   margin-bottom: 6px;
 }
-
+.upgrade {
+  margin-right: 4px;
+  font-weight: 500;
+  line-height: 19px;
+}
 .name {
   flex: auto;
   width: 0;

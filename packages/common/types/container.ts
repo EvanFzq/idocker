@@ -1,8 +1,8 @@
 export interface ContainerStats {
   id: string;
   cpu: number;
-  memory_usage: number;
-  memory_limit: number;
+  memoryUsage: number;
+  memoryLimit: number;
 }
 
 export interface Container {
@@ -263,6 +263,7 @@ export interface ContainerListParams {
   networkId?: string;
   imageId?: string;
   volumeName?: string;
+  hasMetrics?: boolean;
 }
 
 export interface NewPort {
@@ -282,4 +283,22 @@ export interface NewMount {
 export interface NewEnv {
   key: string;
   value: string;
+}
+
+export interface ContainerListItem {
+  id: string;
+  name: string;
+  image: string;
+  status: string;
+  startedAt: number;
+  created: number;
+  labels: Record<string, string>;
+  icon?: string;
+  localUrl?: string;
+  internetUrl?: string;
+  cpu?: number;
+  memoryLimit?: number;
+  memoryUsage?: number;
+  isSelf?: boolean;
+  canUpdate?: boolean;
 }

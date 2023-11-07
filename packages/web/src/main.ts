@@ -29,6 +29,7 @@ import {
   DropdownItem,
   Uploader,
   Divider,
+  Loading,
 } from 'vant';
 
 import { routes } from '@/constants/routes';
@@ -73,6 +74,7 @@ app.use(DropdownMenu);
 app.use(DropdownItem);
 app.use(Uploader);
 app.use(Divider);
+app.use(Loading);
 
 app.mount('#app');
 

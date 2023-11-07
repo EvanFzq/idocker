@@ -21,3 +21,8 @@ export class ImageUpdateOrPullDto {
   @IsString()
   name: string;
 }
+
+export class CheckUpdateDto {
+  @IsString({ each: true })
+  names: string[];
+}

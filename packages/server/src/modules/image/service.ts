@@ -79,4 +79,7 @@ export class ImageService {
     await image.remove();
     return;
   }
+  async checkImageUpdate(names: string[]) {
+    return await Promise.all(names.map(name => this.dockerService.pullImage('local', name, true)));
+  }
 }
