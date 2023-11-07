@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.6.1](///compare/v1.6.0...v1.6.1) (2023-11-07)
+
+
+### Bug Fixes
+
+* 修复检查版本更新时镜像过滤问题 80d44fc
+
 ## [1.6.0](///compare/v1.5.0...v1.6.0) (2023-11-07)
 
 

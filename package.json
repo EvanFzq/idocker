@@ -1,7 +1,7 @@
 {
   "name": "idocker",
   "private": true,
-  "version": "1.6.0",
+  "version": "1.6.1",
   "scripts": {
     "dev": "yarn dev:web & yarn dev:server",
     "dev:web": "vite -c ./packages/web/vite.config.ts",
