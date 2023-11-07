@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.6.0](///compare/v1.5.0...v1.6.0) (2023-11-07)
+
+
+### Features
+
+* 新增检查容器镜像版本和更新容器镜像功能，优化容器列表接口，优化异常提示 0429c1d
+
 ## [1.5.0](///compare/v1.4.0...v1.5.0) (2023-10-30)
 
 
