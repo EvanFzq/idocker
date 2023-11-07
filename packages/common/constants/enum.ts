@@ -25,6 +25,14 @@ export enum ContainerActive {
   unpause = 'unpause',
 }
 
+export enum ContainerStatus {
+  running = 'running',
+  paused = 'paused',
+  exited = 'exited',
+  created = 'created',
+  restarting = 'restarting',
+}
+
 export const NumberLevel: {
   [key: string]: number;
 } = {

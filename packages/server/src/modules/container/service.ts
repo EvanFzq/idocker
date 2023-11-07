@@ -1,8 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import Docker from 'dockerode';
 
-import { ContainerStats } from '@common/types/container';
-import { ContainerActive, RestartPolicy } from '@common/constants/enum';
+import { ContainerStats, AppInfo } from '@common/types/container';
+import { ContainerActive, ContainerStatus, RestartPolicy } from '@common/constants/enum';
 
 import { commandFormat } from '@/utils/utils';
 
@@ -239,5 +239,20 @@ export class ContainerService {
     });
     await nextContainer.start();
     return { id: nextContainer.id };
+  }
+  async getApps(isLocal: boolean): Promise<AppInfo[]> {
+    const containerList = await this.dockerService.docker.listContainers({ all: true });
+    return containerList
+      .map(container => ({
+        name: container.Names[0].slice(1),
+        url: isLocal
+          ? container.Labels['docker.idocker.localUrl']
+          : container.Labels['docker.idocker.internetUrl'],
+        icon: container.Labels['docker.idocker.icon'],
+        status: container.State as ContainerStatus,
+        index: container.Created,
+        type: 'container' as const,
+      }))
+      .filter(item => item.url);
   }
 }

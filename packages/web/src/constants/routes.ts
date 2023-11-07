@@ -6,6 +6,7 @@ import CreateOrEditContainerPage from '@/pages/createOrEditContainer/CreateOrEdi
 import ImageListPage from '@/pages/imageList/ImageListPage.vue';
 import NetworkListPage from '@/pages/networkList/NetworkListPage.vue';
 import VolumeListPage from '@/pages/volumeList/VolumeListPage.vue';
+import AppsPage from '@/pages/apps/AppsPage.vue';
 
 export const routes = [
   { path: '/', component: HomePage },
@@ -16,4 +17,6 @@ export const routes = [
   { path: '/image/list', component: ImageListPage },
   { path: '/network/list', component: NetworkListPage },
   { path: '/volume/list', component: VolumeListPage },
+  { path: '/apps/local', component: AppsPage },
+  { path: '/apps/internet', component: AppsPage },
 ];

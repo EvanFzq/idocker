@@ -1,3 +1,4 @@
+import type { ContainerStatus } from '../constants/enum';
 export interface ContainerStats {
   id: string;
   cpu: number;
@@ -301,4 +302,13 @@ export interface ContainerListItem {
   memoryUsage?: number;
   isSelf?: boolean;
   canUpdate?: boolean;
+}
+
+export interface AppInfo {
+  name: string;
+  url: string;
+  icon?: string;
+  status?: ContainerStatus;
+  index?: number;
+  type: 'container' | 'custom';
 }

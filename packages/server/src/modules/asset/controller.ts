@@ -29,7 +29,7 @@ export class AssetController {
   constructor(private readonly assetService: AssetService) {
     mkdir(imgUploadDir);
   }
-
+  // 上传图片
   @Post('img')
   @UseInterceptors(
     FileInterceptor('file', {
@@ -59,7 +59,7 @@ export class AssetController {
   ) {
     return this.assetService.uploadImg(file, body);
   }
-
+  // 查看图片，不校验登录
   @Public()
   @Get('img/:fileName')
   async getImage(@Param('fileName') fileName: string) {

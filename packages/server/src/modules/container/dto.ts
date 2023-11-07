@@ -146,3 +146,8 @@ export class UpdateContainerImageDto {
   @IsString()
   id: string;
 }
+
+export class GetAppsDto {
+  @IsBoolean()
+  isLocal: boolean;
+}

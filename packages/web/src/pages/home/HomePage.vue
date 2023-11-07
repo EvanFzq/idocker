@@ -1,18 +1,25 @@
 <template>
   <div class="home-page">
+    <AppsTab v-if="active === 'apps'" />
     <ContainerTab v-if="active === 'container'" />
+    <TemplateTab v-if="active === 'template'" />
     <SettingTab v-if="active === 'setting'" />
     <van-tabbar
       :model-value="active"
       @change="onTabChange"
     >
       <van-tabbar-item
+        name="apps"
+        icon="apps-o"
+      >
+        导航
+      </van-tabbar-item>
+      <van-tabbar-item
         name="container"
         icon="play-circle-o"
       >
         容器
       </van-tabbar-item>
-      <!-- <van-tabbar-item name="template" icon="records">模版</van-tabbar-item> -->
       <van-tabbar-item name="add">
         <div
           class="center-add"
@@ -21,7 +28,12 @@
           <van-icon name="plus" />
         </div>
       </van-tabbar-item>
-      <!-- <van-tabbar-item name="other" icon="apps-o">其他</van-tabbar-item> -->
+      <van-tabbar-item
+        name="template"
+        icon="records"
+      >
+        模版
+      </van-tabbar-item>
       <van-tabbar-item
         name="setting"
         icon="setting-o"
@@ -38,7 +50,9 @@ import { useRouter } from 'vue-router';
 
 import ContainerTab from './ContainerTab.vue';
 import SettingTab from './SettingTab.vue';
-const active = ref('container');
+import AppsTab from './AppsTab.vue';
+import TemplateTab from './TemplateTab.vue';
+const active = ref('apps');
 
 const router = useRouter();
 

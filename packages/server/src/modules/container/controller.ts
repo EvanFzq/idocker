@@ -1,7 +1,9 @@
 import { Body, Controller, Post, Put } from '@nestjs/common';
 import dayjs from 'dayjs';
 
-import { ContainerListItem } from '@common/types/container';
+import { ContainerListItem, AppInfo } from '@common/types/container';
+
+import { Public } from '@/decorators';
 
 import { ContainerService } from './service';
 import {
@@ -12,12 +14,13 @@ import {
   ContainerListDto,
   UpdateContainerDto,
   UpdateContainerImageDto,
+  GetAppsDto,
 } from './dto';
 
 @Controller('container')
 export class ContainerController {
   constructor(private readonly containerService: ContainerService) {}
-
+  // 创建容器
   @Post()
   async createContainer(@Body() body: CreateContainerDto) {
     return this.containerService.createContainer(body);
@@ -27,7 +30,7 @@ export class ContainerController {
   async updateContainer(@Body() body: UpdateContainerDto) {
     return this.containerService.updateContainer(body);
   }
-
+  // 获取容器列表
   @Post('list')
   async getContainerList(@Body() body: ContainerListDto): Promise<ContainerListItem[]> {
     let containerList = await this.containerService.getContainerList();
@@ -79,20 +82,22 @@ export class ContainerController {
     }
     return list;
   }
+  // 获取容器配置详情
   @Post('detail')
   async getContainer(@Body() body: ContainerDetailDto) {
     return this.containerService.getContainerDetail(body.id);
   }
+  // 获取容器资源消耗
   @Post('stats')
   async getContainerStats(@Body() body: ContainerStatsDto) {
     return await this.containerService.getContainerStats(body.ids);
   }
-
+  // 获取容器log
   @Post('logs')
   async getContainerLogs(@Body() body: ContainerDetailDto) {
     return await this.containerService.getContainerLogs(body.id);
   }
-
+  // 操作容器，启动、停止、暂停、恢复、移除
   @Put('active')
   async activeContainer(@Body() body: ContainerActiveDto) {
     return await this.containerService.activeContainer(body.id, body.type);
@@ -101,5 +106,11 @@ export class ContainerController {
   @Put('image')
   async updateContainerImage(@Body() body: UpdateContainerImageDto) {
     return await this.containerService.updateContainerImage(body.id);
+  }
+  // 获取导航页配置
+  @Public()
+  @Post('apps')
+  async getApps(@Body() body: GetAppsDto): Promise<AppInfo[]> {
+    return this.containerService.getApps(body.isLocal);
   }
 }

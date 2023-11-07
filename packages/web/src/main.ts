@@ -30,6 +30,9 @@ import {
   Uploader,
   Divider,
   Loading,
+  Empty,
+  Grid,
+  GridItem,
 } from 'vant';
 
 import { routes } from '@/constants/routes';
@@ -75,6 +78,9 @@ app.use(DropdownItem);
 app.use(Uploader);
 app.use(Divider);
 app.use(Loading);
+app.use(Empty);
+app.use(Grid);
+app.use(GridItem);
 
 app.mount('#app');
 
