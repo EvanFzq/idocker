@@ -10,6 +10,8 @@ import { NetworkModule } from '@/modules/network';
 import { VolumeModule } from '@/modules/volume';
 import { AuthModule } from '@/modules/auth/module';
 import { AssetModule } from '@/modules/asset';
+import { SettingModule } from '@/modules/setting';
+import { ConfigModule } from '@/modules/config';
 import { JwtAuthGuard } from '@/guards';
 
 @Module({
@@ -20,6 +22,8 @@ import { JwtAuthGuard } from '@/guards';
     NetworkModule,
     VolumeModule,
     AssetModule,
+    SettingModule,
+    ConfigModule,
     ServeStaticModule.forRoot({
       rootPath: path.join(__dirname, '..', '..', 'web', 'dist'),
     }),

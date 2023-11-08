@@ -6,7 +6,6 @@ import type {
   UpdateContainerParams,
   ContainerListParams,
   ContainerListItem,
-  AppInfo,
 } from '@common/types/container';
 
 import { fetch } from './fetch';
@@ -41,8 +40,4 @@ export const updateContainer = async (params: UpdateContainerParams) => {
 
 export const updateContainerImage = async (id: string) => {
   return fetch.put<void>('/container/image', { id }, { timeout: 0 });
-};
-
-export const getApps = async (isLocal: boolean) => {
-  return fetch.post<AppInfo[]>('/container/apps', { isLocal });
 };

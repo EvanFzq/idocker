@@ -8,3 +8,4 @@ export const userConfigFilePath = path.resolve(rootDirPath, 'config', 'userConfi
 export const systemConfigFilePath = path.resolve(rootDirPath, 'config', 'systemConfig.yml');
 export const imgUploadDir = path.join(rootDirPath, 'upload', 'img');
 export const tempDir = path.join(rootDirPath, 'temp');
+export const wallpaperDir = path.join(rootDirPath, 'wallpapers');

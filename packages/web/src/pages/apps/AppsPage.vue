@@ -1,6 +1,6 @@
 <template>
   <div
-    v-if="list.length === 0"
+    v-show="list.length === 0"
     class="loading-box"
   >
     <van-loading v-if="loading" />
@@ -11,7 +11,8 @@
   </div>
 
   <div
-    v-else
+    v-show="list.length !== 0"
+    ref="bgRef"
     class="app-list"
   >
     <div
@@ -30,14 +31,31 @@
       </div>
     </div>
   </div>
+  <van-floating-bubble
+    class="switch-wallpaper"
+    :offset="{ x: 12, y: offsetY }"
+    :gap="12"
+    axis="xy"
+    magnetic="x"
+    @click="onSwitchWallpaper"
+  >
+    <img
+      ref="switchWallpaperRef"
+      width="40"
+      height="40"
+      :src="switchWallpaperImg"
+    />
+  </van-floating-bubble>
 </template>
 <script setup lang="ts">
-import { computed, ref, watchEffect } from 'vue';
+import { computed, ref, watchEffect, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 
 import type { AppInfo } from '@common/types/container';
 
-import { getApps } from '@/apis/container';
+import { getApps } from '@/apis/setting';
+import { getWallpaper, switchWallpaper } from '@/apis/setting';
+import switchWallpaperImg from '@/assets/switch-wallpaper.webp';
 
 interface AppsPageProps {
   isLocal?: boolean;
@@ -47,6 +65,10 @@ const route = useRoute();
 const isLocalEnv = computed(() => props.isLocal || route.path === '/apps/local');
 const list = ref<AppInfo[]>([]);
 const loading = ref(true);
+const offsetY = document.documentElement.clientHeight - 110;
+const switchWallpaperRef = ref<HTMLImageElement | null>(null);
+const bgRef = ref<HTMLDivElement | null>(null);
+const switching = ref(false);
 
 watchEffect(async () => {
   loading.value = true;
@@ -57,6 +79,43 @@ watchEffect(async () => {
   loading.value = false;
 });
 
+const onSwitchWallpaper = async () => {
+  if (switching.value === true) {
+    return;
+  }
+  switching.value = true;
+  const img = switchWallpaperRef.value;
+  if (img) {
+    let deg = 0;
+    const timer = setInterval(() => {
+      deg += 10;
+      img.style.transform = `rotate(${deg}deg) rotateZ(0deg)`;
+    }, 16);
+    const res = await switchWallpaper();
+    if (res.success && bgRef.value) {
+      bgRef.value.style.backgroundImage = `url("${res.data.src}")`;
+    }
+    clearInterval(timer);
+    // 1秒停止旋转
+    let startTime = Date.now();
+    const timer2 = setInterval(() => {
+      const step = 10 - (Date.now() - startTime) / 100;
+      if (step <= 0) {
+        clearInterval(timer2);
+        return;
+      }
+      deg += step;
+      img.style.transform = `rotate(${deg}deg) rotateZ(0deg)`;
+    }, 16);
+  }
+  switching.value = false;
+};
+onMounted(async () => {
+  const res = await getWallpaper();
+  if (res.success && res.data.src && bgRef.value) {
+    bgRef.value.style.backgroundImage = `url("${res.data.src}")`;
+  }
+});
 const onClickApp = (app: AppInfo) => {
   window.open(app.url, '_blank', 'noreferrer,noopener');
 };
@@ -72,23 +131,25 @@ const onClickApp = (app: AppInfo) => {
 }
 
 .app-list {
-  margin: 10px;
+  padding: 10px;
   display: grid;
+  flex: auto;
   grid-template-columns: repeat(auto-fill, 80px);
   grid-gap: 10px;
   justify-content: space-evenly;
-  align-content: center;
+  align-content: flex-start;
+  background-size: cover;
+  background-position: center;
   .app {
     background-color: #fff;
-    border-radius: 6px;
-    border: solid #eee 1px;
+    border-radius: 8px;
+    border: solid #aaa 1px;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     padding: 6px;
-    box-shadow: 1px 1px 2px #eee;
     .icon {
       width: 66px;
       height: 66px;
@@ -139,9 +200,8 @@ const onClickApp = (app: AppInfo) => {
 }
 </style>
 <style>
-.app.van-grid-item {
-  .van-grid-item__content {
-    padding: 10px;
-  }
+.switch-wallpaper {
+  background-color: #fff !important;
+  box-shadow: 1px 1px 2px #ccc;
 }
 </style>

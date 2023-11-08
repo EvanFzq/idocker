@@ -34,6 +34,17 @@ SettingTab
         to="/volume/list"
       />
     </van-cell-group>
+    <van-cell-group
+      title="设置"
+      inset
+      class="setting-list"
+    >
+      <van-cell
+        title="导航页设置"
+        is-link
+        to="/apps/setting"
+      />
+    </van-cell-group>
     <div class="btns">
       <van-button
         type="primary"

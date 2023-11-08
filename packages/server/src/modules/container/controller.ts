@@ -1,9 +1,7 @@
 import { Body, Controller, Post, Put } from '@nestjs/common';
 import dayjs from 'dayjs';
 
-import { ContainerListItem, AppInfo } from '@common/types/container';
-
-import { Public } from '@/decorators';
+import { ContainerListItem } from '@common/types/container';
 
 import { ContainerService } from './service';
 import {
@@ -14,7 +12,6 @@ import {
   ContainerListDto,
   UpdateContainerDto,
   UpdateContainerImageDto,
-  GetAppsDto,
 } from './dto';
 
 @Controller('container')
@@ -106,11 +103,5 @@ export class ContainerController {
   @Put('image')
   async updateContainerImage(@Body() body: UpdateContainerImageDto) {
     return await this.containerService.updateContainerImage(body.id);
-  }
-  // 获取导航页配置
-  @Public()
-  @Post('apps')
-  async getApps(@Body() body: GetAppsDto): Promise<AppInfo[]> {
-    return this.containerService.getApps(body.isLocal);
   }
 }

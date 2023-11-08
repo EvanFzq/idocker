@@ -13,11 +13,12 @@ import {
   Body,
   Param,
   StreamableFile,
+  Req,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import multer from 'multer';
 
-import { imgUploadDir } from '@/constants/fs';
+import { imgUploadDir, wallpaperDir } from '@/constants/fs';
 import { mkdir } from '@/utils/fs';
 import { Public } from '@/decorators';
 
@@ -64,6 +65,15 @@ export class AssetController {
   @Get('img/:fileName')
   async getImage(@Param('fileName') fileName: string) {
     const file = createReadStream(path.join(imgUploadDir, fileName));
+    return new StreamableFile(file);
+  }
+  // 壁纸图片，不校验登录
+  @Public()
+  @Get('wallpaper/*')
+  async getWallpaper(@Req() req: Request) {
+    const file = createReadStream(
+      path.join(wallpaperDir, decodeURIComponent(req.url.split('/api/v1/asset/wallpaper/')[1])),
+    );
     return new StreamableFile(file);
   }
 }

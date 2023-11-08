@@ -33,6 +33,7 @@ import {
   Empty,
   Grid,
   GridItem,
+  FloatingBubble,
 } from 'vant';
 
 import { routes } from '@/constants/routes';
@@ -81,6 +82,7 @@ app.use(Loading);
 app.use(Empty);
 app.use(Grid);
 app.use(GridItem);
+app.use(FloatingBubble);
 
 app.mount('#app');
 

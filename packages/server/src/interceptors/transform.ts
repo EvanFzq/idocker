@@ -48,6 +48,10 @@ export class TransformInterceptor<T> implements NestInterceptor<T, IHttpData<T>>
         path: '/api/v1/asset/img',
         method: 'GET',
       },
+      {
+        path: '/api/v1/asset/wallpaper',
+        method: 'GET',
+      },
     ];
 
     if (

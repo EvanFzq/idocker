@@ -7,6 +7,7 @@ import ImageListPage from '@/pages/imageList/ImageListPage.vue';
 import NetworkListPage from '@/pages/networkList/NetworkListPage.vue';
 import VolumeListPage from '@/pages/volumeList/VolumeListPage.vue';
 import AppsPage from '@/pages/apps/AppsPage.vue';
+import AppSettingPage from '@/pages/appsSetting/AppSettingPage.vue';
 
 export const routes = [
   { path: '/', component: HomePage },
@@ -19,4 +20,5 @@ export const routes = [
   { path: '/volume/list', component: VolumeListPage },
   { path: '/apps/local', component: AppsPage },
   { path: '/apps/internet', component: AppsPage },
+  { path: '/apps/setting', component: AppSettingPage },
 ];
