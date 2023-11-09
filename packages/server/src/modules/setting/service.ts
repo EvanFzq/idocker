@@ -4,11 +4,13 @@ import path from 'path';
 import { Injectable } from '@nestjs/common';
 
 import { ContainerStatus } from '@common/constants/enum';
-import { AppInfo } from '@common/types/container';
+import { AppInfo, UserInfo } from '@common/types/setting';
 
 import { wallpaperDir } from '@/constants/fs';
 import { DockerService } from '@/modules/docker';
 import { ConfigService } from '@/modules/config';
+
+import { UpdateUserInfoDto } from './dto';
 
 @Injectable()
 export class SettingService {
@@ -71,10 +73,27 @@ export class SettingService {
       }))
       .filter(item => item.url);
   }
-  getAppsNeedLogin(): boolean {
-    return !!this.configService.getUserConfig('appsPageNeedLogin');
+  getAppsPublic(): boolean {
+    return !!this.configService.getUserConfig('appsPagePublic');
   }
-  async updateAppsNeedLogin(needLogin: boolean) {
-    await this.configService.setUserConfig('appsPageNeedLogin', needLogin);
+  async updateAppsPublic(isPublic: boolean) {
+    await this.configService.setUserConfig('appsPagePublic', isPublic);
+  }
+  async getUserInfo(): Promise<UserInfo> {
+    const userName = this.configService.getUserConfig<string>('username');
+    const passwordMaxRetryNum = this.configService.getUserConfig<number>('passwordMaxRetryNum');
+    return {
+      userName,
+      passwordMaxRetryNum,
+    };
+  }
+  async updateUserInfo(data: UpdateUserInfoDto) {
+    const { userName, passwordMaxRetryNum } = data;
+    if (userName) {
+      this.configService.setUserConfig('username', userName);
+    }
+    if (passwordMaxRetryNum) {
+      this.configService.setUserConfig('passwordMaxRetryNum', passwordMaxRetryNum);
+    }
   }
 }

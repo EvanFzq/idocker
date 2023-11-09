@@ -1,43 +1,52 @@
 import { Controller, Post, Body, Put } from '@nestjs/common';
 
-import { AppInfo } from '@common/types/container';
+import { AppInfo, UserInfo } from '@common/types/setting';
 
 import { wallpaperDir } from '@/constants/fs';
 import { mkdir } from '@/utils/fs';
 import { ConfigPublic } from '@/decorators';
 
 import { SettingService } from './service';
-import { GetAppsDto, AppsNeedLoginDto } from './dto';
+import { GetAppsDto, AppsPublicDto, UpdateUserInfoDto } from './dto';
 
 @Controller('setting')
 export class SettingController {
   constructor(private readonly settingService: SettingService) {
     mkdir(wallpaperDir);
   }
-  @ConfigPublic('user', 'appsPageNeedLogin')
+  @ConfigPublic('user', 'appsPagePublic')
   @Post('wallpaper')
   async getWallpaper() {
     return this.settingService.getWallpaper();
   }
-  @ConfigPublic('user', 'appsPageNeedLogin')
+  @ConfigPublic('user', 'appsPagePublic')
   @Post('switch/wallpaper')
   async switchWallpaper() {
     return this.settingService.switchWallpaper();
   }
   // 获取导航页配置
-  @ConfigPublic('user', 'appsPageNeedLogin')
+  @ConfigPublic('user', 'appsPagePublic')
   @Post('apps')
   async getApps(@Body() body: GetAppsDto): Promise<AppInfo[]> {
     return this.settingService.getApps(body.isLocal);
   }
 
-  @Post('apps/login')
-  getAppsNeedLogin(): boolean {
-    return this.settingService.getAppsNeedLogin();
+  @Post('apps/public')
+  getAppsPublic(): boolean {
+    return this.settingService.getAppsPublic();
   }
 
-  @Put('apps/login')
-  async updateAppsNeedLogin(@Body() body: AppsNeedLoginDto): Promise<void> {
-    return this.settingService.updateAppsNeedLogin(body.needLogin);
+  @Put('apps/public')
+  async updateAppsPublic(@Body() body: AppsPublicDto): Promise<void> {
+    return this.settingService.updateAppsPublic(body.isPublic);
+  }
+
+  @Post('user')
+  async getUserInfo(): Promise<UserInfo> {
+    return this.settingService.getUserInfo();
+  }
+  @Put('user')
+  async updateUserInfo(@Body() body: UpdateUserInfoDto): Promise<void> {
+    return this.settingService.updateUserInfo(body);
   }
 }

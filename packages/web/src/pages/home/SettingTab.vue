@@ -2,11 +2,17 @@ SettingTab
 <template>
   <van-nav-bar title="设置" />
   <div class="setting">
+    <h3 class="username">{{ userInfo.userName }}</h3>
     <van-cell-group
       title="个人信息"
       inset
       class="setting-list"
     >
+      <van-cell
+        title="用户设置"
+        is-link
+        to="/user/setting"
+      />
       <van-cell
         title="修改密码"
         is-link
@@ -14,7 +20,7 @@ SettingTab
       />
     </van-cell-group>
     <van-cell-group
-      title="管理"
+      title="Docker 管理"
       inset
       class="setting-list"
     >
@@ -35,7 +41,7 @@ SettingTab
       />
     </van-cell-group>
     <van-cell-group
-      title="设置"
+      title="其他设置"
       inset
       class="setting-list"
     >
@@ -102,9 +108,12 @@ SettingTab
 
 <script lang="ts" setup>
 import { showSuccessToast } from 'vant';
-import { ref } from 'vue';
+import { ref, onMounted, onActivated } from 'vue';
 
-import { changePassword } from '@/apis/user';
+import type { UserInfo } from '@common/types/setting';
+
+import { changePassword } from '@/apis/auth';
+import { getUserInfo } from '@/apis/setting';
 
 import type { FormInstance } from 'vant';
 
@@ -124,6 +133,22 @@ const currentPassword = ref('');
 const newPassword = ref('');
 const newPassword2 = ref('');
 const changePasswordForm = ref<FormInstance>();
+const userInfo = ref<Partial<UserInfo>>({});
+
+const getData = async () => {
+  const res = await getUserInfo();
+  if (res.success) {
+    userInfo.value = res.data;
+  }
+};
+
+onMounted(async () => {
+  getData();
+});
+onActivated(async () => {
+  getData();
+});
+
 const validatorPassword = () => {
   return newPassword.value === newPassword2.value;
 };
@@ -146,6 +171,10 @@ const onChangePasswordSubmit = async () => {
 </script>
 
 <style lang="less" scoped>
+.username {
+  font-size: 28px;
+  margin: 16px 16px 0;
+}
 .setting {
   position: relative;
 
@@ -163,3 +192,4 @@ const onChangePasswordSubmit = async () => {
   margin: 12px 0;
 }
 </style>
+@/apis/auth

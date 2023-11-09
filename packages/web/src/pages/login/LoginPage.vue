@@ -40,7 +40,7 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 
-import { login } from '@/apis/user';
+import { login } from '@/apis/auth';
 
 const username = ref('');
 const password = ref('');
@@ -59,3 +59,4 @@ const onSubmit = async (values: { username: string; password: string }) => {
   margin-top: 32px;
 }
 </style>
+@/apis/auth

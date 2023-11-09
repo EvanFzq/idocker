@@ -4,11 +4,11 @@
     style="margin-bottom: 12px"
   />
   <van-cell-group inset>
-    <van-cell title="是否需要登录">
+    <van-cell title="是否公开（无需登录）">
       <template #value>
         <van-switch
-          v-model="needLogin"
-          @change="onSwitchNeedLogin"
+          v-model="isPublic"
+          @change="onSwitchPublic"
         />
       </template>
     </van-cell>
@@ -19,24 +19,24 @@ import { onMounted, ref } from 'vue';
 import { showLoadingToast, showSuccessToast } from 'vant';
 
 import TitleBar from '@/components/TitleBar.vue';
-import { getAppsNeedLogin, setAppsNeedLogin } from '@/apis/setting';
+import { getAppsPublic, setAppsPublic } from '@/apis/setting';
 
-const needLogin = ref(false);
+const isPublic = ref(false);
 
 onMounted(async () => {
-  const res = await getAppsNeedLogin();
+  const res = await getAppsPublic();
   if (res.success) {
-    needLogin.value = res.data;
+    isPublic.value = res.data;
   }
 });
 
-const onSwitchNeedLogin = async () => {
+const onSwitchPublic = async () => {
   showLoadingToast({ message: '执行中...', duration: 0, forbidClick: true });
-  const res = await setAppsNeedLogin(needLogin.value);
+  const res = await setAppsPublic(isPublic.value);
   if (res.success) {
     showSuccessToast({ message: '切换成功' });
   } else {
-    needLogin.value = !needLogin.value;
+    isPublic.value = !isPublic.value;
   }
 };
 </script>

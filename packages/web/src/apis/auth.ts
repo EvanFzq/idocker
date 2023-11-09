@@ -1,6 +1,7 @@
 import dayjs from 'dayjs';
 
 import { AesEncrypt } from '@common/utils/crypto';
+import {} from '@common/types/setting';
 
 import { fetch } from './fetch';
 

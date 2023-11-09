@@ -16,7 +16,7 @@ export class ConfigService {
     this.userConfig = {
       username: 'admin',
       passwordMaxRetryNum: 10,
-      appsPageNeedLogin: true,
+      appsPagePublic: false,
     };
     this.systemConfig = {};
     this.init();

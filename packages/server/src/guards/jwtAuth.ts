@@ -31,13 +31,13 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     if (config) {
       const { type, key } = config;
       if (type === 'system') {
-        const needLogin = this.configService.getSystemConfig(key as keyof SystemConfig);
-        if (!needLogin) {
+        const isPublic = this.configService.getSystemConfig(key as keyof SystemConfig);
+        if (isPublic) {
           return true;
         }
       } else {
-        const needLogin = this.configService.getUserConfig(key as keyof UserConfig);
-        if (!needLogin) {
+        const isPublic = this.configService.getUserConfig(key as keyof UserConfig);
+        if (isPublic) {
           return true;
         }
       }
