@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.9.0](///compare/v1.8.1...v1.9.0) (2023-11-12)
+
+
+### Features
+
+* 加Docker事件通知功能 c063fb9
+
 ### [1.8.1](///compare/v1.8.0...v1.8.1) (2023-11-09)
 
 ## [1.8.0](///compare/v1.7.0...v1.8.0) (2023-11-08)
