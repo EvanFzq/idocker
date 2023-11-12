@@ -1,4 +1,4 @@
-import type { AppInfo, UserInfo } from '@common/types/setting';
+import type { AppInfo, UserInfo, NoticeInfo } from '@common/types/setting';
 
 import { fetch } from './fetch';
 
@@ -28,4 +28,12 @@ export const getUserInfo = () => {
 
 export const updateUserInfo = (info: UserInfo) => {
   return fetch.put<UserInfo>('/setting/user', info);
+};
+
+export const getNoticeInfo = () => {
+  return fetch.post<NoticeInfo>('/setting/notice');
+};
+
+export const updateNoticeInfo = (info: NoticeInfo) => {
+  return fetch.put<void>('/setting/notice', info);
 };

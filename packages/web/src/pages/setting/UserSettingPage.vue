@@ -28,7 +28,6 @@
           v-model="userInfoForm.userName"
           name="userName"
           label="用户名"
-          :readonly="!isEdit"
           :maxlength="32"
           show-word-limit
           placeholder="请填写用户名"
@@ -45,7 +44,6 @@
           type="digit"
           name="passwordMaxRetryNum"
           label="密码尝试次数"
-          :readonly="!isEdit"
           placeholder="请填写密码最大尝试次数"
           :rules="[
             { required: true, message: '请填写密码最大尝试次数' },

@@ -3,12 +3,13 @@ import path from 'path';
 
 import { Injectable } from '@nestjs/common';
 
-import { ContainerStatus } from '@common/constants/enum';
-import { AppInfo, UserInfo } from '@common/types/setting';
+import { ContainerStatus, EmailType } from '@common/constants/enum';
+import { AppInfo, NoticeInfo, UserInfo } from '@common/types/setting';
 
 import { wallpaperDir } from '@/constants/fs';
 import { DockerService } from '@/modules/docker';
 import { ConfigService } from '@/modules/config';
+import { EmailService } from '@/modules/email';
 
 import { UpdateUserInfoDto } from './dto';
 
@@ -17,10 +18,10 @@ export class SettingService {
   constructor(
     private readonly dockerService: DockerService,
     private readonly configService: ConfigService,
+    private readonly emailService: EmailService,
   ) {}
   async getWallpaper() {
-    const currentWallpaperPath =
-      this.configService.getSystemConfig<string>('appsPageWallpaperPath');
+    const currentWallpaperPath = this.configService.getUserConfig<string>('appsPageWallpaperPath');
     if (!currentWallpaperPath) {
       return { src: null };
     }
@@ -50,10 +51,10 @@ export class SettingService {
       }
     }
     // 随机除当前壁纸外的其他壁纸
-    const currentWallpaperPath = this.configService.getSystemConfig('appsPageWallpaperPath');
+    const currentWallpaperPath = this.configService.getUserConfig('appsPageWallpaperPath');
     imgList = imgList.filter(imgPath => imgPath !== currentWallpaperPath);
     const imgPath = imgList[Math.floor(Math.random() * imgList.length)];
-    await this.configService.setSystemConfig('appsPageWallpaperPath', imgPath);
+    await this.configService.setUserConfig('appsPageWallpaperPath', imgPath);
     return {
       src: '/api/v1/asset/wallpaper' + imgPath.split(wallpaperDir)[1],
     };
@@ -95,5 +96,24 @@ export class SettingService {
     if (passwordMaxRetryNum) {
       this.configService.setUserConfig('passwordMaxRetryNum', passwordMaxRetryNum);
     }
+  }
+  async getNoticeSetting(): Promise<NoticeInfo> {
+    const emailType = this.configService.getUserConfig<EmailType>('emailType');
+    const emailAccount = this.configService.getUserConfig<string>('emailAccount');
+    const emailPassword = this.configService.getUserConfig<string>('emailPassword');
+    const events = this.configService.getUserConfig<Record<string, string[]>>('noticeEvents');
+    return {
+      emailType,
+      emailAccount,
+      emailPassword,
+      events,
+    };
+  }
+  async updateNoticeSetting(data: NoticeInfo) {
+    await this.emailService.changeTransport(data.emailType, data.emailAccount, data.emailPassword);
+    this.configService.setUserConfig('emailType', data.emailType);
+    this.configService.setUserConfig('emailAccount', data.emailAccount);
+    this.configService.setUserConfig('emailPassword', data.emailPassword);
+    this.configService.setUserConfig('noticeEvents', data.events);
   }
 }

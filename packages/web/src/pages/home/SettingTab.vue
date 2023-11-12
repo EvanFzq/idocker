@@ -50,6 +50,11 @@ SettingTab
         is-link
         to="/apps/setting"
       />
+      <van-cell
+        title="通知设置"
+        is-link
+        to="/notice/setting"
+      />
     </van-cell-group>
     <div class="btns">
       <van-button

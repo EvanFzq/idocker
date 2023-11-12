@@ -193,7 +193,7 @@ const onImageChange = async (value: string) => {
         imageList.value = res.data;
       }
     }
-  }, 500);
+  }, 200);
 };
 
 const onSelectImage = (selectImage: Image) => {

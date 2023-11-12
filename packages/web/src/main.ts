@@ -34,6 +34,8 @@ import {
   Grid,
   GridItem,
   FloatingBubble,
+  Checkbox,
+  CheckboxGroup,
 } from 'vant';
 
 import { routes } from '@/constants/routes';
@@ -83,6 +85,8 @@ app.use(Empty);
 app.use(Grid);
 app.use(GridItem);
 app.use(FloatingBubble);
+app.use(Checkbox);
+app.use(CheckboxGroup);
 
 app.mount('#app');
 

@@ -1,13 +1,13 @@
 import { Controller, Post, Body, Put } from '@nestjs/common';
 
-import { AppInfo, UserInfo } from '@common/types/setting';
+import { AppInfo, UserInfo, NoticeInfo } from '@common/types/setting';
 
 import { wallpaperDir } from '@/constants/fs';
 import { mkdir } from '@/utils/fs';
 import { ConfigPublic } from '@/decorators';
 
 import { SettingService } from './service';
-import { GetAppsDto, AppsPublicDto, UpdateUserInfoDto } from './dto';
+import { GetAppsDto, AppsPublicDto, UpdateUserInfoDto, UpdateNoticeInfoDto } from './dto';
 
 @Controller('setting')
 export class SettingController {
@@ -45,8 +45,18 @@ export class SettingController {
   async getUserInfo(): Promise<UserInfo> {
     return this.settingService.getUserInfo();
   }
+
   @Put('user')
   async updateUserInfo(@Body() body: UpdateUserInfoDto): Promise<void> {
     return this.settingService.updateUserInfo(body);
+  }
+
+  @Post('notice')
+  async getNoticeSetting(): Promise<NoticeInfo> {
+    return this.settingService.getNoticeSetting();
+  }
+  @Put('notice')
+  async updateNoticeSetting(@Body() body: UpdateNoticeInfoDto): Promise<void> {
+    return this.settingService.updateNoticeSetting(body);
   }
 }

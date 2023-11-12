@@ -7,8 +7,9 @@ import ImageListPage from '@/pages/imageList/ImageListPage.vue';
 import NetworkListPage from '@/pages/networkList/NetworkListPage.vue';
 import VolumeListPage from '@/pages/volumeList/VolumeListPage.vue';
 import AppsPage from '@/pages/apps/AppsPage.vue';
-import AppSettingPage from '@/pages/appsSetting/AppSettingPage.vue';
-import UserSettingPage from '@/pages/userSetting/UserSettingPage.vue';
+import AppSettingPage from '@/pages/setting/AppSettingPage.vue';
+import UserSettingPage from '@/pages/setting/UserSettingPage.vue';
+import NoticeSettingPage from '@/pages/setting/NoticeSettingPage.vue';
 
 export const routes = [
   { path: '/', component: HomePage },
@@ -23,4 +24,5 @@ export const routes = [
   { path: '/apps/internet', component: AppsPage },
   { path: '/apps/setting', component: AppSettingPage },
   { path: '/user/setting', component: UserSettingPage },
+  { path: '/notice/setting', component: NoticeSettingPage },
 ];
