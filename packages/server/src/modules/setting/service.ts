@@ -1,7 +1,7 @@
 import { promises as fs } from 'fs';
 import path from 'path';
 
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 
 import { ContainerStatus, EmailType } from '@common/constants/enum';
 import { AppInfo, NoticeInfo, UserInfo } from '@common/types/setting';
@@ -53,6 +53,9 @@ export class SettingService {
     // 随机除当前壁纸外的其他壁纸
     const currentWallpaperPath = this.configService.getUserConfig('appsPageWallpaperPath');
     imgList = imgList.filter(imgPath => imgPath !== currentWallpaperPath);
+    if (imgList.length === 0) {
+      throw new HttpException('无可更换壁纸', HttpStatus.INTERNAL_SERVER_ERROR);
+    }
     const imgPath = imgList[Math.floor(Math.random() * imgList.length)];
     await this.configService.setUserConfig('appsPageWallpaperPath', imgPath);
     return {

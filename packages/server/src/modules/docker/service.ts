@@ -78,9 +78,9 @@ export class DockerService {
           this.configService.getUserConfig<Record<EventType, EventAction[]>>('noticeEvents');
 
         const startTime = Math.floor(Date.now() / 1000);
-        const endTime = startTime + 10;
+        const endTime = startTime + 60;
         const res = await env.fetch.get(`/v1.37/events?since=${startTime}&until=${endTime}`, {
-          timeout: 10000,
+          timeout: 61000,
           responseType: 'stream',
         });
         const events: Event[] = [];

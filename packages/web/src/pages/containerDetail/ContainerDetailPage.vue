@@ -1,6 +1,6 @@
 <template>
   <TitleBar
-    :title="containerDetail.Name?.slice(1)"
+    :title="containerDetail.name"
     right-text="修改"
     @click-right="onClickEdit"
   />
@@ -60,40 +60,31 @@
       class="tab"
       title="基本信息"
     >
-      <BaseInfoTab
-        :id="containerDetail.Id"
-        :name="containerDetail.Name?.slice(1)"
-        :image="containerDetail.Config?.Image"
-        :start-time="containerDetail.State?.StartedAt"
-        :create-time="containerDetail.Created"
-        :cmd="containerDetail.Config?.Cmd"
-        :entrypoint="containerDetail.Config?.Entrypoint"
-        :restart="restart"
-      />
+      <BaseInfoTab :data="containerDetail" />
     </van-tab>
     <van-tab
       class="tab"
       title="挂载"
     >
-      <MountTab :list="containerDetail.Mounts" />
+      <MountTab :list="containerDetail.mounts" />
     </van-tab>
     <van-tab
       class="tab"
       title="端口"
     >
-      <PortTab :data="containerDetail.HostConfig?.PortBindings" />
+      <PortTab :data="containerDetail.ports" />
     </van-tab>
     <van-tab
       class="tab"
       title="网络"
     >
-      <NetworkTab :networks="containerDetail.NetworkSettings?.Networks" />
+      <NetworkTab :networks="containerDetail.networks" />
     </van-tab>
     <van-tab
       class="tab"
       title="变量"
     >
-      <EnvVarTab :envs="containerDetail.Config?.Env" />
+      <EnvVarTab :envs="containerDetail.envs" />
     </van-tab>
     <van-tab
       class="tab"
@@ -107,8 +98,7 @@
 import { ref, onMounted, watchEffect, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
-import { restartPolicyList } from '@common/constants/const';
-import type { Container } from '@common/types/container';
+import type { ContainerDetail } from '@common/types/container';
 
 import { getContainerDetail, getContainerStats } from '@/apis/container';
 import TitleBar from '@/components/TitleBar.vue';
@@ -132,26 +122,23 @@ const memoryRate = computed(() =>
   Number(((memoryUsage.value * 100) / memoryLimit.value).toFixed(0)),
 );
 
-const containerDetail = ref<Partial<Container>>({});
+const containerDetail = ref<Partial<ContainerDetail>>({});
 const statusLabel = computed(
-  () => containerDetail.value.State?.Status && statusLabelMap[containerDetail.value.State?.Status],
+  () => containerDetail.value.status && statusLabelMap[containerDetail.value.status],
 );
 const statusColor = computed(
-  () => containerDetail.value.State?.Status && statusColorMap[containerDetail.value.State?.Status],
+  () => containerDetail.value.status && statusColorMap[containerDetail.value.status],
 );
 const localUrl = computed(() => {
-  const template = containerDetail.value.Config?.Labels['docker.idocker.localUrl'];
+  const template = containerDetail.value.localUrl;
   if (!template) return;
   return webUrlTemplateFormat(template, containerDetail.value);
 });
 const internetUrl = computed(() => {
-  const template = containerDetail.value.Config?.Labels['docker.idocker.internetUrl'];
+  const template = containerDetail.value.internetUrl;
   if (!template) return;
   return webUrlTemplateFormat(template, containerDetail.value);
 });
-
-// 'docker.idocker.localUrl': params.localUrl,
-//         'docker.idocker.internetUrl': params.internetUrl,
 
 const activeTab = ref(0);
 
@@ -159,20 +146,12 @@ const route = useRoute();
 const router = useRouter();
 const id = computed(() => route.params.id as string);
 
-const restart = computed(
-  () =>
-    containerDetail.value.HostConfig?.RestartPolicy?.Name &&
-    restartPolicyList.find(
-      item => item.value === containerDetail.value.HostConfig?.RestartPolicy.Name,
-    )?.text + `【${containerDetail.value.HostConfig?.RestartPolicy?.MaximumRetryCount}次】`,
-);
-
 const getStats = async () => {
   const res = await getContainerStats([id.value]);
   if (res.success) {
     cpuRate.value = Math.floor(res.data[0].cpu);
-    memoryUsage.value = res.data[0].memory_usage;
-    memoryLimit.value = res.data[0].memory_limit;
+    memoryUsage.value = res.data[0].memoryUsage;
+    memoryLimit.value = res.data[0].memoryLimit;
   }
 };
 
@@ -188,11 +167,11 @@ onMounted(async () => {
 });
 
 const onClickEdit = () => {
-  router.push({ path: '/container', query: { id: containerDetail.value.Id } });
+  router.push({ path: '/container', query: { id: containerDetail.value.id } });
 };
 
 watchEffect(cleanUp => {
-  if (!id.value || containerDetail.value.State?.Status !== 'running') {
+  if (!id.value || containerDetail.value.status !== 'running') {
     return;
   }
   const timer = setInterval(getStats, 5000);

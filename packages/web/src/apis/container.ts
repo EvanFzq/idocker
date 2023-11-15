@@ -1,11 +1,11 @@
 import type { ContainerActive } from '@common/constants/enum';
 import type { ContainerStats } from '@common/types/container';
 import type {
-  Container,
   CreateContainerParams,
   UpdateContainerParams,
   ContainerListParams,
   ContainerListItem,
+  ContainerDetail,
 } from '@common/types/container';
 
 import { fetch } from './fetch';
@@ -15,7 +15,7 @@ export const getContainerList = async (params?: ContainerListParams) => {
 };
 
 export const getContainerDetail = async (id: string) => {
-  return fetch.post<Container>('/container/detail', { id });
+  return fetch.post<ContainerDetail>('/container/detail', { id });
 };
 
 export const getContainerStats = async (ids: string[]) => {

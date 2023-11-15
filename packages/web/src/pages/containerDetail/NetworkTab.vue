@@ -1,53 +1,53 @@
 <template>
   <div class="network">
     <van-cell-group
-      v-for="(network, key) in networks"
-      :key="network.NetworkID"
+      v-for="network in networks"
+      :key="network.id"
       inset
       class="network-item"
     >
       <van-cell
         title="类型"
-        :value="key"
+        :value="network.type"
       />
-      <div v-if="key !== 'host'">
+      <div v-if="network.type !== 'host'">
+        <van-cell
+          title="NetworkID"
+          :value="network.id.slice(0, 8)"
+        />
         <van-cell
           title="IP"
-          :value="network.IPAddress"
+          :value="network.ip ? network.ip + ' / ' + network.prefixLen : '-'"
         />
         <van-cell
           title="IPv6"
-          :value="network.GlobalIPv6Address"
+          :value="network.ipV6 ? network.ipV6 + ' / ' + network.prefixLenV6 : '-'"
         />
         <van-cell
           title="网关"
-          :value="network.Gateway"
+          :value="network.gateway ? network.gateway + ' / ' + network.prefixLen : '-'"
         />
         <van-cell
           title="IPv6网关"
-          :value="network.IPv6Gateway"
+          :value="network.gatewayV6 ? network.gatewayV6 + ' / ' + network.prefixLenV6 : '-'"
         />
         <van-cell
           title="MAC"
-          :value="network.MacAddress"
-        />
-        <van-cell
-          title="NetworkID"
-          :value="network.NetworkID"
+          :value="network.mac"
         />
       </div>
-      <div v-if="key === 'host'">
+      <div v-if="network.type === 'host'">
         <van-cell
           title="NetworkID"
-          :value="network.NetworkID"
+          :value="network.id"
         />
       </div>
     </van-cell-group>
   </div>
 </template>
 <script lang="ts" setup>
-import type { Networks } from '@common/types/container';
-defineProps<{ networks?: Networks }>();
+import type { Network } from '@common/types/container';
+defineProps<{ networks?: Network[] }>();
 </script>
 <style scoped lang="less">
 .network {

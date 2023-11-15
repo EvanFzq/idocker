@@ -10,14 +10,15 @@
       <van-cell
         v-for="(envVal, index) in envs"
         :key="index"
-        :title="envVal.split('=')[0]"
-        :value="envVal.split('=')[1]"
+        :title="envVal.key"
+        :value="envVal.value"
       />
     </van-cell-group>
   </div>
 </template>
 <script lang="ts" setup>
-defineProps<{ envs?: string[] }>();
+import type { Env } from '@common/types/container';
+defineProps<{ envs?: Env[] }>();
 </script>
 
 <style lang="less">

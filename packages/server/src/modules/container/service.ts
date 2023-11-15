@@ -1,7 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import Docker from 'dockerode';
+import Docker, { PortBinding } from 'dockerode';
+import dayjs from 'dayjs';
 
-import { ContainerStats } from '@common/types/container';
+import { ContainerStats, ContainerDetail, Port } from '@common/types/container';
 import { ContainerActive, RestartPolicy } from '@common/constants/enum';
 
 import { commandFormat } from '@/utils/utils';
@@ -24,7 +25,11 @@ export class ContainerService {
 
     const portBindings: Record<string, [{ HostPort: string }]> = {};
     params.ports?.forEach(port => {
-      portBindings[`${port.container}/${port.protocol}`] = [{ HostPort: port.host }];
+      if (!portBindings[`${port.container}/${port.protocol}`]) {
+        portBindings[`${port.container}/${port.protocol}`] = [{ HostPort: port.host }];
+      } else {
+        portBindings[`${port.container}/${port.protocol}`].push({ HostPort: port.host });
+      }
     });
     const container = await this.dockerService.docker.createContainer({
       name: params.name,
@@ -67,7 +72,11 @@ export class ContainerService {
     await container.remove({ focus: true });
     const portBindings: Record<string, [{ HostPort: string }]> = {};
     params.ports?.forEach(port => {
-      portBindings[`${port.container}/${port.protocol}`] = [{ HostPort: port.host }];
+      if (!portBindings[`${port.container}/${port.protocol}`]) {
+        portBindings[`${port.container}/${port.protocol}`] = [{ HostPort: port.host }];
+      } else {
+        portBindings[`${port.container}/${port.protocol}`].push({ HostPort: port.host });
+      }
     });
     const imageTag = params.image.indexOf(':') > 0 ? params.image : params.image + ':latest';
 
@@ -134,12 +143,87 @@ export class ContainerService {
     });
   }
 
-  async getContainerDetail(id: string) {
+  async getContainerDetail(id: string): Promise<ContainerDetail> {
     const detail = await this.dockerService.docker.getContainer(id).inspect();
+    const ports: Port[] = [];
+    if (detail.HostConfig.PortBindings) {
+      Object.entries(detail.HostConfig.PortBindings).forEach(
+        ([key, value]: [string, PortBinding[]]) => {
+          const [containerPort, protocol] = key.split('/');
+          value.forEach(item => {
+            ports.push({
+              hostPort: item.HostPort,
+              hostIp: item.HostIp,
+              containerPort,
+              protocol: protocol as 'tcp' | 'udp',
+            });
+          });
+        },
+      );
+    }
+
     return {
-      ...detail,
+      id: detail.Id,
+      name: detail.Name.slice(1),
+      image: detail.Config.Image,
+      status: detail.State.Status,
+      startedAt: dayjs(detail.State.StartedAt).valueOf(),
+      created: dayjs(detail.Created).valueOf(),
+      labels: detail.Config.Labels,
+      icon:
+        detail.Config.Labels['docker.idocker.icon'] ||
+        detail.Config.Labels['com.docker.desktop.extension.icon'] ||
+        detail.Config.Labels['net.unraid.docker.icon'] ||
+        null,
+      localUrl: detail.Config.Labels['docker.idocker.localUrl'] || null,
+      internetUrl: detail.Config.Labels['docker.idocker.internetUrl'] || null,
       isSelf: this.dockerService.currentContainerId === detail.Id,
       canUpdate: await this.dockerService.imageCanUpdate(detail.Config.Image, detail.Image),
+      restartPolicyName: detail.HostConfig.RestartPolicy?.Name,
+      restartPolicyMaximumRetryCount: detail.HostConfig.RestartPolicy?.MaximumRetryCount,
+      cmd: detail.Config.Cmd,
+      entrypoint: detail.Config.Entrypoint,
+      mounts: (
+        detail.Mounts as {
+          Name?: string | undefined;
+          Type: 'bind' | 'volume' | 'tmpfs';
+          Source: string;
+          Destination: string;
+          Driver?: string | undefined;
+          Mode: string;
+          RW: boolean;
+          Propagation: string;
+        }[]
+      )?.map(item => ({
+        type: item.Type,
+        source: item.Type === 'bind' ? item.Source : item.Name,
+        target: item.Destination,
+        rw: item.RW,
+      })),
+      ports,
+      exposedPorts: detail.Config.ExposedPorts
+        ? Object.keys(detail.Config.ExposedPorts).map(key => {
+            const [port, protocol] = key.split('/');
+            return { hostPort: port, protocol: protocol as 'tcp' | 'udp' };
+          })
+        : [],
+      networks: detail.NetworkSettings.Networks
+        ? Object.entries(detail.NetworkSettings.Networks).map(([type, value]) => ({
+            id: value.NetworkID,
+            type,
+            ip: value.IPAddress,
+            ipV6: value.GlobalIPv6Address,
+            gateway: value.Gateway,
+            gatewayV6: value.GlobalIPv6Address,
+            prefixLen: value.IPPrefixLen,
+            prefixLenV6: value.GlobalIPv6PrefixLen,
+            mac: value.MacAddress,
+          }))
+        : [],
+      envs: detail.Config.Env.map(item => {
+        const [key, value] = item.split('=');
+        return { key, value };
+      }),
     };
   }
 

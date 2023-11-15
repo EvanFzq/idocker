@@ -8,17 +8,17 @@
         value="容器端口"
       />
       <van-cell
-        v-for="(value, key) in data"
-        :key="key"
-        :title="value?.[0]?.HostPort || '未绑定'"
-        :value="key"
+        v-for="(item, index) in data"
+        :key="index"
+        :title="item.hostPort || '未绑定'"
+        :value="item.containerPort + '/' + item.protocol"
       />
     </van-cell-group>
   </div>
 </template>
 <script lang="ts" setup>
-import type { Ports } from '@common/types/container';
-defineProps<{ data?: Ports }>();
+import type { Port } from '@common/types/container';
+defineProps<{ data?: Port[] }>();
 </script>
 <style lang="less">
 .port {

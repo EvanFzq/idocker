@@ -1,7 +1,6 @@
 import { Body, Controller, Post, Put } from '@nestjs/common';
-import dayjs from 'dayjs';
 
-import { ContainerListItem } from '@common/types/container';
+import { ContainerListItem, ContainerDetail } from '@common/types/container';
 
 import { ContainerService } from './service';
 import {
@@ -50,25 +49,7 @@ export class ContainerController {
     const containerDetailList = await Promise.all(
       containerList.map(item => this.containerService.getContainerDetail(item.Id)),
     );
-    let list: ContainerListItem[] = containerDetailList.map(item => {
-      return {
-        id: item.Id,
-        name: item.Name.slice(1),
-        image: item.Config.Image,
-        status: item.State.Status,
-        startedAt: dayjs(item.State.StartedAt).valueOf(),
-        created: dayjs(item.Created).valueOf(),
-        labels: item.Config.Labels,
-        icon:
-          item.Config.Labels['docker.idocker.icon'] ||
-          item.Config.Labels['com.docker.desktop.extension.icon'] ||
-          item.Config.Labels['net.unraid.docker.icon'],
-        localUrl: item.Config.Labels['docker.idocker.localUrl'],
-        internetUrl: item.Config.Labels['docker.idocker.internetUrl'],
-        isSelf: item.isSelf,
-        canUpdate: item.canUpdate,
-      };
-    });
+    let list: ContainerListItem[] = containerDetailList;
     // 获取容器资源消耗指标
     if (body.hasMetrics) {
       const statsList = await this.containerService.getContainerStats(list.map(item => item.id));
@@ -81,7 +62,7 @@ export class ContainerController {
   }
   // 获取容器配置详情
   @Post('detail')
-  async getContainer(@Body() body: ContainerDetailDto) {
+  async getContainer(@Body() body: ContainerDetailDto): Promise<ContainerDetail> {
     return this.containerService.getContainerDetail(body.id);
   }
   // 获取容器资源消耗
