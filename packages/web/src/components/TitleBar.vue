@@ -20,3 +20,4 @@ const onClickLeft = () => {
   router.back();
 };
 </script>
+<style></style>

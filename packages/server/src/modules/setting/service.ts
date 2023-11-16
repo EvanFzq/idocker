@@ -5,11 +5,13 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 
 import { ContainerStatus, EmailType } from '@common/constants/enum';
 import { AppInfo, NoticeInfo, UserInfo } from '@common/types/setting';
+import { webUrlTemplateFormat } from '@common/utils/utils';
 
 import { wallpaperDir } from '@/constants/fs';
 import { DockerService } from '@/modules/docker';
 import { ConfigService } from '@/modules/config';
 import { EmailService } from '@/modules/email';
+import { ContainerService } from '@/modules/container';
 
 import { UpdateUserInfoDto } from './dto';
 
@@ -19,6 +21,7 @@ export class SettingService {
     private readonly dockerService: DockerService,
     private readonly configService: ConfigService,
     private readonly emailService: EmailService,
+    private readonly containerService: ContainerService,
   ) {}
   async getWallpaper() {
     const currentWallpaperPath = this.configService.getUserConfig<string>('appsPageWallpaperPath');
@@ -62,17 +65,24 @@ export class SettingService {
       src: '/api/v1/asset/wallpaper' + imgPath.split(wallpaperDir)[1],
     };
   }
-  async getApps(isLocal: boolean): Promise<AppInfo[]> {
+  async getApps(req: Request, isLocal: boolean): Promise<AppInfo[]> {
     const containerList = await this.dockerService.docker.listContainers({ all: true });
-    return containerList
+
+    const containerDetailList = await Promise.all(
+      containerList.map(item => this.containerService.getContainerDetail(item.Id)),
+    );
+
+    const { hostname, protocol } = new URL(req.headers['referer']);
+
+    return containerDetailList
       .map(container => ({
-        name: container.Names[0].slice(1),
+        name: container.name,
         url: isLocal
-          ? container.Labels['docker.idocker.localUrl']
-          : container.Labels['docker.idocker.internetUrl'],
-        icon: container.Labels['docker.idocker.icon'],
-        status: container.State as ContainerStatus,
-        index: container.Created,
+          ? webUrlTemplateFormat(container.localUrl, hostname, protocol, container)
+          : webUrlTemplateFormat(container.internetUrl, hostname, protocol, container),
+        icon: container.icon,
+        status: container.status as ContainerStatus,
+        index: container.created,
         type: 'container' as const,
       }))
       .filter(item => item.url);

@@ -9,5 +9,6 @@ import { ImageModule } from '../image';
   imports: [DockerModule, ImageModule],
   controllers: [ContainerController],
   providers: [ContainerService],
+  exports: [ContainerService],
 })
 export class ContainerModule {}

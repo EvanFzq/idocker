@@ -99,11 +99,12 @@ import { ref, onMounted, watchEffect, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 
 import type { ContainerDetail } from '@common/types/container';
+import { webUrlTemplateFormat } from '@common/utils/utils';
 
 import { getContainerDetail, getContainerStats } from '@/apis/container';
 import TitleBar from '@/components/TitleBar.vue';
 import { statusColorMap, statusLabelMap } from '@/constants/container';
-import { fileSizeFormat, webUrlTemplateFormat } from '@/utils/utils';
+import { fileSizeFormat } from '@/utils/utils';
 
 import BaseInfoTab from './BaseInfoTab.vue';
 import EnvVarTab from './EnvVarTab.vue';
@@ -132,12 +133,12 @@ const statusColor = computed(
 const localUrl = computed(() => {
   const template = containerDetail.value.localUrl;
   if (!template) return;
-  return webUrlTemplateFormat(template, containerDetail.value);
+  return webUrlTemplateFormat(template, location.host, location.protocol, containerDetail.value);
 });
 const internetUrl = computed(() => {
   const template = containerDetail.value.internetUrl;
   if (!template) return;
-  return webUrlTemplateFormat(template, containerDetail.value);
+  return webUrlTemplateFormat(template, location.host, location.protocol, containerDetail.value);
 });
 
 const activeTab = ref(0);

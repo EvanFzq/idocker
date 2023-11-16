@@ -58,8 +58,7 @@ import { computed } from 'vue';
 
 import type { ContainerDetail } from '@common/types/container';
 import { restartPolicyList } from '@common/constants/const';
-
-import { webUrlTemplateFormat } from '@/utils/utils';
+import { webUrlTemplateFormat } from '@common/utils/utils';
 
 interface BaseInfoProps {
   data: Partial<ContainerDetail>;
@@ -76,13 +75,13 @@ const restart = computed(
 const localUrl = computed(() => {
   const template = props.data.localUrl;
   if (!template) return;
-  return webUrlTemplateFormat(template, props.data);
+  return webUrlTemplateFormat(template, location.host, location.protocol, props.data);
 });
 
 const internetUrl = computed(() => {
   const template = props.data.internetUrl;
   if (!template) return;
-  return webUrlTemplateFormat(template, props.data);
+  return webUrlTemplateFormat(template, location.host, location.protocol, props.data);
 });
 
 const goTo = (url?: string) => {

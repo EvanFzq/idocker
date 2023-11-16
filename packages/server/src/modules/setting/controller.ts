@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Put } from '@nestjs/common';
+import { Controller, Post, Body, Put, Req } from '@nestjs/common';
 
 import { AppInfo, UserInfo, NoticeInfo } from '@common/types/setting';
 
@@ -27,8 +27,8 @@ export class SettingController {
   // 获取导航页配置
   @ConfigPublic('user', 'appsPagePublic')
   @Post('apps')
-  async getApps(@Body() body: GetAppsDto): Promise<AppInfo[]> {
-    return this.settingService.getApps(body.isLocal);
+  async getApps(@Req() req: Request, @Body() body: GetAppsDto): Promise<AppInfo[]> {
+    return this.settingService.getApps(req, body.isLocal);
   }
 
   @Post('apps/public')

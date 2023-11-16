@@ -51,7 +51,7 @@
 import { computed, ref, watchEffect, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 
-import type { AppInfo } from '@common/types/container';
+import type { AppInfo } from '@common/types/setting';
 
 import { getApps } from '@/apis/setting';
 import { getWallpaper, switchWallpaper } from '@/apis/setting';

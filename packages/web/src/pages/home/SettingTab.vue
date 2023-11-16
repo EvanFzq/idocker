@@ -182,6 +182,7 @@ const onChangePasswordSubmit = async () => {
 }
 .setting {
   position: relative;
+  padding-bottom: 72px;
 
   .setting-list {
     margin: 12px;
