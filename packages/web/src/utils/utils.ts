@@ -12,7 +12,9 @@ export const fileSizeFormat = (size: number) => {
   let str = '';
   Object.keys(VolumeUnit).forEach((unit: string) => {
     const num = size / VolumeUnitSize[unit];
-    if (num > 1) {
+    if (num > 10) {
+      str = num.toFixed(0) + unit;
+    } else if (num > 1) {
       str = num.toFixed(1) + unit;
     }
   });
@@ -53,4 +55,18 @@ export const dataURLtoFile = (dataurl: string, filename: string) => {
   return new File([u8arr], filename, {
     type: 'image/jpeg',
   });
+};
+
+export const isMobile = () => {
+  const userAgent = navigator.userAgent;
+  const width = document.documentElement.offsetWidth;
+  // 屏幕小于1000
+  if (width > 1000) return false;
+  // 且有移动端标识
+  return (
+    userAgent.indexOf('iPhone') > 0 ||
+    userAgent.indexOf('Mobile') > 0 ||
+    userAgent.indexOf('Android') > 0 ||
+    userAgent.indexOf('iPad') > 0
+  );
 };

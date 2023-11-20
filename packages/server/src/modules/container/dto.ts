@@ -5,6 +5,7 @@ import {
   IsOptional,
   ValidateNested,
   IsNumberString,
+  IsInt,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -20,6 +21,14 @@ export class ContainerStatsDto {
 export class ContainerDetailDto {
   @IsString()
   id: string;
+
+  @IsString()
+  @IsOptional()
+  untilNs?: string;
+
+  @IsInt()
+  @IsOptional()
+  num?: number;
 }
 
 export class ContainerActiveDto {

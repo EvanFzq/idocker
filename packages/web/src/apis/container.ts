@@ -4,14 +4,13 @@ import type {
   CreateContainerParams,
   UpdateContainerParams,
   ContainerListParams,
-  ContainerListItem,
   ContainerDetail,
 } from '@common/types/container';
 
 import { fetch } from './fetch';
 
 export const getContainerList = async (params?: ContainerListParams) => {
-  return fetch.post<ContainerListItem[]>('/container/list', params);
+  return fetch.post<ContainerDetail[]>('/container/list', params);
 };
 
 export const getContainerDetail = async (id: string) => {
@@ -22,8 +21,8 @@ export const getContainerStats = async (ids: string[]) => {
   return fetch.post<ContainerStats[]>('/container/stats', { ids });
 };
 
-export const getContainerLogs = async (id: string) => {
-  return fetch.post<string>('/container/logs', { id });
+export const getContainerLogs = async (id: string, untilNs?: string, num?: number) => {
+  return fetch.post<{ date: string; text: string }[]>('/container/logs', { id, untilNs, num });
 };
 
 export const activeContainer = async (id: string, type: ContainerActive) => {

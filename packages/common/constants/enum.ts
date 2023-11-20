@@ -32,6 +32,28 @@ export enum ContainerStatus {
   created = 'created',
   restarting = 'restarting',
 }
+export const ContainerStatusName: Record<string, string> = {
+  [ContainerStatus.running]: '运行中',
+  [ContainerStatus.paused]: '已暂停',
+  [ContainerStatus.exited]: '已关闭',
+  [ContainerStatus.created]: '已创建',
+  [ContainerStatus.restarting]: '重启中',
+};
+
+export const ContainerStatusColor: Record<string, string> = {
+  running: '#07c160',
+  paused: '#ed6a0c',
+  created: '#d9ecff',
+  exited: '#999',
+};
+
+export const ContainerButtonColor = {
+  running: '#07c160',
+  restart: '#1989fa',
+  paused: '#ed6a0c',
+  exited: '#888',
+  delete: '#ee0a24',
+};
 
 export const NumberLevel: {
   [key: string]: number;

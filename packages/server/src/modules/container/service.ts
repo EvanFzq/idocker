@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import Docker, { PortBinding } from 'dockerode';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 
 import { ContainerStats, ContainerDetail, Port } from '@common/types/container';
 import { ContainerActive, RestartPolicy } from '@common/constants/enum';
@@ -280,16 +280,47 @@ export class ContainerService {
     }
   }
 
-  async getContainerLogs(id: string) {
+  async getContainerLogs(id: string, untilNs?: string, num?: number) {
     const container = this.dockerService.docker.getContainer(id);
+
     const res = await container.logs({
       follow: false,
-      tail: 200,
+      tail: untilNs ? 10000 : num || 200,
+      until: untilNs ? dayjs(untilNs).unix() + 1 : undefined,
       timestamps: true,
       stderr: true,
       stdout: true,
+      details: true,
     });
-    return res.toString();
+    let texts = res
+      .toString()
+      .split('\n')
+      // eslint-disable-next-line no-control-regex
+      .map(item => item.replace(/(\x00|\x01|\x02|\x03|\x04|\x05|\x06|\x07)+.{1}/, '').trim())
+      .filter(item => item)
+      .reverse();
+
+    // 去除同一秒内已获取的log
+    if (untilNs) {
+      texts = texts.filter(line => {
+        const date = line.slice(0, 30).trim();
+        // '2023-11-20T08:32:46.451962259Z'.localeCompare('2023-11-20T08:32:46.451962260Z') = -1
+        return date.localeCompare(untilNs) < 0;
+      });
+    }
+    // 限制条数
+    if (num) {
+      texts = texts.slice(0, num);
+    }
+
+    return texts.map(line => {
+      const date = line.slice(0, 30).trim();
+      const content = line.slice(31);
+      return {
+        date: date,
+        text: content,
+      };
+    });
   }
 
   async updateContainerImage(id: string) {

@@ -73,7 +73,7 @@ export class ContainerController {
   // 获取容器log
   @Post('logs')
   async getContainerLogs(@Body() body: ContainerDetailDto) {
-    return await this.containerService.getContainerLogs(body.id);
+    return await this.containerService.getContainerLogs(body.id, body.untilNs, body.num);
   }
   // 操作容器，启动、停止、暂停、恢复、移除
   @Put('active')

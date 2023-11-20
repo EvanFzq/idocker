@@ -2,6 +2,8 @@
 import { showFailToast } from 'vant';
 import axios from 'axios';
 
+import { isMobile } from '@/utils/utils';
+
 import type { AxiosRequestConfig } from 'axios';
 
 export const _fetch = axios.create({
@@ -49,7 +51,7 @@ _fetch.interceptors.response.use(
       showFailToast({
         message: '未登录，即将前往登录',
         onClose() {
-          location.href = '/login';
+          location.href = isMobile() ? '/m/login' : '/d/login';
         },
       });
     } else {
