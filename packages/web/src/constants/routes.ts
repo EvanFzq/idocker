@@ -14,6 +14,7 @@ import UserSettingPage from '@/pages/mobile/setting/UserSettingPage.vue';
 import NoticeSettingPage from '@/pages/mobile/setting/NoticeSettingPage.vue';
 import DesktopContainerListPage from '@/pages/desktop/containerList/containerListPage.vue';
 import DesktopContainerDetailPage from '@/pages/desktop/containerDetail/containerDetailPage.vue';
+import DesktopCreateOrEditContainerPage from '@/pages/desktop/createOrEditContainer/createOrEditContainerPage.vue';
 
 export const routes = [
   {
@@ -43,6 +44,7 @@ export const routes = [
       { path: '/d', component: DesktopContainerListPage },
       { path: '/d/container', component: DesktopContainerListPage },
       { path: '/d/container/:id', component: DesktopContainerDetailPage },
+      { path: '/d/container/newOrEdit', component: DesktopCreateOrEditContainerPage },
     ],
   },
 ];

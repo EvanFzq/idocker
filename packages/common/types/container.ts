@@ -1,6 +1,7 @@
 export interface ContainerStats {
   id: string;
   cpu: number;
+  cpuNum?: number;
   memoryUsage: number;
   memoryLimit: number;
 }
@@ -16,7 +17,7 @@ export interface MountConfig {
 export interface NewPort {
   host: string;
   container: string;
-  protocol: string;
+  protocol: 'tcp' | 'udp';
 }
 
 export interface NewMount {
@@ -39,6 +40,8 @@ export interface CreateContainerParams {
   image: string;
   network: string;
   restart: string;
+  localUrl?: string;
+  internetUrl?: string;
   runAffterCreated: boolean;
   ports: NewPort[];
   mounts: NewMount[];
@@ -66,6 +69,7 @@ export interface ContainerListItem {
   localUrl?: string;
   internetUrl?: string;
   cpu?: number;
+  cpuNum?: number;
   memoryLimit?: number;
   memoryUsage?: number;
   isSelf?: boolean;

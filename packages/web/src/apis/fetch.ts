@@ -74,6 +74,12 @@ interface Response<T> {
 }
 
 export const fetch = {
+  get: async <T>(
+    url: string,
+    config?: AxiosRequestConfig<any> | undefined,
+  ): Promise<Response<T>> => {
+    return await _fetch.get(url, config);
+  },
   post: async <T>(
     url: string,
     data?: any,

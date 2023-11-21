@@ -87,7 +87,7 @@ import { showSuccessToast, showLoadingToast } from 'vant';
 import { useRoute, useRouter } from 'vue-router';
 import set from 'lodash-es/set';
 
-import type { CreateContainerParams, MountConfig } from '@common/types/container';
+import type { CreateContainerParams, MountConfig, Env } from '@common/types/container';
 import type { PortConfig } from '@common/types/network';
 
 import { getContainerDetail } from '@/apis/container';
@@ -102,10 +102,6 @@ import PortTab from './PortTab.vue';
 import EnvVarTab from './EnvVarTab.vue';
 import OtherTab from './OtherTab.vue';
 
-interface Env {
-  key: string;
-  value: string;
-}
 export interface ContainerFormData {
   id?: string;
   name: string;

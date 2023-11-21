@@ -1,48 +1,68 @@
 <template>
-  <div
-    v-if="!detail"
-    class="loading"
+  <PageLayout
+    :breadcrumbs="[
+      { to: '/d/container', lable: '容器列表' },
+      { lable: '容器详情-' + detail?.name },
+    ]"
   >
-    <van-loading />
-  </div>
-  <div
-    v-if="detail"
-    class="container-detail-page"
-  >
-    <div class="name">{{ detail.name }}</div>
-    <el-tabs
-      v-model="activeTab"
-      class="tabs"
+    <template #right>
+      <el-button
+        type="primary"
+        :icon="Edit"
+        @click="onEdit"
+      >
+        编辑
+      </el-button>
+    </template>
+    <div
+      v-if="!detail"
+      class="loading"
     >
-      <el-tab-pane
-        label="信息"
-        name="info"
+      <van-loading />
+    </div>
+    <div
+      v-if="detail"
+      class="container-detail-page"
+    >
+      <el-tabs
+        v-model="activeTab"
+        class="tabs"
       >
-        <ContainerInfo :detail="detail" />
-      </el-tab-pane>
-      <el-tab-pane
-        label="日志"
-        name="logs"
-      >
-        <ContainerLogs :id="route.params.id as string" />
-      </el-tab-pane>
-    </el-tabs>
-  </div>
+        <el-tab-pane
+          label="信息"
+          name="info"
+        >
+          <ContainerInfo :detail="detail" />
+        </el-tab-pane>
+        <el-tab-pane
+          label="日志"
+          name="logs"
+        >
+          <ContainerLogs :id="id" />
+        </el-tab-pane>
+      </el-tabs>
+    </div>
+  </PageLayout>
 </template>
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { ref, onMounted, computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { Edit } from '@element-plus/icons-vue';
 
 import type { ContainerDetail } from '@common/types/container';
 
 import { getContainerDetail } from '@/apis/container';
+import PageLayout from '@/components/desktop/PageLayout.vue';
 
 import ContainerInfo from './containerInfo.vue';
 import ContainerLogs from './containerLogs.vue';
 
 const route = useRoute();
+const router = useRouter();
 const activeTab = ref('info');
 const detail = ref<ContainerDetail | null>(null);
+const id = computed(() => route.params.id as string);
+
 onMounted(async () => {
   if (!route.params.id) {
     return;
@@ -52,6 +72,10 @@ onMounted(async () => {
     detail.value = res.data;
   }
 });
+
+const onEdit = () => {
+  router.push('/d/container/newOrEdit?id=' + detail.value?.id);
+};
 </script>
 <style scoped lang="less">
 .container-detail-page {
@@ -69,12 +93,6 @@ onMounted(async () => {
   justify-content: center;
   align-items: center;
   height: 100%;
-}
-.name {
-  font-size: 24px;
-  font-weight: 700;
-  color: #409eff;
-  margin-bottom: 16px;
 }
 </style>
 <style>

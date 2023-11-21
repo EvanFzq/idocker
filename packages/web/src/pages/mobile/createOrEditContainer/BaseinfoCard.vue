@@ -54,12 +54,12 @@
             @click="() => onSelectImage(image)"
           >
             <div class="name">
+              <span>{{ image.name }}</span>
               <van-icon
                 v-if="image.is_official"
                 name="medal-o"
                 class="icon"
               />
-              <span>{{ image.name }}</span>
             </div>
             <div class="star">
               {{ numberFormat(image.star_count) }}

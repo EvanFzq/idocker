@@ -173,16 +173,11 @@
         v-for="(env, index) in detail.envs"
         :key="index"
         :label="env.key"
-        width="15%"
+        label-class-name="env-desc-label"
       >
         <div style="word-break: break-all"> {{ env.value }}</div>
       </el-descriptions-item>
     </el-descriptions>
-    <el-descriptions
-      title="日志"
-      border
-      class="block"
-    />
   </div>
 </template>
 <script setup lang="ts">
@@ -208,5 +203,12 @@ defineProps<{ detail: ContainerDetail }>();
 }
 .block {
   margin-top: 32px;
+}
+</style>
+<style>
+.env-desc-label {
+  white-space: wrap;
+  word-break: break-all;
+  max-width: 240px;
 }
 </style>

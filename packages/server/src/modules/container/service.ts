@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import Docker, { PortBinding } from 'dockerode';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 
 import { ContainerStats, ContainerDetail, Port } from '@common/types/container';
 import { ContainerActive, RestartPolicy } from '@common/constants/enum';
@@ -240,6 +240,7 @@ export class ContainerService {
       return {
         id,
         cpu: (cpuDelta / systemDelta) * cpu_stats.online_cpus * 100,
+        cpuNum: cpu_stats.online_cpus,
         memoryUsage: memory_stats.usage,
         memoryLimit: memory_stats.limit,
       };

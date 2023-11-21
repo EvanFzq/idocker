@@ -189,12 +189,13 @@
             link
             @click="onView(row.id)"
           >
-            查看
+            详情
           </el-button>
           <el-button
             type="primary"
             :icon="Edit"
             link
+            @click="onEdit(row.id)"
           >
             编辑
           </el-button>
@@ -322,6 +323,9 @@ const onActive = async (id: string, type: ContainerActive) => {
 };
 const onView = (id: string) => {
   router.push('/d/container/' + id);
+};
+const onEdit = (id: string) => {
+  router.push('/d/container/newOrEdit?id=' + id);
 };
 </script>
 <style scoped lang="less">
