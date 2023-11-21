@@ -5,11 +5,13 @@
   >
     <van-loading />
   </div>
-  <div v-if="detail">
+  <div
+    v-if="detail"
+    class="conatiner-detail-page"
+  >
     <el-descriptions
       title="基础信息"
       border
-      class="block"
     >
       <el-descriptions-item label="ID">
         {{ detail.id.slice(0, 16) }}
@@ -194,6 +196,9 @@ defineProps<{ detail: ContainerDetail }>();
   justify-content: center;
   align-items: center;
   height: 100%;
+}
+.conatiner-detail-page {
+  margin-bottom: 32px;
 }
 .name {
   font-size: 24px;

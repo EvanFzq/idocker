@@ -52,7 +52,7 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { Plus } from '@element-plus/icons-vue';
 import { useRouter } from 'vue-router';
 
@@ -106,13 +106,17 @@ const getData = async (hasMetrics?: boolean) => {
   }
 };
 
+let timer: NodeJS.Timeout;
 onMounted(async () => {
   await getData();
   await getData(true);
-
-  setInterval(() => {
+  timer = setInterval(() => {
     getData(true);
   }, 5000);
+});
+// 清理定时器
+onUnmounted(() => {
+  clearInterval(timer);
 });
 
 const onReload = async () => {
