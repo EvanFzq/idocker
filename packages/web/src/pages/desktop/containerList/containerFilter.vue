@@ -53,13 +53,14 @@
       <el-button
         type="primary"
         style="margin-left: 80px"
+        :icon="Search"
         @click="onSubmit"
       >
         查询
       </el-button>
       <el-button
-        type="primary"
         style="margin-left: 12px"
+        :icon="RefreshRight"
         @click="onReset"
       >
         重置
@@ -69,6 +70,7 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { Search, RefreshRight } from '@element-plus/icons-vue';
 
 import { getImageList } from '@/apis/image';
 import { getNetworkList } from '@/apis/network';

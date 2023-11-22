@@ -31,7 +31,7 @@
         type="primary"
         native-type="submit"
       >
-        提交
+        登录
       </van-button>
     </div>
   </van-form>
@@ -44,6 +44,7 @@ import { login } from '@/apis/auth';
 
 const username = ref('');
 const password = ref('');
+
 const onSubmit = async (values: { username: string; password: string }) => {
   const { username, password } = values;
   const res = await login(username, password);

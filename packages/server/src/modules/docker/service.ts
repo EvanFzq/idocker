@@ -111,7 +111,9 @@ export class DockerService {
   private async sendEmail(env: string, events: Event[]) {
     console.info('send email->', env, events);
     const emailAccount = this.configService.getUserConfig<string>('emailAccount');
-    const containerList = await this.docker.listContainers();
+    const containerList = await this.docker.listContainers({
+      all: true,
+    });
     const imagesList = await this.docker.listImages();
     const networkList = await this.docker.listNetworks();
     const volumesList = await this.docker.listVolumes();

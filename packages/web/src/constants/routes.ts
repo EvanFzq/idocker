@@ -1,50 +1,75 @@
 import MobilePage from '@/pages/mobile/mobilePage.vue';
 import DesktopPage from '@/pages/desktop/desktopPage.vue';
-import HomePage from '@/pages/mobile/home/HomePage.vue';
-import LoginPage from '@/pages/mobile/login/LoginPage.vue';
-import ContainerDetailPage from '@/pages/mobile/containerDetail/ContainerDetailPage.vue';
-import containerList from '@/pages/mobile/containerList/containerList.vue';
-import CreateOrEditContainerPage from '@/pages/mobile/createOrEditContainer/CreateOrEditContainerPage.vue';
-import ImageListPage from '@/pages/mobile/imageList/ImageListPage.vue';
-import NetworkListPage from '@/pages/mobile/networkList/NetworkListPage.vue';
-import VolumeListPage from '@/pages/mobile/volumeList/VolumeListPage.vue';
 import AppsPage from '@/pages/mobile/apps/AppsPage.vue';
-import AppSettingPage from '@/pages/mobile/setting/AppSettingPage.vue';
-import UserSettingPage from '@/pages/mobile/setting/UserSettingPage.vue';
-import NoticeSettingPage from '@/pages/mobile/setting/NoticeSettingPage.vue';
-import DesktopContainerListPage from '@/pages/desktop/containerList/containerListPage.vue';
-import DesktopContainerDetailPage from '@/pages/desktop/containerDetail/containerDetailPage.vue';
-import DesktopCreateOrEditContainerPage from '@/pages/desktop/createOrEditContainer/createOrEditContainerPage.vue';
 
 export const routes = [
+  { path: '/apps/local', component: AppsPage },
+  { path: '/apps/internet', component: AppsPage },
   {
     path: '/m',
     component: MobilePage,
     children: [
-      { path: '/m', component: HomePage },
-      { path: '/m/login', component: LoginPage },
-      { path: '/m/container', component: CreateOrEditContainerPage },
-      { path: '/m/container/list', component: containerList },
-      { path: '/m/container/:id', component: ContainerDetailPage },
-      { path: '/m/image/list', component: ImageListPage },
-      { path: '/m/network/list', component: NetworkListPage },
-      { path: '/m/volume/list', component: VolumeListPage },
-      { path: '/m/apps/local', component: AppsPage },
-      { path: '/m/apps/internet', component: AppsPage },
-      { path: '/m/apps/setting', component: AppSettingPage },
-      { path: '/m/user/setting', component: UserSettingPage },
-      { path: '/m/notice/setting', component: NoticeSettingPage },
+      { path: '/m', component: () => import('@/pages/mobile/home/HomePage.vue') },
+      { path: '/m/login', component: () => import('@/pages/mobile/login/LoginPage.vue') },
+      {
+        path: '/m/container',
+        component: () =>
+          import('@/pages/mobile/createOrEditContainer/CreateOrEditContainerPage.vue'),
+      },
+      {
+        path: '/m/container/list',
+        component: () => import('@/pages/mobile/containerList/containerList.vue'),
+      },
+      {
+        path: '/m/container/:id',
+        component: () => import('@/pages/mobile/containerDetail/ContainerDetailPage.vue'),
+      },
+      {
+        path: '/m/image/list',
+        component: () => import('@/pages/mobile/imageList/ImageListPage.vue'),
+      },
+      {
+        path: '/m/network/list',
+        component: () => import('@/pages/mobile/networkList/NetworkListPage.vue'),
+      },
+      {
+        path: '/m/volume/list',
+        component: () => import('@/pages/mobile/volumeList/VolumeListPage.vue'),
+      },
+
+      {
+        path: '/m/apps/setting',
+        component: () => import('@/pages/mobile/setting/AppSettingPage.vue'),
+      },
+      {
+        path: '/m/user/setting',
+        component: () => import('@/pages/mobile/setting/UserSettingPage.vue'),
+      },
+      {
+        path: '/m/notice/setting',
+        component: () => import('@/pages/mobile/setting/NoticeSettingPage.vue'),
+      },
     ],
   },
-  { path: '/d/login', component: LoginPage },
+  { path: '/d/login', component: () => import('@/pages/desktop/login/LoginPage.vue') },
   {
     path: '/d',
     component: DesktopPage,
     children: [
-      { path: '/d', component: DesktopContainerListPage },
-      { path: '/d/container', component: DesktopContainerListPage },
-      { path: '/d/container/:id', component: DesktopContainerDetailPage },
-      { path: '/d/container/newOrEdit', component: DesktopCreateOrEditContainerPage },
+      {
+        path: '/d/container',
+        component: () => import('@/pages/desktop/containerList/containerListPage.vue'),
+      },
+      {
+        path: '/d/container/:id',
+        component: () => import('@/pages/desktop/containerDetail/containerDetailPage.vue'),
+      },
+      {
+        path: '/d/container/newOrEdit',
+        component: () =>
+          import('@/pages/desktop/createOrEditContainer/createOrEditContainerPage.vue'),
+      },
+      { path: '/d/:error*', component: () => import('@/pages/desktop/error404/ErrerPage.vue') },
     ],
   },
 ];
