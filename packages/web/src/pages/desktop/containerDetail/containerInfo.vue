@@ -3,106 +3,69 @@
     v-if="!detail"
     class="loading"
   >
-    <van-loading />
+    <Spin />
   </div>
   <div
     v-if="detail"
     class="conatiner-detail-page"
   >
-    <el-descriptions
+    <a-descriptions
       title="基础信息"
-      border
+      bordered
+      :content-style="{ background: '#fff' }"
+      :label-style="{ background: '#f5f7fa' }"
     >
-      <el-descriptions-item label="ID">
+      <a-descriptions-item label="ID">
         {{ detail.id.slice(0, 16) }}
-      </el-descriptions-item>
-      <el-descriptions-item label="镜像">
+      </a-descriptions-item>
+      <a-descriptions-item label="镜像">
         {{ detail.image }}
-      </el-descriptions-item>
-      <el-descriptions-item label="重启策略">
+      </a-descriptions-item>
+      <a-descriptions-item label="重启策略">
         {{
           detail.restartPolicyName
             ? restartPolicyList.find(item => item.value === detail?.restartPolicyName)?.text +
               `【${detail.restartPolicyMaximumRetryCount}次】`
             : ''
         }}
-      </el-descriptions-item>
-      <el-descriptions-item label="启动时间">
+      </a-descriptions-item>
+      <a-descriptions-item label="启动时间">
         {{ detail.startedAt ? dayjs(detail.startedAt).format('YYYY-MM-DD HH:mm:ss') : '-' }}
-      </el-descriptions-item>
-      <el-descriptions-item label="创建时间">
+      </a-descriptions-item>
+      <a-descriptions-item label="创建时间">
         {{ detail.created ? dayjs(detail.created).format('YYYY-MM-DD HH:mm:ss') : '-' }}
-      </el-descriptions-item>
-      <el-descriptions-item label="CMD">
+      </a-descriptions-item>
+      <a-descriptions-item label="CMD">
         {{ detail.cmd?.join(' ') || '-' }}
-      </el-descriptions-item>
-      <el-descriptions-item label="Entrypoint">
+      </a-descriptions-item>
+      <a-descriptions-item label="Entrypoint">
         {{ Array.isArray(detail.entrypoint) ? detail.entrypoint?.join(' ') : detail.entrypoint }}
-      </el-descriptions-item>
-      <el-descriptions-item label="内网地址">
+      </a-descriptions-item>
+      <a-descriptions-item label="内网地址">
         {{ detail.localUrl }}
-      </el-descriptions-item>
-      <el-descriptions-item label="外网地址">
+      </a-descriptions-item>
+      <a-descriptions-item label="外网地址">
         {{ detail.internetUrl }}
-      </el-descriptions-item>
-    </el-descriptions>
-    <el-descriptions
+      </a-descriptions-item>
+    </a-descriptions>
+    <a-descriptions
       title="挂载信息"
-      border
+      bordered
       class="block"
     />
-    <el-table
-      :data="detail.mounts"
+    <a-table
+      :data-source="detail.mounts"
+      :columns="mountColumns"
       style="width: 100%"
-    >
-      <el-table-column
-        prop="type"
-        label="序号"
-        width="80"
-      >
-        <template #default="{ $index }">{{ $index + 1 }}</template>
-      </el-table-column>
-      <el-table-column
-        prop="type"
-        label="类型"
-        width="80"
-      >
-        <template #default="{ row }: { row: Mount }">
-          {{ row.type === 'bind' ? '路径' : '卷' }}
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="soure"
-        label="主机"
-      >
-        <template #default="{ row }: { row: Mount }">
-          {{ row.source }}
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="target"
-        label="容器"
-      >
-        <template #default="{ row }: { row: Mount }">
-          {{ row.target }}
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="rw"
-        label="读写"
-        width="80"
-      >
-        <template #default="{ row }: { row: Mount }">
-          {{ row.rw ? '读写' : '只读' }}
-        </template>
-      </el-table-column>
-    </el-table>
-    <el-descriptions
+    />
+    <a-descriptions
       title="端口信息"
-      border
+      bordered
       class="block"
+      :content-style="{ background: '#fff' }"
+      :label-style="{ background: '#f5f7fa' }"
     >
-      <el-descriptions-item
+      <a-descriptions-item
         v-for="(port, index) in detail.ports"
         :key="index"
         :label="'端口' + (index + 1)"
@@ -111,84 +74,123 @@
         <div style="word-break: break-all">
           {{ port.hostPort }}（主机） -> {{ port.containerPort }}（容器） / {{ port.protocol }}
         </div>
-      </el-descriptions-item>
-    </el-descriptions>
+      </a-descriptions-item>
+    </a-descriptions>
 
-    <el-descriptions
+    <a-descriptions
       title="网络信息"
-      border
+      bordered
       class="block"
     />
-    <el-table
-      :data="detail.networks"
+    <a-table
+      :data-source="detail.networks"
+      :columns="networkColumns"
       style="width: 100%"
-    >
-      <el-table-column
-        prop="id"
-        label="ID"
-        width="200"
-      >
-        <template #default="{ row }: { row: Network }">
-          {{ row.id.slice(0, 10) + '...' + row.id.slice(-10) }}
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="type"
-        label="网络"
-      />
-
-      <el-table-column
-        prop="ip"
-        label="IP"
-      >
-        <template #default="{ row }: { row: Network }">
-          {{ row.ip ? row.ip + '/' : '' }}{{ row.prefixLen || '-' }}
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="gateway"
-        label="网关"
-      />
-      <el-table-column
-        prop="ipv6"
-        label="IPv6"
-      >
-        <template #default="{ row }: { row: Network }">
-          {{ row.ipV6 ? row.ipV6 + '/' : '' }}{{ row.prefixLenV6 || '-' }}
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="gatewayV6"
-        label="网关v6"
-      />
-      <el-table-column
-        prop="mac"
-        label="MAC"
-      />
-    </el-table>
-    <el-descriptions
+    />
+    <a-descriptions
       title="环境变量"
-      border
+      bordered
       class="block"
+      :content-style="{ background: '#fff' }"
+      :label-style="{ background: '#f5f7fa', maxWidth: '240px', wordBreak: 'break-all' }"
     >
-      <el-descriptions-item
+      <a-descriptions-item
         v-for="(env, index) in detail.envs"
         :key="index"
         :label="env.key"
-        label-class-name="env-desc-label"
       >
         <div style="word-break: break-all"> {{ env.value }}</div>
-      </el-descriptions-item>
-    </el-descriptions>
+      </a-descriptions-item>
+    </a-descriptions>
   </div>
 </template>
 <script setup lang="ts">
 import dayjs from 'dayjs';
+import { Spin } from 'ant-design-vue';
 
 import type { ContainerDetail, Mount, Network } from '@common/types/container';
 import { restartPolicyList } from '@common/constants/const';
 
+import type { TableColumnProps } from 'ant-design-vue';
+
 defineProps<{ detail: ContainerDetail }>();
+
+const mountColumns: TableColumnProps<Mount>[] = [
+  {
+    key: 'index',
+    dataIndex: 'id',
+    title: '序号',
+    customRender: ({ index }) => index + 1,
+  },
+  {
+    key: 'type',
+    dataIndex: 'type',
+    title: '类型',
+    customRender: ({ value }) => (value === 'bind' ? '路径' : '卷'),
+  },
+  {
+    key: 'source',
+    dataIndex: 'source',
+    title: '主机',
+  },
+  {
+    key: 'target',
+    dataIndex: 'target',
+    title: '容器',
+  },
+  {
+    key: 'rw',
+    dataIndex: 'rw',
+    title: '读写',
+    customRender: ({ value }) => (value ? '读写' : '只读'),
+  },
+];
+const networkColumns: TableColumnProps<Network>[] = [
+  {
+    key: 'index',
+    dataIndex: 'id',
+    title: '序号',
+    customRender: ({ index }) => index + 1,
+  },
+  {
+    key: 'id',
+    dataIndex: 'id',
+    title: 'ID',
+    customRender: ({ value }) => value.slice(0, 10) + '...' + value.slice(-10),
+  },
+  {
+    key: 'type',
+    dataIndex: 'type',
+    title: '网络',
+  },
+  {
+    key: 'ip',
+    dataIndex: 'ip',
+    title: 'IP',
+    customRender: ({ value, record }) => (value ? value + '/' : '') + (record.prefixLen || '-'),
+  },
+  {
+    key: 'gateway',
+    dataIndex: 'gateway',
+    title: '网关',
+  },
+  {
+    key: 'ipV6',
+    dataIndex: 'ipV6',
+    title: 'IPv6',
+    customRender: ({ value, record }) => (value ? value + '/' : '') + (record.prefixLenV6 || '-'),
+  },
+  {
+    key: 'gatewayV6',
+    dataIndex: 'gatewayV6',
+    title: '网关v6',
+  },
+  {
+    key: 'mac',
+    dataIndex: 'mac',
+    title: 'MAC',
+  },
+];
 </script>
 <style scoped lang="less">
 .loading {
@@ -208,12 +210,5 @@ defineProps<{ detail: ContainerDetail }>();
 }
 .block {
   margin-top: 32px;
-}
-</style>
-<style>
-.env-desc-label {
-  white-space: wrap;
-  word-break: break-all;
-  max-width: 240px;
 }
 </style>

@@ -1,35 +1,22 @@
 <template>
-  <el-result
-    title="4 0 4"
+  <a-result
+    status="404"
+    title="404"
     sub-title="页面不存在！请检查页面地址"
     class="desktop-page-404"
   >
-    <template #icon>
-      <el-empty
-        class="empty"
-        description=" "
-      />
-    </template>
     <template #extra>
-      <el-button
+      <a-button
         type="primary"
-        @click="router.back()"
+        @click="router.push('/d/container')"
       >
-        回退
-      </el-button>
+        回到首页
+      </a-button>
     </template>
-  </el-result>
+  </a-result>
 </template>
 <script setup lang="ts">
 import { useRouter } from 'vue-router';
 
 const router = useRouter();
 </script>
-<style lang="less">
-.desktop-page-404 {
-  .el-empty__image svg {
-    width: 100%;
-    height: 100%;
-  }
-}
-</style>

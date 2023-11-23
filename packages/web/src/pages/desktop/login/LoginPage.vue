@@ -3,34 +3,29 @@
     <div class="login-box">
       <div class="logo">iDocker</div>
       <div class="title">登录</div>
-      <el-form
+      <a-form
         ref="formRef"
         :model="form"
         label-width="60px"
-        label-position="left"
-        label-suffix=" :"
-        hide-required-asterisk
         class="login-form"
+        hide-required-mark
       >
-        <el-form-item
+        <a-form-item
           label="账户"
-          prop="username"
+          name="username"
           :rules="[{ required: true, message: '请输入' }]"
         >
-          <el-input v-model="form.username" />
-        </el-form-item>
-        <el-form-item
+          <a-input v-model:value="form.username" />
+        </a-form-item>
+        <a-form-item
           label="密码"
-          prop="password"
+          name="password"
           :rules="[{ required: true, message: '请输入' }]"
         >
-          <el-input
-            v-model="form.password"
-            show-password
-          />
-        </el-form-item>
-        <el-button
-          round
+          <a-input-password v-model:value="form.password" />
+        </a-form-item>
+        <a-button
+          shape="round"
           type="primary"
           size="large"
           class="login-btn"
@@ -38,8 +33,8 @@
           @click="onSubmit"
         >
           登录
-        </el-button>
-      </el-form>
+        </a-button>
+      </a-form>
     </div>
   </div>
 </template>
@@ -48,7 +43,7 @@ import { ref } from 'vue';
 
 import { login } from '@/apis/auth';
 
-import type { FormInstance } from 'element-plus';
+import type { FormInstance } from 'ant-design-vue';
 
 const form = ref({
   username: '',

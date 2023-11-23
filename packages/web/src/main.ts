@@ -2,8 +2,8 @@ import { createApp } from 'vue';
 import { createRouter, createWebHistory } from 'vue-router';
 import Vant from 'vant';
 import 'vant/lib/index.css';
-import ElementPlus from 'element-plus';
-import 'element-plus/dist/index.css';
+import Antd from 'ant-design-vue';
+import 'ant-design-vue/dist/reset.css';
 import 'material-icons/iconfont/material-icons.css';
 
 import { routes } from '@/constants/routes';
@@ -18,7 +18,7 @@ const router = createRouter({
 const app = createApp(App);
 app.use(router);
 app.use(Vant);
-app.use(ElementPlus);
+app.use(Antd);
 
 app.mount('#app');
 

@@ -1,23 +1,23 @@
 <template>
   <div class="dashboard">
     <div class="dashboard-item">
-      <el-progress
+      <a-progress
         type="dashboard"
-        :percentage="Math.floor(totalData.cpu / totalData.cpuNum)"
+        :percent="Math.floor(totalData.cpu / totalData.cpuNum)"
       >
-        <template #default>
+        <template #format>
           <div class="percentage-value">{{ Number(totalData.cpu.toFixed(2)) }}%</div>
           <div class="percentage-label"> 总量：{{ totalData.cpuNum }}00% </div>
         </template>
-      </el-progress>
+      </a-progress>
       <div class="dashboard-name">CPU使用率</div>
     </div>
     <div class="dashboard-item">
-      <el-progress
+      <a-progress
         type="dashboard"
-        :percentage="totalData.memoryUsage / totalData.memoryLimit"
+        :percent="totalData.memoryUsage / totalData.memoryLimit"
       >
-        <template #default>
+        <template #format>
           <div class="percentage-value">
             {{ Number((totalData.memoryUsage / totalData.memoryLimit).toFixed(2)) }}%
           </div>
@@ -29,7 +29,7 @@
             }}
           </div>
         </template>
-      </el-progress>
+      </a-progress>
       <div class="dashboard-name">内存使用率</div>
     </div>
   </div>
@@ -55,6 +55,14 @@ defineProps<{
     font-weight: 700;
     font-size: 16px;
     color: #333;
+  }
+  .percentage-value {
+    font-size: 24px;
+    margin-bottom: 12px;
+    color: #1677ff;
+  }
+  .percentage-label {
+    font-size: 14px;
   }
 }
 </style>

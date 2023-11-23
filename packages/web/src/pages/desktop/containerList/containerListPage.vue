@@ -6,54 +6,54 @@
       <div class="right">
         <ContainerFilter @search="onSearch" />
         <div class="btn-row">
-          <el-button
+          <a-button
             type="primary"
-            :icon="Plus"
+            :icon="h(PlusOutlined)"
             @click="onGoToAdd"
           >
             创建容器
-          </el-button>
+          </a-button>
         </div>
       </div>
     </div>
 
-    <el-tabs
-      v-model="activeName"
+    <a-tabs
+      v-model:activeKey="activeName"
       class="tabs"
     >
-      <el-tab-pane
-        label="全部"
-        name="all"
+      <a-tab-pane
+        key="all"
+        tab="全部"
       >
         <ContainerTable :list="list" />
-      </el-tab-pane>
-      <el-tab-pane
-        label="运行中"
-        :name="ContainerStatus.running"
+      </a-tab-pane>
+      <a-tab-pane
+        :key="ContainerStatus.running"
+        tab="运行中"
       >
         <ContainerTable :list="list.filter(item => item.status === ContainerStatus.running)" />
-      </el-tab-pane>
-      <el-tab-pane
-        label="已暂停"
-        :name="ContainerStatus.paused"
+      </a-tab-pane>
+      <a-tab-pane
+        :key="ContainerStatus.paused"
+        tab="已暂停"
       >
         <ContainerTable :list="list.filter(item => item.status === ContainerStatus.paused)" />
-      </el-tab-pane>
-      <el-tab-pane
-        label="已停止"
-        :name="ContainerStatus.exited"
+      </a-tab-pane>
+      <a-tab-pane
+        :key="ContainerStatus.exited"
+        tab="已停止"
       >
         <ContainerTable
           :list="list.filter(item => item.status === ContainerStatus.exited)"
           @reload="onReload"
         />
-      </el-tab-pane>
-    </el-tabs>
+      </a-tab-pane>
+    </a-tabs>
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
-import { Plus } from '@element-plus/icons-vue';
+import { ref, onMounted, onUnmounted, h } from 'vue';
+import { PlusOutlined } from '@ant-design/icons-vue';
 import { useRouter } from 'vue-router';
 
 import { ContainerStatus } from '@common/constants/enum';

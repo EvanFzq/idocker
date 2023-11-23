@@ -1,53 +1,55 @@
 <template>
   <PageLayout
     :breadcrumbs="[
-      { to: '/d/container', lable: '容器列表' },
-      { lable: '容器详情-' + detail?.name },
+      { path: '/d/container', breadcrumbName: '容器列表' },
+      { breadcrumbName: '容器详情' },
     ]"
+    :title="detail?.name"
   >
-    <template #right>
-      <el-button
+    <template #extra>
+      <a-button
         type="primary"
-        :icon="Edit"
+        :icon="h(EditOutlined)"
         @click="onEdit"
       >
         编辑
-      </el-button>
+      </a-button>
     </template>
     <div
       v-if="!detail"
       class="loading"
     >
-      <van-loading />
+      <Spin />
     </div>
     <div
       v-if="detail"
       class="container-detail-page"
     >
-      <el-tabs
-        v-model="activeTab"
+      <a-tabs
+        v-model:activeKey="activeTab"
         class="tabs"
       >
-        <el-tab-pane
-          label="信息"
-          name="info"
+        <a-tab-pane
+          key="info"
+          tab="信息"
         >
           <ContainerInfo :detail="detail" />
-        </el-tab-pane>
-        <el-tab-pane
-          label="日志"
-          name="logs"
+        </a-tab-pane>
+        <a-tab-pane
+          key="logs"
+          tab="日志"
         >
           <ContainerLogs :id="id" />
-        </el-tab-pane>
-      </el-tabs>
+        </a-tab-pane>
+      </a-tabs>
     </div>
   </PageLayout>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, h } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { Edit } from '@element-plus/icons-vue';
+import { EditOutlined } from '@ant-design/icons-vue';
+import { Spin } from 'ant-design-vue';
 
 import type { ContainerDetail } from '@common/types/container';
 
@@ -93,17 +95,5 @@ const onEdit = () => {
   justify-content: center;
   align-items: center;
   height: 100%;
-}
-</style>
-<style>
-.container-detail-page {
-  .el-tabs__content {
-    flex: auto;
-    height: 0;
-    .el-tab-pane {
-      height: 100%;
-      overflow: auto;
-    }
-  }
 }
 </style>

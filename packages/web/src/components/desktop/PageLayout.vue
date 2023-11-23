@@ -2,29 +2,29 @@
   <div class="page">
     <div class="top">
       <div class="left">
-        <el-breadcrumb
-          v-if="breadcrumbs"
-          :separator-icon="ArrowRight"
+        <a-breadcrumb
+          :routes="breadcrumbs"
+          class="breadcrumb"
         >
-          <el-breadcrumb-item
-            v-for="(breadcrumb, i) in breadcrumbs"
-            :key="i"
-            :to="breadcrumb.to"
-            :replace="breadcrumb.replace"
-          >
-            {{ breadcrumb.lable }}
-          </el-breadcrumb-item>
-        </el-breadcrumb>
+          <template #itemRender="{ route }">
+            <span v-if="!route.path">{{ route.breadcrumbName }}</span>
+            <router-link
+              v-else
+              :to="route.path"
+            >
+              {{ route.breadcrumbName }}
+            </router-link>
+          </template>
+        </a-breadcrumb>
         <div
-          v-else
+          v-if="title"
           class="title"
         >
           {{ title }}
         </div>
       </div>
-
-      <div class="right-btns">
-        <slot name="right" />
+      <div>
+        <slot name="extra" />
       </div>
     </div>
     <div class="content">
@@ -33,18 +33,15 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ArrowRight } from '@element-plus/icons-vue';
-
 import type { RouteLocationRaw } from 'vue-router';
 
-export interface Breadcrumb {
-  to?: string | RouteLocationRaw;
-  replace?: boolean;
-  lable: string;
+export interface Route {
+  path?: string | RouteLocationRaw;
+  breadcrumbName: string;
 }
 
 defineProps<{
-  breadcrumbs?: Breadcrumb[];
+  breadcrumbs?: Route[];
   title?: string;
 }>();
 </script>
@@ -55,16 +52,25 @@ defineProps<{
   flex-direction: column;
   .top {
     flex: none;
-    height: 48px;
     padding: 0 16px;
+    min-height: 48px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    box-shadow: 1px 1px 5px #ccc;
+    box-shadow: 0px 5px 5px #ccc;
+    border-bottom: solid 1px #ccc;
+    background-color: #fff;
+    .breadcrumb {
+      flex: none;
+      padding: 6px 0;
+    }
     .title {
       font-weight: 700;
-      font-size: 20px;
+      font-size: 24px;
       color: #409eff;
+      height: 36px;
+      margin-bottom: 6px;
+      flex: none;
     }
   }
   .content {

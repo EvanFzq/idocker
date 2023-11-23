@@ -2,581 +2,489 @@
 <template>
   <PageLayout
     :breadcrumbs="[
-      { to: '/d/container', lable: '容器列表' },
-      { lable: `容器${isEdit ? '编辑-' : '新增'}${formData?.name || ''}` },
+      { path: '/d/container', breadcrumbName: '容器列表' },
+      { breadcrumbName: `容器${isEdit ? '编辑-' : '新增'}${formData?.name || ''}` },
     ]"
   >
-    <template #right>
-      <el-button
-        type="success"
+    <template #extra>
+      <a-button
+        type="primary"
         @click="onSubmit"
       >
         保存
-      </el-button>
+      </a-button>
     </template>
     <div class="new-or-edit-container-page">
-      <el-form
+      <a-form
         ref="formRef"
         :model="formData"
-        label-width="120px"
+        :label-col="{ style: { width: '120px' } }"
       >
-        <el-row>
-          <el-col :span="24">
-            <el-form-item
+        <a-row>
+          <a-col :span="24">
+            <a-form-item
               label="图标"
-              prop="icon"
+              name="icon"
+              :wrapper-col="{ style: { width: '220px', flex: 'none' } }"
             >
-              <el-upload
-                ref="uploadIconRef"
-                v-model:file-list="formData.icon"
-                class="upload-icon"
-                list-type="picture-card"
-                drag
-                :auto-upload="false"
-                :on-change="onIconReaded"
-                :on-exceed="onIconOversize"
-                :on-preview="onIconPreview"
-                :limit="1"
-              >
-                <el-icon class="el-icon--upload"><upload-filled /></el-icon>
-                <div class="el-upload__text">
-                  拖拽上传 <br />
-                  <em>点击上传</em>
-                </div>
-                <template #tip>
-                  <div class="el-upload__tip"> 支持jpeg、webp、png <br />裁剪后大小不超过10MB </div>
-                </template>
-              </el-upload>
-            </el-form-item>
-          </el-col>
-          <el-col v-bind="fieldLayout">
-            <el-form-item
+              <a-tooltip title="支持jpeg、webp、png, 裁剪后不超过10MB">
+                <a-upload
+                  v-model:fileList="formData.icon"
+                  class="icon-upload-control"
+                  accept="image/*"
+                  list-type="picture-card"
+                  :max-count="1"
+                  :before-upload="() => false"
+                  @change="onIconReaded"
+                  @preview="onIconPreview"
+                >
+                  <div>
+                    <div class="upload-icon">
+                      <InboxOutlined />
+                    </div>
+                    <div class="upload-text">拖拽上传<br />点击上传</div>
+                  </div>
+                </a-upload>
+              </a-tooltip>
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="fieldLayout">
+            <a-form-item
               label="容器名"
-              prop="name"
+              name="name"
               :rules="[{ required: true, message: '请输入' }]"
             >
-              <el-input
-                v-model="formData.name"
+              <a-input
+                v-model:value="formData.name"
                 placeholder="请输入"
               />
-            </el-form-item>
-          </el-col>
-          <el-col v-bind="fieldLayout">
-            <el-form-item
+            </a-form-item>
+          </a-col>
+          <a-col
+            :xs="16"
+            :md="8"
+            :xl="6"
+            :xxl="4"
+          >
+            <a-form-item
               label="镜像"
-              prop="image"
+              name="image"
               :rules="[{ required: true, message: '请输入' }]"
             >
-              <el-select
-                v-model="formData.image"
-                style="width: 60%"
-                filterable
-                remote
-                default-first-option
-                placeholder="请选择"
-                :remote-method="onImageInputChange"
+              <a-select
+                v-model:value="formData.image"
+                style="width: 100%"
+                show-search
+                placeholder="请输入选择"
+                :show-arrow="false"
+                :filter-option="false"
+                :not-found-content="null"
+                popup-class-name="image-search-list"
+                option-label-prop="label"
+                @search="onImageInputChange"
                 @change="onImageChange"
               >
-                <el-option
+                <a-select-option
                   v-for="item in imageList"
                   :key="item.name"
-                  :label="item.name"
+                  :title="item.name"
                   :value="item.name"
                 >
                   <div class="image-item">
+                    <FireFilled
+                      v-if="item.is_official"
+                      style="margin-right: 6px; color: rgb(207, 8, 8)"
+                    />
                     <div class="name">
                       <span>{{ item.name }}</span>
-                      <el-icon
-                        v-if="item.is_official"
-                        class="icon"
-                      >
-                        <Medal />
-                      </el-icon>
                     </div>
                     <div class="star">
                       {{ numberFormat(item.star_count) }}
-                      <el-icon style="margin-left: 4px"><StarFilled /></el-icon>
+                      <StarFilled style="color: rgb(255, 136, 0)" />
                     </div>
                   </div>
-                </el-option>
-              </el-select>
-              <el-input
-                v-model="formData.tag"
-                style="width: 40%"
-                placeholder="请输入"
-              />
-            </el-form-item>
-          </el-col>
-          <el-col v-bind="fieldLayout">
-            <el-form-item
-              label="网络"
-              prop="network"
+                </a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
+          <a-col
+            :xs="8"
+            :md="4"
+            :xl="2"
+            :xxl="2"
+          >
+            <a-form-item
+              name="tag"
               :rules="[{ required: true, message: '请输入' }]"
             >
-              <el-select
-                v-model="formData.network"
+              <a-input
+                v-model:value="formData.tag"
+                style="width: 100%"
+                placeholder="请输入"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="fieldLayout">
+            <a-form-item
+              label="网络"
+              name="network"
+              :rules="[{ required: true, message: '请输入' }]"
+            >
+              <a-select
+                v-model:value="formData.network"
                 style="width: 100%"
                 placeholder="请选择"
-              >
-                <el-option
-                  v-for="network in networkList"
-                  :key="network.Name"
-                  :label="network.Name"
-                  :value="network.Name"
-                />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col v-bind="fieldLayout">
-            <el-form-item
+                :options="networkList"
+                :field-names="{ label: 'Name', value: 'Name' }"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="fieldLayout">
+            <a-form-item
               label="重启策略"
-              prop="restart"
+              name="restart"
             >
-              <el-select
-                v-model="formData.restart"
+              <a-select
+                v-model:value="formData.restart"
                 style="width: 100%"
                 placeholder="请选择"
-              >
-                <el-option
-                  v-for="network in restartPolicyList"
-                  :key="network.value"
-                  :label="network.text"
-                  :value="network.value"
-                />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col v-bind="fieldLayout">
-            <el-form-item
+                :options="restartPolicyList"
+                :field-names="{ label: 'text', value: 'value' }"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="fieldLayout">
+            <a-form-item
               label="内网地址"
-              prop="localUrl"
+              name="localUrl"
             >
-              <el-input
-                v-model="formData.localUrl"
+              <a-input
+                v-model:value="formData.localUrl"
                 placeholder="例：http://192.168.0.1:7880"
               />
-            </el-form-item>
-          </el-col>
-          <el-col v-bind="fieldLayout">
-            <el-form-item
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="fieldLayout">
+            <a-form-item
               label="外网地址"
-              prop="internetUrl"
+              name="internetUrl"
             >
-              <el-input
-                v-model="formData.internetUrl"
+              <a-input
+                v-model:value="formData.internetUrl"
                 placeholder="例：https://xxx.xxx.com"
               />
-            </el-form-item>
-          </el-col>
-          <el-col v-bind="fieldLayout">
-            <el-form-item
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="fieldLayout">
+            <a-form-item
               label="启动命令"
-              prop="command"
+              name="command"
             >
-              <el-input
-                v-model="formData.command"
+              <a-textarea
+                v-model:value="formData.command"
                 type="textarea"
                 :rows="2"
                 placeholder='请输入启动命令, 参数中间有空格使用双引号包裹,例：nginx -g "daemon off;"'
               />
-            </el-form-item>
-          </el-col>
-          <el-col v-bind="fieldLayout">
-            <el-form-item
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="fieldLayout">
+            <a-form-item
               label="创建后启动"
-              prop="runAffterCreated"
+              name="runAffterCreated"
             >
-              <el-switch v-model="formData.runAffterCreated" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-card
+              <a-switch v-model:checked="formData.runAffterCreated" />
+            </a-form-item>
+          </a-col>
+        </a-row>
+        <a-card
           v-if="formData.network !== 'host'"
           class="form-card"
+          title="端口配置"
         >
-          <template #header>
-            <div class="card-header">
-              <span>端口配置</span>
-              <el-button
-                class="button"
-                text
-                size="small"
-                type="primary"
-                @click="formData.ports.push({ protocol: 'tcp' } as PortConfig)"
-              >
-                增加端口
-              </el-button>
-            </div>
+          <template #extra>
+            <a-button
+              class="button"
+              size="small"
+              type="link"
+              @click="formData.ports.push({ protocol: 'tcp' } as PortConfig)"
+            >
+              增加端口
+            </a-button>
           </template>
-          <el-table
-            :data="formData.ports"
-            empty-text="无条目，请添加"
+          <a-table
+            :data-source="formData.ports"
+            :columns="portColumns"
+            size="middle"
+            :pagination="false"
           >
-            <el-table-column
-              prop="date"
-              label="序号"
-              width="80"
-            >
-              <template #default="{ $index }: { $index: number }">
-                {{ $index + 1 }}
-              </template>
-            </el-table-column>
-            <el-table-column
-              prop="host"
-              label="主机端口"
-            >
-              <template #default="{ row, $index }: { row: PortConfig; $index: number }">
-                <el-form-item
+            <template #emptyText> 无条目，请添加 </template>
+            <template #bodyCell="{ column, record, index }">
+              <template v-if="column.key === 'host'">
+                <a-form-item
                   label-width="0"
-                  :prop="`ports[${$index}].host`"
+                  :name="['ports', index, 'host']"
                   :rules="[{ required: true, message: '请输入' }]"
                 >
-                  <el-input-number
-                    v-model="row.host"
+                  <a-input-number
+                    v-model:value="record.host"
                     :precision="0"
-                    :controls="false"
                     placeholder="请输入"
                     style="width: 100%"
                   />
-                </el-form-item>
+                </a-form-item>
               </template>
-            </el-table-column>
-            <el-table-column
-              prop="container"
-              label="容器端口"
-            >
-              <template #default="{ row, $index }: { row: PortConfig; $index: number }">
-                <el-form-item
+              <template v-if="column.key === 'container'">
+                <a-form-item
                   label-width="0"
-                  :prop="`ports[${$index}].container`"
+                  :name="['ports', index, 'container']"
                   :rules="[{ required: true, message: '请输入' }]"
                 >
-                  <el-input-number
-                    v-model="row.container"
+                  <a-input-number
+                    v-model:value="record.container"
                     :precision="0"
-                    :controls="false"
                     placeholder="请输入"
                     style="width: 100%"
                   />
-                </el-form-item>
+                </a-form-item>
               </template>
-            </el-table-column>
-            <el-table-column
-              prop="protocol"
-              label="协议"
-            >
-              <template #default="{ row, $index }: { row: PortConfig; $index: number }">
-                <el-form-item
+              <template v-if="column.key === 'protocol'">
+                <a-form-item
                   label-width="0"
-                  :prop="`ports[${$index}].protocol`"
+                  :name="['ports', index, 'protocol']"
                   :rules="[{ required: true, message: '请选择' }]"
                 >
-                  <el-select
-                    v-model="row.protocol"
+                  <a-select
+                    v-model:value="record.protocol"
                     placeholder="请选择"
                     style="width: 100%"
-                  >
-                    <el-option
-                      value="tcp"
-                      label="TCP"
-                    />
-                    <el-option
-                      value="udp"
-                      label="UDP"
-                    />
-                  </el-select>
-                </el-form-item>
+                    :options="[
+                      { label: 'TCP', value: 'tcp' },
+                      { label: 'UDP', value: 'udp' },
+                    ]"
+                  />
+                </a-form-item>
               </template>
-            </el-table-column>
-            <el-table-column
-              prop="container"
-              label="操作"
-            >
-              <template #default="{ $index }: { $index: number }">
-                <el-button
-                  type="danger"
-                  link
-                  @click="onRemove('ports', $index)"
+              <template v-if="column.key === 'operate'">
+                <a-button
+                  type="link"
+                  danger
+                  @click="onRemove('ports', index)"
                 >
                   移除
-                </el-button>
+                </a-button>
               </template>
-            </el-table-column>
-          </el-table>
-        </el-card>
-        <el-card class="form-card">
-          <template #header>
-            <div class="card-header">
-              <span>挂载配置</span>
-              <el-button
-                class="button"
-                text
-                size="small"
-                type="primary"
-                @click="formData.mounts.push({ type: 'bind', container: '', readonly: false })"
-              >
-                增加挂载
-              </el-button>
-            </div>
+            </template>
+          </a-table>
+        </a-card>
+        <a-card
+          class="form-card"
+          title="挂载配置"
+        >
+          <template #extra>
+            <a-button
+              class="button"
+              size="small"
+              type="link"
+              @click="formData.mounts.push({ type: 'bind', container: '', readonly: false })"
+            >
+              增加挂载
+            </a-button>
           </template>
-          <el-table
-            :data="formData.mounts"
-            empty-text="无条目，请添加"
+          <a-table
+            :data-source="formData.mounts"
+            :columns="mountColumns"
+            size="middle"
+            :pagination="false"
           >
-            <el-table-column
-              prop="date"
-              label="序号"
-              width="80"
-            >
-              <template #default="{ $index }: { $index: number }">
-                {{ $index + 1 }}
-              </template>
-            </el-table-column>
-            <el-table-column
-              prop="type"
-              label="类型"
-              width="120"
-            >
-              <template #default="{ row, $index }: { row: MountConfig; $index: number }">
-                <el-form-item
+            <template #emptyText> 无条目，请添加 </template>
+            <template #bodyCell="{ column, record, index }">
+              <template v-if="column.key === 'type'">
+                <a-form-item
                   label-width="0"
-                  :prop="`mounts[${$index}].type`"
+                  :name="['mounts', index, 'type']"
                   :rules="[{ required: true, message: '请选择' }]"
                 >
-                  <el-select
-                    v-model="row.type"
+                  <a-select
+                    v-model:value="record.type"
                     placeholder="请选择"
                     style="width: 100%"
-                  >
-                    <el-option
-                      value="bind"
-                      label="路径"
-                    />
-                    <el-option
-                      value="volume"
-                      label="卷"
-                    />
-                  </el-select>
-                </el-form-item>
+                    :options="[
+                      { label: '路径', value: 'bind' },
+                      { label: '卷', value: 'volume' },
+                    ]"
+                  />
+                </a-form-item>
               </template>
-            </el-table-column>
-            <el-table-column
-              prop="host"
-              label="主机路径/卷"
-            >
-              <template #default="{ row, $index }: { row: MountConfig; $index: number }">
-                <el-form-item
-                  v-if="row.type === 'bind'"
+              <template v-if="column.key === 'host'">
+                <a-form-item
+                  v-if="record.type === 'bind'"
                   label-width="0"
-                  :prop="`mounts[${$index}].hostBind`"
+                  :name="['mounts', index, 'hostBind']"
                   :rules="[{ required: true, message: '请输入' }]"
                 >
-                  <el-input
-                    v-model="row.hostBind"
+                  <a-input
+                    v-model:value="record.hostBind"
                     placeholder="请输入"
                     style="width: 100%"
                   />
-                </el-form-item>
-                <el-form-item
+                </a-form-item>
+                <a-form-item
                   v-else
                   label-width="0"
-                  :prop="`mounts[${$index}].volume`"
+                  :name="['mounts', index, 'volume']"
                   :rules="[{ required: true, message: '请选择' }]"
                 >
-                  <el-select
-                    v-model="row.volume"
+                  <a-select
+                    v-model:value="record.volume"
                     style="width: 100%"
                     placeholder="请选择"
-                  >
-                    <el-option
-                      v-for="volume in volumeList"
-                      :key="volume.Name"
-                      :value="volume.Name"
-                      :label="volume.Name"
-                    />
-                  </el-select>
-                </el-form-item>
+                    :options="volumeList"
+                    :field-names="{ label: 'Name', value: 'Name' }"
+                  />
+                </a-form-item>
               </template>
-            </el-table-column>
-            <el-table-column
-              prop="container"
-              label="容器路径"
-            >
-              <template #default="{ row, $index }: { row: MountConfig; $index: number }">
-                <el-form-item
+              <template v-if="column.key === 'container'">
+                <a-form-item
                   label-width="0"
-                  :prop="`mounts[${$index}].container`"
+                  :name="['mounts', index, 'container']"
                   :rules="[{ required: true, message: '请输入' }]"
                 >
-                  <el-input
-                    v-model="row.container"
+                  <a-input
+                    v-model:value="record.container"
                     placeholder="请输入"
                     style="width: 100%"
                   />
-                </el-form-item>
+                </a-form-item>
               </template>
-            </el-table-column>
-            <el-table-column
-              prop="container"
-              label="只读"
-              width="120"
-            >
-              <template #default="{ row, $index }: { row: MountConfig; $index: number }">
-                <el-form-item
+              <template v-if="column.key === 'rw'">
+                <a-form-item
                   label-width="0"
-                  :prop="`mounts[${$index}].readonly`"
+                  :name="['mounts', index, 'readonly']"
                 >
-                  <el-switch v-model="row.readonly" />
-                </el-form-item>
+                  <a-switch v-model:checked="record.readonly" />
+                </a-form-item>
               </template>
-            </el-table-column>
-
-            <el-table-column
-              prop="container"
-              label="操作"
-              width="120"
-            >
-              <template #default="{ $index }: { $index: number }">
-                <el-button
-                  type="danger"
-                  link
-                  @click="onRemove('mounts', $index)"
+              <template v-if="column.key === 'operate'">
+                <a-button
+                  type="link"
+                  danger
+                  @click="onRemove('mounts', index)"
                 >
                   移除
-                </el-button>
+                </a-button>
               </template>
-            </el-table-column>
-          </el-table>
-        </el-card>
-        <el-card class="form-card">
-          <template #header>
-            <div class="card-header">
-              <span>环境变量配置</span>
-              <el-button
-                class="button"
-                text
-                size="small"
-                type="primary"
-                @click="formData.envs.push({ key: '', value: '' })"
-              >
-                增加环境变量
-              </el-button>
-            </div>
+            </template>
+          </a-table>
+        </a-card>
+        <a-card
+          class="form-card"
+          title="环境变量配置"
+        >
+          <template #extra>
+            <a-button
+              class="button"
+              size="small"
+              type="link"
+              @click="formData.envs.push({ envKey: '', envValue: '' })"
+            >
+              增加环境变量
+            </a-button>
           </template>
-          <el-table
-            :data="formData.envs"
-            empty-text="无条目，请添加"
+          <a-table
+            :data-source="formData.envs"
+            :columns="envColumns"
+            size="middle"
+            :pagination="false"
           >
-            <el-table-column
-              prop="index"
-              label="序号"
-              width="80"
-            >
-              <template #default="{ $index }: { $index: number }">
-                {{ $index + 1 }}
-              </template>
-            </el-table-column>
-            <el-table-column
-              prop="key"
-              label="键"
-            >
-              <template #default="{ row, $index }: { row: Env; $index: number }">
-                <el-form-item
+            <template #emptyText> 无条目，请添加 </template>
+            <template #bodyCell="{ column, record, index }">
+              <template v-if="column.key === 'envKey'">
+                <a-form-item
                   label-width="0"
-                  :prop="`envs[${$index}].key`"
+                  :name="['envs', index, 'envKey']"
                   :rules="[{ required: true, message: '请输入' }]"
                 >
-                  <el-input
-                    v-model="row.key"
+                  <a-input
+                    v-model:value="record.envKey"
                     placeholder="请输入"
                     style="width: 100%"
                   />
-                </el-form-item>
+                </a-form-item>
               </template>
-            </el-table-column>
-            <el-table-column
-              prop="value"
-              label="值"
-            >
-              <template #default="{ row, $index }: { row: Env; $index: number }">
-                <el-form-item
+              <template v-if="column.key === 'envValue'">
+                <a-form-item
                   label-width="0"
-                  :prop="`envs[${$index}].value`"
+                  :name="['envs', index, 'envValue']"
                   :rules="[{ required: true, message: '请输入' }]"
                 >
-                  <el-input
-                    v-model="row.value"
+                  <a-input
+                    v-model:value="record.envValue"
                     placeholder="请输入"
                     style="width: 100%"
                   />
-                </el-form-item>
+                </a-form-item>
               </template>
-            </el-table-column>
-            <el-table-column
-              prop="container"
-              label="操作"
-              width="120"
-            >
-              <template #default="{ $index }: { $index: number }">
-                <el-button
-                  type="danger"
-                  link
-                  @click="onRemove('envs', $index)"
+              <template v-if="column.key === 'operate'">
+                <a-button
+                  type="link"
+                  danger
+                  @click="onRemove('envs', index)"
                 >
                   移除
-                </el-button>
+                </a-button>
               </template>
-            </el-table-column>
-          </el-table>
-        </el-card>
-      </el-form>
+            </template>
+          </a-table>
+        </a-card>
+      </a-form>
     </div>
-    <el-dialog
-      v-model="showIconCropper"
+    <a-modal
+      v-model:open="showIconCropper"
       title="编辑图片"
-      width="464"
-      :show-close="false"
-      :close-on-click-modal="false"
-      :close-on-press-escape="false"
-      @opened="onCropperOpen"
+      :width="472"
+      :closable="false"
+      :force-render="true"
+      :keyboard="false"
+      :mask-closable="false"
     >
       <div class="cropper-box">
         <img id="container-icon-cropper" />
       </div>
       <template #footer>
         <span class="dialog-footer">
-          <el-button @click="onIconCropperCancel">取消</el-button>
-          <el-button
+          <a-button @click="onIconCropperCancel">取消</a-button>
+          <a-button
             type="primary"
             @click="onIconCropperConfirm"
           >
             确认裁剪
-          </el-button>
+          </a-button>
         </span>
       </template>
-    </el-dialog>
-    <el-dialog
-      v-model="showPreviewIcon"
+    </a-modal>
+    <a-modal
+      v-model:open="showPreviewIcon"
       title="图标预览"
-      width="440"
+      :footer="null"
     >
       <img
-        width="400"
-        w-full
+        alt="example"
+        style="width: 100%"
         :src="previewIconUrl"
-        alt="Preview Image"
       />
-    </el-dialog>
+    </a-modal>
   </PageLayout>
 </template>
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { UploadFilled, Medal, StarFilled } from '@element-plus/icons-vue';
-import { ElLoading, ElMessage } from 'element-plus';
+import { InboxOutlined, FireFilled, StarFilled } from '@ant-design/icons-vue';
+import { message } from 'ant-design-vue';
 import Cropper from 'cropperjs';
+import 'cropperjs/dist/cropper.css';
 
-import type { MountConfig, Env } from '@common/types/container';
+import type { MountConfig } from '@common/types/container';
 import type { Image } from '@common/types/image';
 import type { Volume } from '@common/types/volume';
 import type { PortConfig, Network } from '@common/types/network';
@@ -594,7 +502,8 @@ import {
 } from '@/apis';
 import { dataURLtoFile, numberFormat } from '@/utils/utils';
 
-import type { UploadUserFile, UploadProps, FormInstance } from 'element-plus';
+import type { TableColumnProps, UploadFile, FormInstance } from 'ant-design-vue';
+
 const showIconCropper = ref(false);
 const showPreviewIcon = ref(false);
 const previewIconUrl = ref('');
@@ -610,27 +519,113 @@ const router = useRouter();
 const isEdit = !!route.query.id;
 const fieldLayout = {
   xs: 24,
-  sm: 12,
-  lg: 8,
-  xl: 6,
+  md: 12,
+  xl: 8,
+  xxl: 6,
 };
 
 const formData = ref({
   id: '',
   name: '',
-  icon: [] as UploadUserFile[],
-  image: '',
+  icon: [] as UploadFile[],
+  image: null as unknown as string,
   tag: '',
   network: '',
   runAffterCreated: false,
   command: '',
-  envs: [] as Env[],
+  envs: [] as { envKey: string; envValue: string }[],
   mounts: [] as MountConfig[],
   ports: [] as PortConfig[],
   restart: 'no',
   localUrl: '',
   internetUrl: '',
 });
+
+const portColumns: TableColumnProps[] = [
+  {
+    key: 'index',
+    dataIndex: 'index',
+    title: '序号',
+    customRender: ({ index }) => index + 1,
+  },
+  {
+    key: 'host',
+    dataIndex: 'host',
+    title: '主机端口',
+  },
+  {
+    key: 'container',
+    dataIndex: 'container',
+    title: '容器端口',
+  },
+  {
+    key: 'protocol',
+    dataIndex: 'protocol',
+    title: '协议',
+  },
+  {
+    key: 'operate',
+    dataIndex: 'operate',
+    title: '操作',
+  },
+];
+
+const mountColumns: TableColumnProps[] = [
+  {
+    key: 'index',
+    dataIndex: 'index',
+    title: '序号',
+    customRender: ({ index }) => index + 1,
+  },
+  {
+    key: 'type',
+    dataIndex: 'type',
+    title: '类型',
+  },
+  {
+    key: 'host',
+    dataIndex: 'host',
+    title: '主机路径/卷',
+  },
+  {
+    key: 'container',
+    dataIndex: 'container',
+    title: '容器路径',
+  },
+  {
+    key: 'rw',
+    dataIndex: 'rw',
+    title: '只读',
+  },
+  {
+    key: 'operate',
+    dataIndex: 'operate',
+    title: '操作',
+  },
+];
+const envColumns: TableColumnProps[] = [
+  {
+    key: 'index',
+    dataIndex: 'index',
+    title: '序号',
+    customRender: ({ index }) => index + 1,
+  },
+  {
+    key: 'envKey',
+    dataIndex: 'envKey',
+    title: '键',
+  },
+  {
+    key: 'envValue',
+    dataIndex: 'envValue',
+    title: '值',
+  },
+  {
+    key: 'operate',
+    dataIndex: 'operate',
+    title: '操作',
+  },
+];
 
 const getContainerData = async (id: string) => {
   const res = await getContainerDetail(id);
@@ -658,7 +653,7 @@ const getContainerData = async (id: string) => {
       restart: restartPolicyName,
       runAffterCreated: true,
       command: cmd?.map(item => (item.indexOf(' ') > 0 ? `"${item}"` : item))?.join(' ') || '',
-      envs,
+      envs: envs.map(env => ({ envKey: env.key, envValue: env.value })),
       mounts:
         mounts?.map(item => ({
           type: item.type as 'bind' | 'volume',
@@ -675,6 +670,7 @@ const getContainerData = async (id: string) => {
         })) || [],
       icon: [
         {
+          uid: '',
           url: icon,
           name: icon || '',
         },
@@ -706,29 +702,27 @@ onMounted(async () => {
   }
 });
 
-const onIconOversize = () => {
-  ElMessage('最多一张图片，请移除后再添加');
-};
-
-const onIconReaded = (file: UploadUserFile) => {
+const onIconReaded = ({ file }: { file: File }) => {
+  if (!(file instanceof File)) return;
   iconFileName.value = file.name;
   showIconCropper.value = true;
-};
-
-const onCropperOpen = () => {
   const image = document.getElementById('container-icon-cropper');
   if (!image) {
     return;
   }
-  const src = formData.value.icon[0].url;
-  image.setAttribute('src', src as string);
-  image.onload = () => {
-    iconCropper.value?.destroy();
-    iconCropper.value = new Cropper(image as HTMLImageElement, {
-      aspectRatio: 1,
-      autoCrop: true,
-      modal: true,
-    });
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onload = e => {
+    const src = e.target?.result || '';
+    image.setAttribute('src', src as string);
+    image.onload = () => {
+      iconCropper.value?.destroy();
+      iconCropper.value = new Cropper(image as HTMLImageElement, {
+        aspectRatio: 1,
+        autoCrop: true,
+        modal: true,
+      });
+    };
   };
 };
 
@@ -743,12 +737,12 @@ const onIconCropperConfirm = async () => {
     const file = dataURLtoFile(croppedData, iconFileName.value as string);
     const res = await uploadImg(file, { name: iconFileName.value, height: 240 });
     if (res.success) {
-      ElMessage({
-        type: 'success',
-        message: '上传成功',
+      message.success({
+        content: '上传成功',
       });
       formData.value.icon = [
         {
+          uid: '',
           url: res.data,
           name: iconFileName.value || '',
         },
@@ -758,17 +752,20 @@ const onIconCropperConfirm = async () => {
   }
 };
 
-const onIconPreview: UploadProps['onPreview'] = (uploadFile: UploadUserFile) => {
+const onIconPreview = (uploadFile: UploadFile) => {
   previewIconUrl.value = uploadFile.url!;
   showPreviewIcon.value = true;
 };
-
+let searchTimer: NodeJS.Timeout;
 const onImageInputChange = async (text: string) => {
   if (!text.trim()) return;
-  const res = await searchImage(text.trim());
-  if (res.success) {
-    imageList.value = res.data;
-  }
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(async () => {
+    const res = await searchImage(text.trim());
+    if (res.success) {
+      imageList.value = res.data;
+    }
+  }, 500);
 };
 const onImageChange = () => {
   formData.value.tag = 'latest';
@@ -778,13 +775,14 @@ const onRemove = (key: 'ports' | 'mounts' | 'envs', index: number) => {
 };
 const onSubmit = async () => {
   await formRef.value?.validate();
-  const { image, icon, tag, ports } = formData.value;
-  const loading = ElLoading.service();
+  const { image, icon, tag, ports, envs } = formData.value;
+  const closeLoading = message.loading();
   if (formData.value.id) {
     const res = await updateContainer({
       ...formData.value,
       image: `${image}:${tag}`,
       icon: icon[0]?.url || '',
+      envs: envs.map(env => ({ key: env.envKey, value: env.envValue })),
       ports: ports.map(port => ({
         host: port.host.toString(),
         container: port.container.toString(),
@@ -792,9 +790,8 @@ const onSubmit = async () => {
       })),
     });
     if (res.success) {
-      ElMessage({
-        type: 'success',
-        message: '更新成功',
+      message.success({
+        content: '更新成功',
         onClose() {
           router.push('/d/container');
         },
@@ -805,6 +802,7 @@ const onSubmit = async () => {
       ...formData.value,
       image: `${image}:${tag}`,
       icon: icon[0]?.url || '',
+      envs: envs.map(env => ({ key: env.envKey, value: env.envValue })),
       ports: ports.map(port => ({
         host: port.host.toString(),
         container: port.container.toString(),
@@ -812,16 +810,15 @@ const onSubmit = async () => {
       })),
     });
     if (res.success) {
-      ElMessage({
-        type: 'success',
-        message: '创建成功',
+      message.success({
+        content: '创建成功',
         onClose() {
           router.push('/d/container');
         },
       });
     }
   }
-  loading.close();
+  closeLoading();
 };
 </script>
 <style scoped lang="less">
@@ -829,18 +826,15 @@ const onSubmit = async () => {
   padding-top: 16px;
   padding-right: 16px;
   padding-bottom: 32px;
-  .upload-demo .el-upload-dragger {
-    padding: 10px 16px;
+  .upload-icon {
+    font-size: 24px;
+    color: #409eff;
   }
-  .el-icon--upload {
-    font-size: 56px;
-  }
-  .el-upload__text {
+  .upload-text {
+    font-size: 12px;
+    line-height: 18px !important;
     line-height: 24px;
-  }
-  .el-upload__tip {
-    line-height: 18px;
-    text-align: center;
+    color: #777;
   }
 }
 .cropper-box {
@@ -850,9 +844,8 @@ const onSubmit = async () => {
   height: 400px;
 }
 #container-icon-cropper {
-  width: 100%;
-  display: block;
   max-width: 100%;
+  max-height: 100%;
 }
 .image-item {
   display: flex;
@@ -864,8 +857,6 @@ const onSubmit = async () => {
     text-overflow: ellipsis;
     white-space: nowrap;
     margin-right: 16px;
-    display: flex;
-    align-items: center;
   }
   .star {
     flex: none;
@@ -883,22 +874,19 @@ const onSubmit = async () => {
 </style>
 <style lang="less">
 .new-or-edit-container-page {
-  .el-upload--picture-card {
-    border: 0;
+  .icon-upload-control {
+    .ant-upload-select {
+      background-color: #fff !important;
+    }
   }
-  .upload-icon .el-upload-dragger {
-    padding: 10px 16px;
-  }
+
   .form-card {
     & + .form-card {
       margin-top: 16px;
     }
-    .el-card__header {
-      padding: 12px 16px;
-    }
-    .el-card__body {
-      padding: 12px 16px;
-    }
   }
+}
+.image-search-list {
+  width: 300px !important;
 }
 </style>

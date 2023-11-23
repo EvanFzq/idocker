@@ -2,26 +2,24 @@
   <div class="header">
     <div class="logo">iDocker</div>
     <div class="right-menu">
-      <el-dropdown class="user">
-        <span class="name">
+      <a-dropdown>
+        <div class="name">
           {{ userInfo.userName }}
-          <el-icon class="el-icon--right">
-            <arrow-down />
-          </el-icon>
-        </span>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item @click="onLogout">注销</el-dropdown-item>
-          </el-dropdown-menu>
+          <DownOutlined style="margin-left: 4px" />
+        </div>
+        <template #overlay>
+          <a-menu>
+            <a-menu-item @click="onLogout"> 注销 </a-menu-item>
+          </a-menu>
         </template>
-      </el-dropdown>
+      </a-dropdown>
     </div>
   </div>
 </template>
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { ArrowDown } from '@element-plus/icons-vue';
-import { ElMessage } from 'element-plus';
+import { DownOutlined } from '@ant-design/icons-vue';
+import { message } from 'ant-design-vue';
 
 import type { UserInfo } from '@common/types/setting';
 
@@ -38,9 +36,8 @@ onMounted(async () => {
 
 const onLogout = () => {
   sessionStorage.removeItem('token');
-  ElMessage({
-    message: '注销成功！',
-    type: 'success',
+  message.success({
+    content: '注销成功！',
     onClose() {
       location.href = '/d/login';
     },
@@ -50,9 +47,8 @@ const onLogout = () => {
 <style lang="less" scoped>
 .header {
   height: 100%;
-  background: #409eff;
   overflow: hidden;
-  padding: 16px;
+  padding: 16px 0;
   box-sizing: border-box;
   display: flex;
   align-items: center;
@@ -63,15 +59,17 @@ const onLogout = () => {
     font-size: 24px;
     font-weight: 700;
   }
-  .user {
-    .name {
-      cursor: pointer;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      outline: none !important;
-    }
+
+  .name {
+    cursor: pointer;
+    color: #fff;
+    display: flex;
+    font-size: 18px;
+    height: 24px;
+    align-items: center;
+    outline: none !important;
   }
+
   .logout {
     color: #fff;
   }

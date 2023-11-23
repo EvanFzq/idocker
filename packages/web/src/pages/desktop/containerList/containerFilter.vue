@@ -1,76 +1,63 @@
 <template>
-  <el-form
-    :inline="true"
+  <a-form
+    layout="inline"
     :model="filter"
-    label-width="80px"
+    autocomplete="off"
+    :label-col="labelCol"
+    :wrapper-col="wrapperCol"
     style="max-width: 630px"
   >
-    <el-form-item label="镜像">
-      <el-select
-        v-model="filter.image"
+    <a-form-item
+      label="镜像"
+      style="margin-bottom: 12px"
+    >
+      <a-select
+        v-model:value="filter.image"
         placeholder="选择镜像"
-        clearable
-      >
-        <el-option
-          v-for="item in imageList"
-          :key="item.id"
-          :label="item.name"
-          :value="item.id"
-        />
-      </el-select>
-    </el-form-item>
-    <el-form-item label="网络">
-      <el-select
-        v-model="filter.network"
+        allow-clear
+        :options="imageList"
+        :field-names="{ label: 'name', value: 'id' }"
+      />
+    </a-form-item>
+    <a-form-item label="网络">
+      <a-select
+        v-model:value="filter.network"
         placeholder="选择网络"
-        clearable
-      >
-        <el-option
-          v-for="item in networkList"
-          :key="item.id"
-          :label="item.name"
-          :value="item.id"
-        />
-      </el-select>
-    </el-form-item>
-
-    <el-form-item label="卷">
-      <el-select
-        v-model="filter.volume"
+        allow-clear
+        :options="networkList"
+        :field-names="{ label: 'name', value: 'id' }"
+      />
+    </a-form-item>
+    <a-form-item label="卷">
+      <a-select
+        v-model:value="filter.volume"
         placeholder="选择卷"
-        clearable
-      >
-        <el-option
-          v-for="item in volumekList"
-          :key="item"
-          :label="item"
-          :value="item"
-        />
-      </el-select>
-    </el-form-item>
-
-    <el-form-item>
-      <el-button
+        allow-clear
+        :options="volumekList"
+        :field-names="{ label: 'name', value: 'name' }"
+      />
+    </a-form-item>
+    <a-space wrap>
+      <a-button
         type="primary"
         style="margin-left: 80px"
-        :icon="Search"
+        :icon="h(SearchOutlined)"
         @click="onSubmit"
       >
         查询
-      </el-button>
-      <el-button
-        style="margin-left: 12px"
-        :icon="RefreshRight"
+      </a-button>
+      <a-button
+        :icon="h(RollbackOutlined)"
         @click="onReset"
       >
         重置
-      </el-button>
-    </el-form-item>
-  </el-form>
+      </a-button>
+    </a-space>
+  </a-form>
 </template>
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import { Search, RefreshRight } from '@element-plus/icons-vue';
+import { ref, onMounted, h } from 'vue';
+import { SearchOutlined, RollbackOutlined } from '@ant-design/icons-vue';
 
 import { getImageList } from '@/apis/image';
 import { getNetworkList } from '@/apis/network';
@@ -82,15 +69,18 @@ export interface FilterData {
   volume: string;
 }
 
+const labelCol = { style: { width: '80px' } };
+const wrapperCol = { style: { width: '210px' } };
+
 const filter = ref({
-  image: '',
-  network: '',
-  volume: '',
+  image: null,
+  network: null,
+  volume: null,
 });
 
 const imageList = ref<{ name: string; id: string }[]>([]);
 const networkList = ref<{ name: string; id: string }[]>([]);
-const volumekList = ref<string[]>([]);
+const volumekList = ref<{ name: string }[]>([]);
 
 const emits = defineEmits(['search']);
 
@@ -107,7 +97,7 @@ onMounted(async () => {
     networkList.value = networkRes.data.map(item => ({ name: item.Name, id: item.Id }));
   }
   if (volumeRes.success) {
-    volumekList.value = volumeRes.data.map(item => item.Name);
+    volumekList.value = volumeRes.data.map(item => ({ name: item.Name }));
   }
 });
 
@@ -116,9 +106,9 @@ const onSubmit = () => {
 };
 const onReset = () => {
   filter.value = {
-    image: '',
-    network: '',
-    volume: '',
+    image: null,
+    network: null,
+    volume: null,
   };
   emits('search', filter.value);
 };

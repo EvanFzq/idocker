@@ -1,60 +1,57 @@
 <template>
   <div class="aside">
     <div class="menu-list">
-      <el-menu
+      <a-menu
         default-active="/d/container"
-        :collapse="!isOpen"
-        style="border: none"
-        @select="onMenuSelect"
+        :inline-collapsed="collapsed"
+        :items="items"
+        @click="onMenuSelect"
       >
-        <el-menu-item index="/d/container">
-          <el-icon><VideoPlay /></el-icon>
-          <span>容器</span>
-        </el-menu-item>
-        <el-menu-item index="/d/image">
-          <el-icon><Coin /></el-icon>
-          <template #title>镜像</template>
-        </el-menu-item>
-        <el-menu-item index="/d/network">
-          <el-icon><Connection /></el-icon>
-          <template #title>网络</template>
-        </el-menu-item>
-        <el-menu-item index="/d/vol">
-          <el-icon><Document /></el-icon>
-          <template #title>数据</template>
-        </el-menu-item>
-      </el-menu>
+      </a-menu>
     </div>
-    <el-button
-      class="collapse-btn"
-      type="primary"
-      @click="onCollapse"
-    >
-      <el-icon v-if="isOpen"><ArrowLeftBold /></el-icon>
-      <el-icon v-if="!isOpen"><ArrowRightBold /></el-icon>
-    </el-button>
   </div>
 </template>
 <script setup lang="ts">
-import { ElMenu, ElMenuItem } from 'element-plus';
-import { useRouter } from 'vue-router';
 import {
-  Connection,
-  Coin,
-  VideoPlay,
-  Document,
-  ArrowLeftBold,
-  ArrowRightBold,
-} from '@element-plus/icons-vue';
+  PlayCircleOutlined,
+  AppstoreOutlined,
+  ApartmentOutlined,
+  FileOutlined,
+} from '@ant-design/icons-vue';
+import { useRouter } from 'vue-router';
+import { ref, h } from 'vue';
 
-const props = defineProps<{ isOpen: boolean }>();
-const emit = defineEmits(['change']);
+defineProps<{ collapsed: boolean }>();
 const router = useRouter();
 
-const onCollapse = () => {
-  emit('change', !props.isOpen);
-};
-const onMenuSelect = (key: string) => {
+const items = ref([
+  {
+    key: '/d/container',
+    icon: () => h(PlayCircleOutlined),
+    label: '容器',
+    title: '容器',
+  },
+  {
+    key: '/d/image',
+    icon: () => h(AppstoreOutlined),
+    label: '镜像',
+    title: '镜像',
+  },
+  {
+    key: '/d/network',
+    icon: () => h(ApartmentOutlined),
+    label: '网络',
+    title: '网络',
+  },
+  {
+    key: '/d/vol',
+    icon: () => h(FileOutlined),
+    label: '数据',
+    title: '数据',
+  },
+]);
+
+const onMenuSelect = ({ key }: { key: string }) => {
   router.push(key);
 };
 </script>
