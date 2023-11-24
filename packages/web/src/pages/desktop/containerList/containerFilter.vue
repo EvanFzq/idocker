@@ -64,19 +64,17 @@ import { getNetworkList } from '@/apis/network';
 import { getVolumeList } from '@/apis/volume';
 
 export interface FilterData {
-  image: string;
-  network: string;
-  volume: string;
+  image: string | null;
+  network: string | null;
+  volume: string | null;
 }
 
 const labelCol = { style: { width: '80px' } };
 const wrapperCol = { style: { width: '210px' } };
 
-const filter = ref({
-  image: null,
-  network: null,
-  volume: null,
-});
+const props = defineProps<{ defaultValue: FilterData }>();
+
+const filter = ref(props.defaultValue);
 
 const imageList = ref<{ name: string; id: string }[]>([]);
 const networkList = ref<{ name: string; id: string }[]>([]);

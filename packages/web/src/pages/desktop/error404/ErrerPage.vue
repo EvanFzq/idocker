@@ -8,7 +8,7 @@
     <template #extra>
       <a-button
         type="primary"
-        @click="router.push('/d/container')"
+        @click="router.push('/d/container/list')"
       >
         回到首页
       </a-button>

@@ -23,7 +23,7 @@
         >
           <AsideMenu :collapsed="collapsed" />
         </a-layout-sider>
-        <a-layout>
+        <a-layout class="main">
           <router-view v-slot="{ Component }">
             <keep-alive :include="['HomePage']">
               <component :is="Component" />
@@ -46,6 +46,7 @@ const collapsed = ref(false);
 .main {
   height: 100%;
   padding: 0;
+  overflow: auto;
 }
 </style>
 <style>

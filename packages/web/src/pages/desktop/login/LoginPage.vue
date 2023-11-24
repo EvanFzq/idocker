@@ -29,6 +29,7 @@
           type="primary"
           size="large"
           class="login-btn"
+          html-type="submit"
           :disabled="!form.password.trim() || !form.username.trim()"
           @click="onSubmit"
         >

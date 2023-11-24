@@ -176,15 +176,7 @@ export class DockerService {
     });
   }
 
-  async pullImage(
-    env: string,
-    image: string,
-    catchError?: boolean,
-  ): Promise<{
-    image: string;
-    tag: string;
-    sha256: string;
-  }> {
+  async pullImage(env: string, image: string, catchError?: boolean): Promise<void> {
     const fetch = this.getFetch(env);
     const tag = image.indexOf(':') > 0 ? image.split(':')[1] : 'latest';
     image = image.indexOf(':') > 0 ? image.split(':')[0] : image;
@@ -204,21 +196,6 @@ export class DockerService {
         throw new DockerException();
       }
     }
-    const msgArr: Record<string, string>[] = res.data.split('\n').map(str => {
-      try {
-        return JSON.parse(str);
-      } catch (error) {
-        console.info(str, error);
-        return {};
-      }
-    });
-    const sha256 = msgArr.find(item => item.status?.startsWith('Digest: sha256'))?.status;
-    this.imageLastVersion[image + ':' + tag] = sha256;
-    return {
-      image,
-      tag,
-      sha256,
-    };
   }
   async imageCanUpdate(tag: string, sha256: string) {
     const imagesList = await this.docker.listImages({ all: true });

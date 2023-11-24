@@ -72,6 +72,14 @@
           </div>
         </div>
       </template>
+      <template v-if="column.key === 'networks'">
+        <div
+          v-for="(network, index) in record.networks"
+          :key="index"
+        >
+          <span>{{ network.type }}</span>
+        </div>
+      </template>
       <template v-if="column.key === 'ports'">
         <div
           v-for="(port, index) in record.ports"
@@ -136,6 +144,7 @@
             <a-button
               class="button"
               type="primary"
+              :loading="activeLoadingId === record.id"
               style="background-color: #07c160"
               :icon="h(CaretRightOutlined)"
               @click="onActive(record.id, ContainerActive.start)"
@@ -149,6 +158,7 @@
             <a-button
               class="button"
               type="primary"
+              :loading="activeLoadingId === record.id"
               style="background-color: #07c160"
               :icon="h(PlayCircleOutlined)"
               @click="onActive(record.id, ContainerActive.unpause)"
@@ -162,6 +172,7 @@
             <a-button
               class="button"
               type="primary"
+              :loading="activeLoadingId === record.id"
               style="background-color: #ff976a"
               :icon="h(PauseCircleOutlined)"
               @click="onActive(record.id, ContainerActive.pause)"
@@ -176,6 +187,7 @@
             <a-button
               class="button"
               type="primary"
+              :loading="activeLoadingId === record.id"
               :icon="h(ReloadOutlined)"
               @click="onActive(record.id, ContainerActive.restart)"
             />
@@ -191,6 +203,7 @@
           >
             <a-button
               class="button"
+              :loading="activeLoadingId === record.id"
               style="background-color: #dcdee0"
               :icon="h(StopOutlined)"
               @click="onActive(record.id, ContainerActive.stop)"
@@ -203,6 +216,7 @@
             <a-button
               class="button"
               type="primary"
+              :loading="activeLoadingId === record.id"
               style="background-color: #ee3c3c"
               :icon="h(DeleteOutlined)"
               @click="onActive(record.id, ContainerActive.remove)"
@@ -215,7 +229,7 @@
 </template>
 <script setup lang="ts">
 import dayjs from 'dayjs';
-import { h } from 'vue';
+import { h, ref } from 'vue';
 import { message, Modal } from 'ant-design-vue';
 import { useRouter } from 'vue-router';
 import {
@@ -245,6 +259,7 @@ import type { TableColumnProps } from 'ant-design-vue';
 defineProps<{ list: ContainerDetail[] }>();
 const emit = defineEmits(['reload']);
 const router = useRouter();
+const activeLoadingId = ref('');
 const columns: TableColumnProps<ContainerDetail>[] = [
   {
     key: 'icon',
@@ -280,7 +295,7 @@ const columns: TableColumnProps<ContainerDetail>[] = [
     key: 'networks',
     dataIndex: 'networks',
     title: '网络',
-    width: 100,
+    width: 120,
   },
   {
     key: 'ports',
@@ -315,13 +330,13 @@ const tableWidth: number = (columns as { width: number }[]).reduce(
 );
 
 const handleActive = async (id: string, type: ContainerActive) => {
-  const hideLoading = message.loading();
+  activeLoadingId.value = id;
   const res = await activeContainer(id, type);
 
   if (res.success) {
     message.success('操作成功');
   }
-  hideLoading();
+  activeLoadingId.value = '';
   emit('reload');
 };
 

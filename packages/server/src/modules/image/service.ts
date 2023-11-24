@@ -20,22 +20,7 @@ export class ImageService {
     try {
       const image = this.dockerService.docker.getImage(imageTag);
       if (!image || !image.id) {
-        return new Promise<void>((resolve, reject) => {
-          this.dockerService.docker.pull(imageTag, (err, stream) => {
-            function onFinished(err) {
-              if (err) {
-                reject(err);
-              } else {
-                resolve();
-              }
-            }
-            if (err) {
-              reject(err);
-            } else {
-              this.dockerService.docker.modem.followProgress(stream, onFinished);
-            }
-          });
-        });
+        await this.dockerService.pullImage('local', imageTag);
       }
     } catch (error) {
       console.error(error);

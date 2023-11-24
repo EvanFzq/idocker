@@ -1,7 +1,7 @@
 <template>
   <PageLayout
     :breadcrumbs="[
-      { path: '/d/container', breadcrumbName: '容器列表' },
+      { path: '/d/container/list', breadcrumbName: '容器列表' },
       { breadcrumbName: '容器详情' },
     ]"
     :title="detail?.name"

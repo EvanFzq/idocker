@@ -2,7 +2,7 @@
   <div class="aside">
     <div class="menu-list">
       <a-menu
-        default-active="/d/container"
+        v-model:selectedKeys="selectedKeys"
         :inline-collapsed="collapsed"
         :items="items"
         @click="onMenuSelect"
@@ -18,33 +18,35 @@ import {
   ApartmentOutlined,
   FileOutlined,
 } from '@ant-design/icons-vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { ref, h } from 'vue';
 
 defineProps<{ collapsed: boolean }>();
 const router = useRouter();
+const route = useRoute();
+const selectedKeys = ref([route.path]);
 
 const items = ref([
   {
-    key: '/d/container',
+    key: '/d/container/list',
     icon: () => h(PlayCircleOutlined),
     label: '容器',
     title: '容器',
   },
   {
-    key: '/d/image',
+    key: '/d/image/list',
     icon: () => h(AppstoreOutlined),
     label: '镜像',
     title: '镜像',
   },
   {
-    key: '/d/network',
+    key: '/d/network/list',
     icon: () => h(ApartmentOutlined),
     label: '网络',
     title: '网络',
   },
   {
-    key: '/d/vol',
+    key: '/d/volume/list',
     icon: () => h(FileOutlined),
     label: '数据',
     title: '数据',

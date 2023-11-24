@@ -20,7 +20,7 @@ if (
   (!isMobile() && !location.pathname.startsWith('/d'))
 ) {
   router.push({
-    path: isMobile() ? '/m' : '/d/container',
+    path: isMobile() ? '/m' : '/d/container/list',
   });
 }
 </script>

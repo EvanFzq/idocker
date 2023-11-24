@@ -57,7 +57,7 @@ export const routes = [
     component: DesktopPage,
     children: [
       {
-        path: '/d/container',
+        path: '/d/container/list',
         component: () => import('@/pages/desktop/containerList/containerListPage.vue'),
       },
       {
@@ -68,6 +68,18 @@ export const routes = [
         path: '/d/container/newOrEdit',
         component: () =>
           import('@/pages/desktop/createOrEditContainer/createOrEditContainerPage.vue'),
+      },
+      {
+        path: '/d/image/list',
+        component: () => import('@/pages/desktop/imageList/imageListPage.vue'),
+      },
+      {
+        path: '/d/network/list',
+        component: () => import('@/pages/desktop/networkList/networkListPage.vue'),
+      },
+      {
+        path: '/d/volume/list',
+        component: () => import('@/pages/desktop/volumeList/volumeListPage.vue'),
       },
       { path: '/d/:error*', component: () => import('@/pages/desktop/error404/ErrerPage.vue') },
     ],

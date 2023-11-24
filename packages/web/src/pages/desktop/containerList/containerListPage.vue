@@ -4,7 +4,10 @@
       <ContainerDashboard :total-data="totalData" />
       <div class="divider"></div>
       <div class="right">
-        <ContainerFilter @search="onSearch" />
+        <ContainerFilter
+          :default-value="filter"
+          @search="onSearch"
+        />
         <div class="btn-row">
           <a-button
             type="primary"
@@ -54,7 +57,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, h } from 'vue';
 import { PlusOutlined } from '@ant-design/icons-vue';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 
 import { ContainerStatus } from '@common/constants/enum';
 import type { ContainerDetail } from '@common/types/container';
@@ -66,12 +69,15 @@ import ContainerDashboard from './containerDashboard.vue';
 import ContainerFilter from './containerFilter.vue';
 import type { FilterData } from './containerFilter.vue';
 
+const router = useRouter();
+const route = useRoute();
+
 const activeName = ref('all');
 const list = ref<ContainerDetail[]>([]);
-const filter = ref({
-  image: '',
-  network: '',
-  volume: '',
+const filter = ref<FilterData>({
+  image: route.query.imageId ? (route.query.imageId as string) : null,
+  network: route.query.networkId ? (route.query.networkId as string) : null,
+  volume: route.query.volumeName ? (route.query.volumeName as string) : null,
 });
 const totalData = ref({
   cpu: 0,
@@ -79,7 +85,6 @@ const totalData = ref({
   memoryUsage: 0,
   memoryLimit: 1,
 });
-const router = useRouter();
 
 const getData = async (hasMetrics?: boolean) => {
   const res = await getContainerList({

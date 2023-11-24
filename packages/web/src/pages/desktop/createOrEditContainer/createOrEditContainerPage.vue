@@ -2,13 +2,14 @@
 <template>
   <PageLayout
     :breadcrumbs="[
-      { path: '/d/container', breadcrumbName: '容器列表' },
+      { path: '/d/container/list', breadcrumbName: '容器列表' },
       { breadcrumbName: `容器${isEdit ? '编辑-' : '新增'}${formData?.name || ''}` },
     ]"
   >
     <template #extra>
       <a-button
         type="primary"
+        :loading="submitLoading"
         @click="onSubmit"
       >
         保存
@@ -130,13 +131,23 @@
               name="network"
               :rules="[{ required: true, message: '请输入' }]"
             >
-              <a-select
-                v-model:value="formData.network"
-                style="width: 100%"
-                placeholder="请选择"
-                :options="networkList"
-                :field-names="{ label: 'Name', value: 'Name' }"
-              />
+              <div style="display: flex; align-items: center">
+                <a-select
+                  v-model:value="formData.network"
+                  style="width: 100%"
+                  placeholder="请选择"
+                  :options="networkList"
+                  :field-names="{ label: 'Name', value: 'Name' }"
+                />
+                <a-button
+                  type="primary"
+                  shape="circle"
+                  size="small"
+                  style="margin-left: 6px"
+                  :icon="h(PlusOutlined)"
+                  @click="showCreateNetworkModal = true"
+                />
+              </div>
             </a-form-item>
           </a-col>
           <a-col v-bind="fieldLayout">
@@ -335,13 +346,23 @@
                   :name="['mounts', index, 'volume']"
                   :rules="[{ required: true, message: '请选择' }]"
                 >
-                  <a-select
-                    v-model:value="record.volume"
-                    style="width: 100%"
-                    placeholder="请选择"
-                    :options="volumeList"
-                    :field-names="{ label: 'Name', value: 'Name' }"
-                  />
+                  <div style="display: flex; align-items: center">
+                    <a-select
+                      v-model:value="record.volume"
+                      style="width: 100%"
+                      placeholder="请选择"
+                      :options="volumeList"
+                      :field-names="{ label: 'Name', value: 'Name' }"
+                    />
+                    <a-button
+                      type="primary"
+                      shape="circle"
+                      size="small"
+                      style="margin-left: 6px"
+                      :icon="h(PlusOutlined)"
+                      @click="showCreateVolumeModal = true"
+                    />
+                  </div>
                 </a-form-item>
               </template>
               <template v-if="column.key === 'container'">
@@ -474,12 +495,20 @@
         :src="previewIconUrl"
       />
     </a-modal>
+    <CreateNetworkModal
+      v-model:open="showCreateNetworkModal"
+      @created="getNetworkData()"
+    />
+    <CreateVolumeModal
+      v-model:open="showCreateVolumeModal"
+      @created="getVolumeData()"
+    />
   </PageLayout>
 </template>
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, h } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { InboxOutlined, FireFilled, StarFilled } from '@ant-design/icons-vue';
+import { InboxOutlined, FireFilled, StarFilled, PlusOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
@@ -491,6 +520,8 @@ import type { PortConfig, Network } from '@common/types/network';
 import { restartPolicyList } from '@common/constants/const';
 
 import PageLayout from '@/components/desktop/PageLayout.vue';
+import CreateNetworkModal from '@/components/desktop/CreateNetworkModal.vue';
+import CreateVolumeModal from '@/components/desktop/CreateVolumeModal.vue';
 import {
   searchImage,
   getNetworkList,
@@ -506,6 +537,8 @@ import type { TableColumnProps, UploadFile, FormInstance } from 'ant-design-vue'
 
 const showIconCropper = ref(false);
 const showPreviewIcon = ref(false);
+const showCreateNetworkModal = ref(false);
+const showCreateVolumeModal = ref(false);
 const previewIconUrl = ref('');
 const iconCropper = ref<Cropper | null>(null);
 const iconFileName = ref<string | undefined>('');
@@ -513,6 +546,7 @@ const imageList = ref<Image[]>([]);
 const networkList = ref<Network[]>([]);
 const volumeList = ref<Volume[]>([]);
 const formRef = ref<FormInstance>();
+const submitLoading = ref(false);
 
 const route = useRoute();
 const router = useRouter();
@@ -530,7 +564,7 @@ const formData = ref({
   icon: [] as UploadFile[],
   image: null as unknown as string,
   tag: '',
-  network: '',
+  network: null as unknown as string,
   runAffterCreated: false,
   command: '',
   envs: [] as { envKey: string; envValue: string }[],
@@ -756,6 +790,7 @@ const onIconPreview = (uploadFile: UploadFile) => {
   previewIconUrl.value = uploadFile.url!;
   showPreviewIcon.value = true;
 };
+
 let searchTimer: NodeJS.Timeout;
 const onImageInputChange = async (text: string) => {
   if (!text.trim()) return;
@@ -767,16 +802,19 @@ const onImageInputChange = async (text: string) => {
     }
   }, 500);
 };
+
 const onImageChange = () => {
   formData.value.tag = 'latest';
 };
+
 const onRemove = (key: 'ports' | 'mounts' | 'envs', index: number) => {
   formData.value[key]?.splice(index, 1);
 };
+
 const onSubmit = async () => {
   await formRef.value?.validate();
   const { image, icon, tag, ports, envs } = formData.value;
-  const closeLoading = message.loading();
+  submitLoading.value = true;
   if (formData.value.id) {
     const res = await updateContainer({
       ...formData.value,
@@ -793,7 +831,7 @@ const onSubmit = async () => {
       message.success({
         content: '更新成功',
         onClose() {
-          router.push('/d/container');
+          router.push('/d/container/list');
         },
       });
     }
@@ -813,12 +851,12 @@ const onSubmit = async () => {
       message.success({
         content: '创建成功',
         onClose() {
-          router.push('/d/container');
+          router.push('/d/container/list');
         },
       });
     }
   }
-  closeLoading();
+  submitLoading.value = false;
 };
 </script>
 <style scoped lang="less">
