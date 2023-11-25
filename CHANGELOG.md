@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.10.0](///compare/v1.9.0...v1.10.0) (2023-11-25)
+
+
+### Features
+
+* 新增桌面端容器列表和详情页，优化日志查看 b505dcf
+* 新增桌面端新增、编辑容器、新增桌面端容器列表过滤选项和资源看板 86fcc32
+* 增加电脑端登录页、页面路由优化 8f08b1b
+* 增加桌面端镜像、网络、数据管理 88e33c5
+* 增加桌面端网络链接功能，修复通知导致的程序崩溃 0718e5a
+
+
+### Bug Fixes
+
+* 修复导航页地址模版解析问题 4d42a53
+* 修复桌面端容器列表定时器在页面卸载时未清除 72a6019
+* 优化切换壁纸时无可切换壁纸异常提示、修复端口一对多被覆盖问题，详情增加内外网地址展示 d39c98b
+
 ## [1.9.0](///compare/v1.8.1...v1.9.0) (2023-11-12)
 
 
