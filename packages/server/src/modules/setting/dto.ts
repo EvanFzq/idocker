@@ -8,6 +8,7 @@ import {
   IsEmail,
   IsEnum,
   ValidateNested,
+  IsOptional,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -35,21 +36,27 @@ export class UpdateUserInfoDto {
 }
 
 export class Events {
+  @IsOptional()
   @IsString({ each: true })
   container: string[];
 
+  @IsOptional()
   @IsString({ each: true })
   image: string[];
 
+  @IsOptional()
   @IsString({ each: true })
   volume: string[];
 
+  @IsOptional()
   @IsString({ each: true })
   network: string[];
 
+  @IsOptional()
   @IsString({ each: true })
   volumes: string[];
 
+  @IsOptional()
   @IsString({ each: true })
   service: string[];
 }

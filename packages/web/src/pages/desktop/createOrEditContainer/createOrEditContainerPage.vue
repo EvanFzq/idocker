@@ -12,7 +12,7 @@
         :loading="submitLoading"
         @click="onSubmit"
       >
-        保存
+        {{ isEdit ? '保存' : '创建' }}
       </a-button>
     </template>
     <div class="new-or-edit-container-page">
@@ -766,7 +766,9 @@ const onIconCropperCancel = () => {
 };
 
 const onIconCropperConfirm = async () => {
-  const croppedData = iconCropper.value?.getCroppedCanvas().toDataURL('image/jpeg');
+  const croppedData = iconCropper.value
+    ?.getCroppedCanvas({ fillColor: '#fff' })
+    .toDataURL('image/jpeg');
   if (croppedData) {
     const file = dataURLtoFile(croppedData, iconFileName.value as string);
     const res = await uploadImg(file, { name: iconFileName.value, height: 240 });

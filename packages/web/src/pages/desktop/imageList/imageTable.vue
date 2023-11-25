@@ -40,6 +40,7 @@
             danger
             :disabled="!!record.Containers"
             type="primary"
+            size="small"
             :icon="h(DeleteOutlined)"
             :loading="operateLoadingId === record.Id"
             @click="onRemove(record.Id)"

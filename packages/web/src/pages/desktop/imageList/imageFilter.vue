@@ -15,7 +15,7 @@
   </div>
   <PullImageModal
     v-model:open="showPullImageModal"
-    @pulled="$emit('reload')"
+    @finish="$emit('reload')"
   />
 </template>
 <script setup lang="ts">

@@ -88,7 +88,7 @@ import { searchImage, pullImage } from '@/apis/image';
 import type { FormInstance } from 'ant-design-vue';
 
 const props = defineProps<{ open: boolean }>();
-const emits = defineEmits(['update:open', 'pulled']);
+const emits = defineEmits(['update:open', 'finish']);
 const formRef = ref<FormInstance>();
 const formData = ref({
   image: null as string | null,
@@ -131,7 +131,7 @@ const onPullImage = async () => {
   if (res.success) {
     message.success('拉取成功');
     emits('update:open', false);
-    emits('pulled');
+    emits('finish');
   }
   loading.value = false;
 };

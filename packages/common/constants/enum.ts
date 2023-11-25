@@ -43,7 +43,7 @@ export const ContainerStatusName: Record<string, string> = {
 export const ContainerStatusColor: Record<string, string> = {
   running: '#07c160',
   paused: '#ed6a0c',
-  created: '#d9ecff',
+  created: '#57abff',
   exited: '#999',
 };
 

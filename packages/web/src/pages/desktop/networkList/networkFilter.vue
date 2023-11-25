@@ -15,7 +15,7 @@
   </div>
   <CreateNetworkModal
     v-model:open="showCreateNetworkModal"
-    @created="$emit('reload')"
+    @finish="$emit('reload')"
   />
 </template>
 <script setup lang="ts">

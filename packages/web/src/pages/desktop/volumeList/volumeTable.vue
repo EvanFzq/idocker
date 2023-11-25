@@ -30,6 +30,7 @@
             danger
             :disabled="!!record.UsageData.RefCount"
             type="primary"
+            size="small"
             :icon="h(DeleteOutlined)"
             :loading="operateLoadingName === record.Name"
             @click="onRemove(record.Name)"

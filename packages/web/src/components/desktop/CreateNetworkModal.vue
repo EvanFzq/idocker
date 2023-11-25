@@ -102,7 +102,7 @@ import { addNetwork } from '@/apis/network';
 import type { FormInstance } from 'ant-design-vue';
 
 const props = defineProps<{ open: boolean }>();
-const emits = defineEmits(['update:open', 'created']);
+const emits = defineEmits(['update:open', 'finish']);
 const formRef = ref<FormInstance>();
 const loading = ref(false);
 
@@ -151,7 +151,7 @@ const onCreate = async () => {
   if (res.success) {
     message.success('创建成功');
     emits('update:open', false);
-    emits('created');
+    emits('finish');
   }
   loading.value = false;
 };

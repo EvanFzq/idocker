@@ -5,6 +5,7 @@
         colorPrimary: '#409eff',
       },
     }"
+    :locale="zhCN"
   >
     <a-layout>
       <a-layout-header
@@ -36,6 +37,7 @@
 </template>
 <script setup lang="ts">
 import { ref } from 'vue';
+import zhCN from 'ant-design-vue/es/locale/zh_CN';
 
 import AsideMenu from '@/components/desktop/AsideMenu.vue';
 import DesktopHeader from '@/components/desktop/DesktopHeader.vue';

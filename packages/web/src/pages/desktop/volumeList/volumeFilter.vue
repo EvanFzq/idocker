@@ -15,7 +15,7 @@
   </div>
   <CreateVolumeModal
     v-model:open="showCreateVolumeModal"
-    @created="$emit('reload')"
+    @finish="$emit('reload')"
   />
 </template>
 <script setup lang="ts">

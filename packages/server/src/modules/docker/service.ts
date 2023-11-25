@@ -74,36 +74,49 @@ export class DockerService {
     // 添加事件监听
     this.envs.forEach(async env => {
       const getEvents = async () => {
-        const noticeEvents =
-          this.configService.getUserConfig<Record<EventType, EventAction[]>>('noticeEvents');
-
-        const startTime = Math.floor(Date.now() / 1000);
-        const endTime = startTime + 60;
-        const res = await env.fetch.get(`/v1.37/events?since=${startTime}&until=${endTime}`, {
-          timeout: 61000,
-          responseType: 'stream',
-        });
-        const events: Event[] = [];
-        res.data.on('data', (chunk: Buffer) => {
-          const event: Event = JSON.parse(chunk.toString('utf-8'));
-          if (
-            event?.Type &&
-            noticeEvents[event.Type] &&
-            noticeEvents[event.Type].includes(event.Action)
-          ) {
-            events.push(event);
-          }
-          // 处理流数据的逻辑
-        });
-        res.data.on('error', error => {
-          console.error('notice events error', error);
-        });
-        res.data.on('close', () => {
-          if (events.length > 0) {
-            this.sendEmail(env.name, events);
-          }
-          getEvents();
-        });
+        const noticeEvents = this.configService.getUserConfig<Record<
+          EventType,
+          EventAction[]
+        > | null>('noticeEvents');
+        try {
+          const startTime = Math.floor(Date.now() / 1000);
+          const endTime = startTime + 60;
+          const res = await env.fetch.get(`/v1.37/events?since=${startTime}&until=${endTime}`, {
+            timeout: 61000,
+            responseType: 'stream',
+          });
+          const events: Event[] = [];
+          res.data.on('data', (chunk: Buffer) => {
+            try {
+              // 处理流数据的逻辑
+              const event: Event = JSON.parse(chunk.toString('utf-8'));
+              if (
+                event?.Type &&
+                noticeEvents?.[event.Type] &&
+                noticeEvents?.[event.Type].includes(event.Action)
+              ) {
+                events.push(event);
+              }
+            } catch (error) {
+              console.error(error);
+            }
+          });
+          res.data.on('error', error => {
+            console.error('notice events error', error);
+          });
+          res.data.on('close', async () => {
+            try {
+              if (events.length > 0) {
+                await this.sendEmail(env.name, events);
+              }
+              getEvents();
+            } catch (error) {
+              console.error(error);
+            }
+          });
+        } catch (error) {
+          console.error(error);
+        }
       };
       getEvents();
     });
