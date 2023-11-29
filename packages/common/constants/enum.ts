@@ -94,12 +94,27 @@ export enum EmailType {
   WangYi163 = '网易163邮箱',
 }
 
+export const EmailTypeList = [
+  {
+    text: EmailType.QQ,
+    value: EmailType.QQ,
+  },
+  {
+    text: EmailType.Outlook,
+    value: EmailType.Outlook,
+  },
+  {
+    text: EmailType.WangYi163,
+    value: EmailType.WangYi163,
+  },
+];
+
 export enum EventType {
   Container = 'container',
   Image = 'image',
   Volume = 'volume',
   Network = 'network',
-  Daemon = 'volumes',
+  Daemon = 'daemon',
 }
 export const EventTypeName: Record<string, string> = {
   [EventType.Container]: '容器',

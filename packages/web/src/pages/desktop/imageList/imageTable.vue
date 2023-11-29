@@ -36,16 +36,27 @@
       </template>
       <template v-if="column.key === 'operate'">
         <a-space>
+          <a-tooltip :title="!!record.Containers ? '存在使用容器' : ''">
+            <a-button
+              danger
+              :disabled="!!record.Containers"
+              type="primary"
+              size="small"
+              :icon="h(DeleteOutlined)"
+              :loading="operateLoadingId === record.Id"
+              @click="onRemove(record.Id)"
+            >
+              删除
+            </a-button>
+          </a-tooltip>
+
           <a-button
-            danger
-            :disabled="!!record.Containers"
             type="primary"
             size="small"
-            :icon="h(DeleteOutlined)"
-            :loading="operateLoadingId === record.Id"
-            @click="onRemove(record.Id)"
+            :icon="h(PlusOutlined)"
+            @click="onGoToCreate(record)"
           >
-            删除
+            创建容器
           </a-button>
         </a-space>
       </template>
@@ -54,9 +65,9 @@
 </template>
 <script setup lang="ts">
 import { ref, h } from 'vue';
-import { RouterLink } from 'vue-router';
+import { RouterLink, useRouter } from 'vue-router';
 import dayjs from 'dayjs';
-import { DeleteOutlined } from '@ant-design/icons-vue';
+import { DeleteOutlined, PlusOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
 
 import type { ImageItem } from '@common/types/image';
@@ -103,6 +114,7 @@ const columns: TableColumnProps[] = [
     title: '操作',
   },
 ];
+const router = useRouter();
 
 const onRemove = async (id: string) => {
   operateLoadingId.value = id;
@@ -114,6 +126,15 @@ const onRemove = async (id: string) => {
   }
   emits('reload');
   operateLoadingId.value = '';
+};
+const onGoToCreate = async (record: ImageItem) => {
+  router.push({
+    path: '/d/container/newOrEdit',
+    query: {
+      image: record.Name,
+      tag: record.Tags[0],
+    },
+  });
 };
 </script>
 <style scoped lang="less">

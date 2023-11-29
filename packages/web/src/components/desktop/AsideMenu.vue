@@ -4,6 +4,7 @@
       <a-menu
         v-model:selectedKeys="selectedKeys"
         :inline-collapsed="collapsed"
+        mode="inline"
         :items="items"
         @click="onMenuSelect"
       >
@@ -17,6 +18,9 @@ import {
   AppstoreOutlined,
   ApartmentOutlined,
   FileOutlined,
+  SettingOutlined,
+  UserOutlined,
+  NotificationOutlined,
 } from '@ant-design/icons-vue';
 import { useRouter, useRoute } from 'vue-router';
 import { ref, h } from 'vue';
@@ -50,6 +54,26 @@ const items = ref([
     icon: () => h(FileOutlined),
     label: '数据',
     title: '数据',
+  },
+  {
+    key: '/d/setting',
+    icon: () => h(SettingOutlined),
+    label: '设置',
+    title: '设置',
+    children: [
+      {
+        icon: () => h(UserOutlined),
+        key: '/d/setting/user',
+        label: '用户信息',
+        title: '用户信息',
+      },
+      {
+        icon: () => h(NotificationOutlined),
+        key: '/d/setting/notice',
+        label: '通知',
+        title: '通知',
+      },
+    ],
   },
 ]);
 

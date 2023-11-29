@@ -218,7 +218,7 @@
               class="button"
               size="small"
               type="link"
-              @click="formData.ports.push({ protocol: 'tcp' } as PortConfig)"
+              @click="formData.ports?.push({ protocol: 'tcp' } as PortConfig)"
             >
               增加端口
             </a-button>
@@ -297,7 +297,7 @@
               class="button"
               size="small"
               type="link"
-              @click="formData.mounts.push({ type: 'bind', container: '', readonly: false })"
+              @click="formData.mounts?.push({ type: 'bind', container: '', readonly: false })"
             >
               增加挂载
             </a-button>
@@ -407,7 +407,7 @@
               class="button"
               size="small"
               type="link"
-              @click="formData.envs.push({ envKey: '', envValue: '' })"
+              @click="formData.envs?.push({ envKey: '', envValue: '' })"
             >
               增加环境变量
             </a-button>
@@ -558,18 +558,35 @@ const fieldLayout = {
   xxl: 6,
 };
 
-const formData = ref({
+interface FormData {
+  id?: string;
+  name: string;
+  icon: UploadFile[];
+  image: string;
+  tag: string;
+  network: string;
+  runAffterCreated: boolean;
+  command: string;
+  envs: { envKey: string; envValue: string }[];
+  mounts: MountConfig[];
+  ports: PortConfig[];
+  restart: string;
+  localUrl?: string;
+  internetUrl?: string;
+}
+
+const formData = ref<Partial<FormData>>({
   id: '',
   name: '',
-  icon: [] as UploadFile[],
-  image: null as unknown as string,
-  tag: '',
-  network: null as unknown as string,
+  icon: [],
+  image: route.query.image as string,
+  tag: route.query.tag as string,
+  network: undefined,
   runAffterCreated: false,
   command: '',
-  envs: [] as { envKey: string; envValue: string }[],
-  mounts: [] as MountConfig[],
-  ports: [] as PortConfig[],
+  envs: [],
+  mounts: [],
+  ports: [],
   restart: 'no',
   localUrl: '',
   internetUrl: '',
@@ -815,11 +832,30 @@ const onRemove = (key: 'ports' | 'mounts' | 'envs', index: number) => {
 
 const onSubmit = async () => {
   await formRef.value?.validate();
-  const { image, icon, tag, ports, envs } = formData.value;
+  const {
+    image,
+    icon,
+    tag,
+    ports,
+    envs,
+    command,
+    name,
+    network,
+    mounts,
+    restart,
+    runAffterCreated,
+    id,
+  } = formData.value as FormData;
   submitLoading.value = true;
   if (formData.value.id) {
     const res = await updateContainer({
-      ...formData.value,
+      id: id as string,
+      command,
+      name,
+      network,
+      mounts,
+      restart,
+      runAffterCreated,
       image: `${image}:${tag}`,
       icon: icon[0]?.url || '',
       envs: envs.map(env => ({ key: env.envKey, value: env.envValue })),
@@ -839,7 +875,12 @@ const onSubmit = async () => {
     }
   } else {
     const res = await createContainer({
-      ...formData.value,
+      command,
+      name,
+      network,
+      mounts,
+      restart,
+      runAffterCreated,
       image: `${image}:${tag}`,
       icon: icon[0]?.url || '',
       envs: envs.map(env => ({ key: env.envKey, value: env.envValue })),

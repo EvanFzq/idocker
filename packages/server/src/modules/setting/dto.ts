@@ -25,10 +25,12 @@ export class AppsPublicDto {
 }
 
 export class UpdateUserInfoDto {
+  @IsOptional()
   @IsString()
   @Length(4, 32) //6-32位
   userName: string;
 
+  @IsOptional()
   @IsInt()
   @Max(100)
   @Min(1)
@@ -61,16 +63,24 @@ export class Events {
   service: string[];
 }
 
-export class UpdateNoticeInfoDto {
+export class NoticeEmail {
   @IsEnum(EmailType)
-  emailType: EmailType;
+  type: EmailType;
 
   @IsEmail()
-  emailAccount: string;
+  account: string;
 
   @IsString()
-  emailPassword: string;
+  password: string;
+}
 
+export class UpdateNoticeInfoDto {
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => NoticeEmail)
+  email: NoticeEmail;
+
+  @IsOptional()
   @ValidateNested()
   @Type(() => Events)
   events: Record<string, string[]>;

@@ -1,8 +1,8 @@
 import type { ContainerStatus, EmailType } from '../constants/enum';
 
 export interface UserInfo {
-  userName: string;
-  passwordMaxRetryNum: number;
+  userName?: string;
+  passwordMaxRetryNum?: number;
 }
 
 export interface AppInfo {
@@ -46,9 +46,13 @@ export interface EmailMessage {
   attachments?: Attachment[];
 }
 
+export interface NoticeEmail {
+  type: EmailType;
+  account: string;
+  password: string;
+}
+
 export interface NoticeInfo {
-  emailType: EmailType;
-  emailAccount: string;
-  emailPassword: string;
-  events: Record<string, string[]>;
+  email?: NoticeEmail;
+  events?: Record<string, string[]>;
 }

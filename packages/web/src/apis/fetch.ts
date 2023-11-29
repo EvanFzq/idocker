@@ -47,7 +47,7 @@ _fetch.interceptors.response.use(
   function (error) {
     // 超出 2xx 范围的状态码都会触发该函数。
     // 对响应错误做点什么
-    if (error?.response?.status === 401 && location.pathname !== '/login') {
+    if (error?.response?.status === 401 && !['/d/login', '/d/login'].includes(location.pathname)) {
       showFailToast({
         message: '未登录，即将前往登录',
         onClose() {

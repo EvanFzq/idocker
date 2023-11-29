@@ -13,15 +13,15 @@
     >
       <van-cell
         title="邮箱类型"
-        :value="noticeInfo.emailType"
+        :value="noticeInfo.email?.type"
       />
       <van-cell
         title="邮箱账户"
-        :value="noticeInfo.emailAccount"
+        :value="noticeInfo.email?.account"
       />
       <van-cell
         title="邮箱密码"
-        :value="new Array(noticeInfo.emailPassword?.length || 0).fill('*').join('')"
+        :value="new Array(noticeInfo.email?.password?.length || 0).fill('*').join('')"
       />
     </van-cell-group>
     <van-cell-group
@@ -33,7 +33,7 @@
         v-for="item in eventTypeList"
         :key="item.key"
         :title="item.name"
-        :value="noticeInfo.events?.[item.key].map(item => EventActionName[item]).join(',') || '无'"
+        :value="noticeInfo.events?.[item.key]?.map(item => EventActionName[item]).join(',') || '无'"
       />
     </van-cell-group>
     <van-form
@@ -46,10 +46,10 @@
         inset
       >
         <van-field
-          v-model="noticeInfoForm.emailType"
+          v-model="noticeInfoForm.email.type"
           is-link
           readonly
-          name="emailType"
+          name="email.type"
           label="邮箱类型"
           placeholder="请选择邮箱类型"
           :rules="[{ required: true, message: '请选择邮箱类型' }]"
@@ -60,32 +60,32 @@
           position="bottom"
         >
           <van-picker
-            :columns="emailTypeList"
+            :columns="EmailTypeList"
             @confirm="onEmailTypeConfirm"
             @cancel="showEmailTypePicker = false"
           />
         </van-popup>
         <van-field
-          v-model="noticeInfoForm.emailAccount"
+          v-model="noticeInfoForm.email.account"
           type="email"
-          name="emailAccount"
+          name="email.account"
           label="邮箱账号"
           placeholder="请填写邮箱账号"
           :rules="[{ required: true, message: '请填写邮箱账号' }]"
         />
         <van-field
-          v-model="noticeInfoForm.emailPassword"
+          v-model="noticeInfoForm.email.password"
           type="password"
-          name="emailPassword"
-          :label="noticeInfoForm.emailType !== EmailType.Outlook ? '授权码' : '邮箱密码'"
+          name="email.password"
+          :label="noticeInfoForm.email.type !== EmailType.Outlook ? '授权码' : '邮箱密码'"
           :placeholder="
-            noticeInfoForm.emailType !== EmailType.Outlook ? '请填写授权码' : '请填写邮箱密码'
+            noticeInfoForm.email.type !== EmailType.Outlook ? '请填写授权码' : '请填写邮箱密码'
           "
           :rules="[
             {
               required: true,
               message:
-                noticeInfoForm.emailType !== EmailType.Outlook ? '请填写授权码' : '请填写邮箱密码',
+                noticeInfoForm.email.type !== EmailType.Outlook ? '请填写授权码' : '请填写邮箱密码',
             },
           ]"
         />
@@ -140,6 +140,7 @@ import set from 'lodash-es/set';
 import type { NoticeInfo } from '@common/types/setting';
 import {
   EmailType,
+  EmailTypeList,
   EventTypeName,
   EventActionName,
   EventTypeActions,
@@ -151,33 +152,20 @@ import { getNoticeInfo, updateNoticeInfo } from '@/apis/setting';
 const [isEdit, toggleEdit] = useToggle();
 const noticeInfo = ref<NoticeInfo | null>(null);
 const noticeInfoForm = ref({
-  emailType: undefined as EmailType | undefined,
-  emailAccount: '',
-  emailPassword: '',
+  email: {
+    type: undefined as EmailType | undefined,
+    account: '',
+    password: '',
+  },
   events: {
     container: [],
     image: [],
     volume: [],
     network: [],
-    volumes: [],
+    daemon: [],
   } as Record<string, string[]>,
 });
 const showEmailTypePicker = ref(false);
-
-const emailTypeList = ref([
-  {
-    text: EmailType.QQ,
-    value: EmailType.QQ,
-  },
-  {
-    text: EmailType.Outlook,
-    value: EmailType.Outlook,
-  },
-  {
-    text: EmailType.WangYi163,
-    value: EmailType.WangYi163,
-  },
-]);
 
 const eventTypeList = Object.entries(EventTypeName).map(([key, value]) => ({ key, name: value }));
 
@@ -192,13 +180,17 @@ const onClickRight = () => {
   if (!noticeInfo.value) return;
   if (!isEdit.value) {
     noticeInfoForm.value = {
-      ...noticeInfo.value,
+      email: {
+        type: noticeInfo.value.email?.type,
+        account: noticeInfo.value.email?.account || '',
+        password: noticeInfo.value.email?.password || '',
+      },
       events: {
         container: noticeInfo.value.events?.container || [],
         image: noticeInfo.value.events?.image || [],
         volume: noticeInfo.value.events?.volume || [],
         network: noticeInfo.value.events?.network || [],
-        volumes: noticeInfo.value.events?.volumes || [],
+        daemon: noticeInfo.value.events?.daemon || [],
       },
     };
   }
@@ -206,7 +198,7 @@ const onClickRight = () => {
 };
 
 const onEmailTypeConfirm = ({ selectedValues }: { selectedValues: EmailType[] }) => {
-  noticeInfoForm.value.emailType = selectedValues[0];
+  noticeInfoForm.value.email.type = selectedValues[0];
   showEmailTypePicker.value = false;
 };
 

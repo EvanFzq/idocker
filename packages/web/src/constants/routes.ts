@@ -81,6 +81,14 @@ export const routes = [
         path: '/d/volume/list',
         component: () => import('@/pages/desktop/volumeList/volumeListPage.vue'),
       },
+      {
+        path: '/d/setting/user',
+        component: () => import('@/pages/desktop/setting/user/userSettingPage.vue'),
+      },
+      {
+        path: '/d/setting/notice',
+        component: () => import('@/pages/desktop/setting/notice/noticeSettingPage.vue'),
+      },
       { path: '/d/:error*', component: () => import('@/pages/desktop/error404/ErrerPage.vue') },
     ],
   },

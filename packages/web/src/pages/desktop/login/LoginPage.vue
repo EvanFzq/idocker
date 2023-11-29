@@ -22,7 +22,10 @@
           name="password"
           :rules="[{ required: true, message: '请输入' }]"
         >
-          <a-input-password v-model:value="form.password" />
+          <a-input-password
+            v-model:value="form.password"
+            autocomplete="new-password"
+          />
         </a-form-item>
         <a-button
           shape="round"

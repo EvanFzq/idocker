@@ -116,17 +116,29 @@ export class SettingService {
     const emailPassword = this.configService.getUserConfig<string>('emailPassword');
     const events = this.configService.getUserConfig<Record<string, string[]>>('noticeEvents');
     return {
-      emailType,
-      emailAccount,
-      emailPassword,
-      events,
+      email: {
+        type: emailType,
+        account: emailAccount,
+        password: emailPassword,
+      },
+      events: events || {},
     };
   }
   async updateNoticeSetting(data: NoticeInfo) {
-    await this.emailService.changeTransport(data.emailType, data.emailAccount, data.emailPassword);
-    this.configService.setUserConfig('emailType', data.emailType);
-    this.configService.setUserConfig('emailAccount', data.emailAccount);
-    this.configService.setUserConfig('emailPassword', data.emailPassword);
-    this.configService.setUserConfig('noticeEvents', data.events);
+    if (data.email) {
+      const { type, account, password } = data.email;
+      try {
+        await this.emailService.changeTransport(type, account, password);
+        this.configService.setUserConfig('emailType', type);
+        this.configService.setUserConfig('emailAccount', account);
+        this.configService.setUserConfig('emailPassword', password);
+      } catch (error) {
+        console.error(error);
+        throw new HttpException('邮件地址或密码（授权码）错误', HttpStatus.BAD_REQUEST);
+      }
+    }
+    if (data.events) {
+      this.configService.setUserConfig('noticeEvents', data.events);
+    }
   }
 }
