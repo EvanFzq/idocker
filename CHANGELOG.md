@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.11.0](///compare/v1.10.0...v1.11.0) (2023-12-01)
+
+
+### Features
+
+* 增加桌面端导航页，列表接口增加排序 9dbeb61
+* 桌面端增加设置相关功能 6e1bd42
+
 ## [1.10.0](///compare/v1.9.0...v1.10.0) (2023-11-25)
 
 
