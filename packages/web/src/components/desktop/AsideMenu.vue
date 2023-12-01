@@ -21,6 +21,7 @@ import {
   SettingOutlined,
   UserOutlined,
   NotificationOutlined,
+  ContainerOutlined,
 } from '@ant-design/icons-vue';
 import { useRouter, useRoute } from 'vue-router';
 import { ref, h } from 'vue';
@@ -32,6 +33,12 @@ const selectedKeys = ref([route.path]);
 
 const items = ref([
   {
+    key: '/d/nav',
+    icon: () => h(AppstoreOutlined),
+    label: '导航',
+    title: '导航',
+  },
+  {
     key: '/d/container/list',
     icon: () => h(PlayCircleOutlined),
     label: '容器',
@@ -39,7 +46,7 @@ const items = ref([
   },
   {
     key: '/d/image/list',
-    icon: () => h(AppstoreOutlined),
+    icon: () => h(ContainerOutlined),
     label: '镜像',
     title: '镜像',
   },

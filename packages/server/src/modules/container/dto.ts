@@ -55,6 +55,14 @@ export class ContainerListDto {
   @IsBoolean()
   @IsOptional()
   hasMetrics?: boolean;
+
+  @IsString()
+  @IsOptional()
+  sortBy?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  sortAsc?: boolean;
 }
 
 export class NewPort {

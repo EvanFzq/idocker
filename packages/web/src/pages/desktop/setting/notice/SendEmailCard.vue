@@ -2,6 +2,7 @@
   <a-card
     title="通知发件箱"
     style="margin-top: 16px"
+    hoverable
   >
     <template #extra>
       <a-button

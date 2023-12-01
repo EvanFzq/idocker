@@ -18,7 +18,7 @@ export interface ImageItem {
   Id: string;
   Labels?: Record<string, string>;
   ParentId: string;
-  RepoDigests: string[];
+  RepoDigests?: string[];
   RepoTags: string[];
   SharedSize: number;
   Size: number;

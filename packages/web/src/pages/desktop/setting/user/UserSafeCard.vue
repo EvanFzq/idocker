@@ -2,6 +2,7 @@
   <a-card
     title="用户安全"
     style="margin-top: 16px"
+    hoverable
   >
     <template #extra>
       <a-button

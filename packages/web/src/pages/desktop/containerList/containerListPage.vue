@@ -141,18 +141,22 @@ const onGoToAdd = () => {
 }
 .top {
   display: flex;
-  justify-content: space-evenly;
-  height: 180px;
+  justify-content: space-between;
   .divider {
-    height: 100%;
+    min-height: 180px;
+    margin: 0 56px;
+    flex: none;
     border-left: solid 1px #e5e5e5;
   }
   .right {
+    flex: auto;
+    width: 50%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     .btn-row {
       text-align: right;
+      flex: none;
     }
   }
 }

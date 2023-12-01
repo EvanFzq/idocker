@@ -5,7 +5,6 @@
     autocomplete="off"
     :label-col="labelCol"
     :wrapper-col="wrapperCol"
-    style="max-width: 630px"
   >
     <a-form-item
       label="镜像"
@@ -19,7 +18,10 @@
         :field-names="{ label: 'name', value: 'id' }"
       />
     </a-form-item>
-    <a-form-item label="网络">
+    <a-form-item
+      label="网络"
+      style="margin-bottom: 12px"
+    >
       <a-select
         v-model:value="filter.network"
         placeholder="选择网络"
@@ -28,7 +30,10 @@
         :field-names="{ label: 'name', value: 'id' }"
       />
     </a-form-item>
-    <a-form-item label="卷">
+    <a-form-item
+      label="卷"
+      style="margin-bottom: 12px"
+    >
       <a-select
         v-model:value="filter.volume"
         placeholder="选择卷"
@@ -37,7 +42,10 @@
         :field-names="{ label: 'name', value: 'name' }"
       />
     </a-form-item>
-    <a-space wrap>
+    <a-space
+      wrap
+      style="min-width: 290px; margin-bottom: 12px"
+    >
       <a-button
         type="primary"
         style="margin-left: 80px"

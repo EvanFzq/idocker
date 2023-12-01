@@ -44,6 +44,8 @@ defineProps<{
 <style scoped lang="less">
 .dashboard {
   display: flex;
+  flex: auto;
+  width: 50%;
   justify-content: space-evenly;
   .dashboard-item {
     display: flex;

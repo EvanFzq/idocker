@@ -2,6 +2,7 @@
   <a-card
     title="通知事件"
     style="margin-top: 16px"
+    hoverable
   >
     <template #extra>
       <a-button

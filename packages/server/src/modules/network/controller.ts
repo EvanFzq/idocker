@@ -9,7 +9,9 @@ export class NetworkController {
 
   @Post('list')
   async getNetworkList() {
-    return this.networkService.getNetworkList();
+    let list = await this.networkService.getNetworkList();
+    list = list.sort((a, b) => a.Name.localeCompare(b.Name));
+    return list;
   }
 
   @Post()

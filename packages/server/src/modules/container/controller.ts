@@ -45,6 +45,7 @@ export class ContainerController {
           !body.volumeName ||
           item.Mounts.some(mount => mount.Type === 'volume' && mount.Name === body.volumeName),
       );
+
     // 获取详细信息及格式转换
     const containerDetailList = await Promise.all(
       containerList.map(item => this.containerService.getContainerDetail(item.Id)),
@@ -58,6 +59,18 @@ export class ContainerController {
         return { ...item, ...stats };
       });
     }
+    // 排序
+    const { sortBy = 'name', sortAsc = true } = body;
+    list = list.sort((a, b) => {
+      const aVal = a[sortBy];
+      const bVal = b[sortBy];
+      if (typeof aVal === 'string' && typeof bVal === 'string') {
+        return sortAsc ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+      } else if (typeof aVal === 'number' && typeof bVal === 'number') {
+        return sortAsc ? aVal - bVal : bVal - aVal;
+      }
+      return 0;
+    });
     return list;
   }
   // 获取容器配置详情

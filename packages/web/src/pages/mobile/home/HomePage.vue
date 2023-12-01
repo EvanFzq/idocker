@@ -1,6 +1,6 @@
 <template>
   <div class="home-page">
-    <AppsTab v-if="active === 'apps'" />
+    <NavTab v-if="active === 'nav'" />
     <ContainerTab v-if="active === 'container'" />
     <TemplateTab v-if="active === 'template'" />
     <SettingTab v-if="active === 'setting'" />
@@ -9,7 +9,7 @@
       @change="onTabChange"
     >
       <van-tabbar-item
-        name="apps"
+        name="nav"
         icon="apps-o"
       >
         导航
@@ -50,9 +50,9 @@ import { useRouter } from 'vue-router';
 
 import ContainerTab from './ContainerTab.vue';
 import SettingTab from './SettingTab.vue';
-import AppsTab from './AppsTab.vue';
+import NavTab from './NavTab.vue';
 import TemplateTab from './TemplateTab.vue';
-const active = ref('apps');
+const active = ref('nav');
 
 const router = useRouter();
 

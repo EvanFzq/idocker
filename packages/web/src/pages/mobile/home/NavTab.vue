@@ -28,7 +28,7 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 
-import AppsPage from '@/pages/mobile/apps/AppsPage.vue';
+import AppsPage from '@/pages/common/apps/AppsPage.vue';
 
 const isLocal = ref(true);
 

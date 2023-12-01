@@ -33,8 +33,8 @@
   </div>
   <van-floating-bubble
     class="switch-wallpaper"
-    :offset="{ x: 12, y: offsetY }"
-    :gap="12"
+    :offset="{ x: -20, y: offsetY }"
+    :gap="20"
     axis="xy"
     magnetic="x"
     @click="onSwitchWallpaper"

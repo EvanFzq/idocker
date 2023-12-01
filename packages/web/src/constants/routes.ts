@@ -1,6 +1,6 @@
 import MobilePage from '@/pages/mobile/mobilePage.vue';
 import DesktopPage from '@/pages/desktop/desktopPage.vue';
-import AppsPage from '@/pages/mobile/apps/AppsPage.vue';
+import AppsPage from '@/pages/common/apps/AppsPage.vue';
 
 export const routes = [
   { path: '/apps/local', component: AppsPage },
@@ -56,6 +56,10 @@ export const routes = [
     path: '/d',
     component: DesktopPage,
     children: [
+      {
+        path: '/d/nav',
+        component: () => import('@/pages/desktop/nav/navPage.vue'),
+      },
       {
         path: '/d/container/list',
         component: () => import('@/pages/desktop/containerList/containerListPage.vue'),
