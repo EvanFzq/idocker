@@ -19,7 +19,7 @@
       >
         <template #format>
           <div class="percentage-value">
-            {{ Number((totalData.memoryUsage / totalData.memoryLimit).toFixed(2)) }}%
+            {{ Number(((totalData.memoryUsage * 100) / totalData.memoryLimit).toFixed(2)) }}%
           </div>
           <div class="percentage-label">
             {{

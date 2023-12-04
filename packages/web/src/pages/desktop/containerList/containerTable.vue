@@ -61,7 +61,7 @@
             :show-info="false"
             :percent="
               record.memoryLimit
-                ? Math.floor(((record.memoryUsage || 0) * 1000) / record.memoryLimit)
+                ? Math.floor(((record.memoryUsage || 0) * 100) / record.memoryLimit)
                 : 0
             "
           >
