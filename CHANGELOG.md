@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.11.1](///compare/v1.11.0...v1.11.1) (2023-12-04)
+
+
+### Bug Fixes
+
+* 修复镜像列表、数据卷列表获取异常问题 cbe7235
+
 ## [1.11.0](///compare/v1.10.0...v1.11.0) (2023-12-01)
 
 
