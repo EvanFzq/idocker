@@ -10,20 +10,12 @@
       <div @click="onClickContainers">
         <span>容器数量：</span>
         <span
-          :style="
-            volume.UsageData.RefCount ? 'color:green;text-decoration: underline;' : 'color:red'
-          "
+          :style="volume.ContainerNum ? 'color:green;text-decoration: underline;' : 'color:red'"
         >
-          {{ volume.UsageData.RefCount }}
+          {{ volume.ContainerNum }}
         </span>
       </div>
       <div>创建时间：{{ timeLongFormat(volume.CreatedAt) }}</div>
-    </div>
-    <div class="row">
-      <div>
-        <span>大小：</span>
-        <span>{{ fileSizeFormat(volume.UsageData.Size) || '0KB' }}</span>
-      </div>
     </div>
   </div>
 </template>
@@ -32,7 +24,7 @@ import { useRouter } from 'vue-router';
 
 import type { Volume } from '@common/types/volume';
 
-import { timeLongFormat, fileSizeFormat } from '@/utils/utils';
+import { timeLongFormat } from '@/utils/utils';
 
 const props = defineProps<{
   volume: Volume;

@@ -6,8 +6,5 @@ export interface Volume {
   Name: string;
   Options: unknown;
   Scope: string;
-  UsageData: {
-    RefCount: number;
-    Size: number;
-  };
+  ContainerNum: number;
 }

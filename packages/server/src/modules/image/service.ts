@@ -34,7 +34,7 @@ export class ImageService {
     });
     const list: ImageItem[] = imageList.map(image => {
       let containerNum = 0;
-      const [imageName] = image.RepoDigests[0].split('@');
+      const [imageName] = image.RepoDigests?.[0]?.split('@') || [''];
       containerList.forEach(container => {
         if (image.Id === container.ImageID) {
           containerNum++;
@@ -44,7 +44,7 @@ export class ImageService {
         ...image,
         Containers: containerNum,
         Name: imageName,
-        Tags: image.RepoTags.map(tag => tag.slice(imageName.length + 1)),
+        Tags: image.RepoTags?.map(tag => tag.slice(imageName.length + 1)),
       };
     });
     return list;
