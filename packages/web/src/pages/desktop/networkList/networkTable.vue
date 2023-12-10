@@ -4,6 +4,7 @@
     :columns="columns"
     :loading="loading"
     size="middle"
+    :pagination="{ showSizeChanger: true }"
   >
     <template
       #bodyCell="{ column, record }: { record: Network; column: TableColumnProps<Network> }"
@@ -11,7 +12,7 @@
       <template v-if="column.key === 'Containers'">
         <RouterLink
           v-if="record.Containers"
-          :to="'/d/container/list?networkId=' + record.Id"
+          :to="'/d/container/list?networkName=' + record.Name"
           class="image-containers"
         >
           {{ record.Containers }}
@@ -214,13 +215,13 @@ const connectContainerList = computed(() => {
   // 其他网络不允许链接none和host容器
 
   return props.containerList.filter(
-    item => !item.networks.some(network => network.type === 'none' || network.type === 'host'),
+    item => !item.networks.some(network => network.name === 'none' || network.name === 'host'),
   );
 });
 const unconnectContainerList = computed(() =>
   unconnectNetwork.value
     ? props.containerList.filter(container =>
-        container.networks.some(network => network.id === unconnectNetwork.value?.Id),
+        container.networks.some(network => network.name === unconnectNetwork.value?.Name),
       )
     : [],
 );
@@ -262,9 +263,9 @@ const columns: TableColumnProps<Network>[] = [
     key: 'Subnet',
     dataIndex: 'IPAM',
     title: '子网',
-    customRender: ({ value, record }) => {
+    customRender: ({ value }) => {
       if (!value.Config?.[0]?.Subnet) return '-';
-      return value.Config?.[0]?.Subnet + (record.Labels?.Subnet ? ' (用户配置)' : ' (系统分配)');
+      return value.Config?.[0]?.Subnet;
     },
   },
   {

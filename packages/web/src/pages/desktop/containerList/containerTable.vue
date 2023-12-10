@@ -4,6 +4,7 @@
     :data-source="list"
     :scroll="{ x: tableWidth }"
     size="middle"
+    :pagination="{ showSizeChanger: true }"
   >
     <template
       #bodyCell="{
@@ -77,7 +78,7 @@
           v-for="(network, index) in record.networks"
           :key="index"
         >
-          <span>{{ network.type }}</span>
+          <span>{{ network.name }}</span>
         </div>
       </template>
       <template v-if="column.key === 'ports'">

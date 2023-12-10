@@ -71,9 +71,9 @@ defineProps<{
     }
     .title {
       font-weight: 700;
-      font-size: 24px;
+      font-size: 20px;
       color: #409eff;
-      height: 36px;
+      height: 24px;
       margin-bottom: 6px;
       flex: none;
     }

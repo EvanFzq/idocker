@@ -8,5 +8,6 @@ import { DockerModule } from '../docker';
   imports: [DockerModule],
   controllers: [NetworkController],
   providers: [NetworkService],
+  exports: [NetworkService],
 })
 export class NetworkModule {}

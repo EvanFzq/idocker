@@ -3,7 +3,7 @@ import { ValidationPipe, HttpException, HttpStatus } from '@nestjs/common';
 import { json, urlencoded } from 'express';
 
 import { LoggerInterceptor, TransformInterceptor } from '@/interceptors';
-import { HttpExceptionFilter, DockerExceptionFilter } from '@/filter';
+import { HttpExceptionFilter, DockerExceptionFilter, BusinessExceptionFilter } from '@/filter';
 
 import { AppModule } from './src/app.module';
 
@@ -28,6 +28,7 @@ async function bootstrap() {
   app.useGlobalInterceptors(new TransformInterceptor());
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalFilters(new DockerExceptionFilter());
+  app.useGlobalFilters(new BusinessExceptionFilter());
   await app.listen(3580);
 }
 bootstrap();

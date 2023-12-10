@@ -35,10 +35,8 @@ export class ContainerController {
       .filter(item => !body.imageId || item.ImageID === body.imageId)
       .filter(
         item =>
-          !body.networkId ||
-          Object.values(item.NetworkSettings.Networks).some(
-            network => network.NetworkID === body.networkId,
-          ),
+          !body.networkName ||
+          Object.keys(item.NetworkSettings.Networks).some(network => network === body.networkName),
       )
       .filter(
         item =>

@@ -125,31 +125,7 @@
               />
             </a-form-item>
           </a-col>
-          <a-col v-bind="fieldLayout">
-            <a-form-item
-              label="网络"
-              name="network"
-              :rules="[{ required: true, message: '请输入' }]"
-            >
-              <div style="display: flex; align-items: center">
-                <a-select
-                  v-model:value="formData.network"
-                  style="width: 100%"
-                  placeholder="请选择"
-                  :options="networkList"
-                  :field-names="{ label: 'Name', value: 'Name' }"
-                />
-                <a-button
-                  type="primary"
-                  shape="circle"
-                  size="small"
-                  style="margin-left: 6px"
-                  :icon="h(PlusOutlined)"
-                  @click="showCreateNetworkModal = true"
-                />
-              </div>
-            </a-form-item>
-          </a-col>
+
           <a-col v-bind="fieldLayout">
             <a-form-item
               label="重启策略"
@@ -161,6 +137,28 @@
                 placeholder="请选择"
                 :options="restartPolicyList"
                 :field-names="{ label: 'text', value: 'value' }"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="fieldLayout">
+            <a-form-item
+              label="hostname"
+              :name="['network', 'hostname']"
+            >
+              <a-input
+                v-model:value="formData.hostname"
+                placeholder="示例：web01"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="fieldLayout">
+            <a-form-item
+              label="domainName"
+              :name="['network', 'domainName']"
+            >
+              <a-input
+                v-model:value="formData.domainName"
+                placeholder="示例：example.com"
               />
             </a-form-item>
           </a-col>
@@ -201,6 +199,18 @@
           </a-col>
           <a-col v-bind="fieldLayout">
             <a-form-item
+              label="Hosts文件配置"
+              :name="['network', 'extraHosts']"
+            >
+              <a-textarea
+                v-model:value="formData.extraHosts"
+                :rows="4"
+                placeholder="示例：www.baidu.com:192.168.0.1,cn.bing.com:192.168.0.2，多个使用逗号、空格、换行符分隔"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col v-bind="fieldLayout">
+            <a-form-item
               label="创建后启动"
               name="runAffterCreated"
             >
@@ -209,7 +219,107 @@
           </a-col>
         </a-row>
         <a-card
-          v-if="formData.network !== 'host'"
+          class="form-card"
+          title="网络配置"
+        >
+          <template #extra>
+            <a-button
+              class="button"
+              size="small"
+              type="link"
+              :disabled="['host', 'none'].includes(formData.networks[0]?.name || '')"
+              @click="formData.networks?.push({} as NetworkConfig)"
+            >
+              增加网络
+            </a-button>
+          </template>
+          <a-table
+            :data-source="formData.networks"
+            :columns="networkColumns"
+            size="middle"
+            :pagination="false"
+          >
+            <template #emptyText> 无条目，请添加 </template>
+            <template #bodyCell="{ column, record, index }">
+              <template v-if="column.key === 'name'">
+                <a-form-item
+                  label="网络"
+                  :label-col="{ style: { width: '60px' } }"
+                  :name="['networks', index, 'name']"
+                  :rules="[
+                    { required: true, message: '请输入' },
+                    {
+                      validator: validatorNetworkName,
+                      message: 'host、none网络不能与其他网络共存',
+                    },
+                  ]"
+                >
+                  <div style="display: flex; align-items: center">
+                    <a-select
+                      v-model:value="record.name"
+                      style="width: 100%"
+                      placeholder="请选择"
+                      :options="networkList"
+                      :field-names="{ label: 'Name', value: 'Name' }"
+                      @change="(value: string) => onNetworkNameChange(value, index)"
+                    />
+                    <a-button
+                      type="primary"
+                      shape="circle"
+                      size="small"
+                      style="margin-left: 6px"
+                      :icon="h(PlusOutlined)"
+                      @click="showCreateNetworkModal = true"
+                    />
+                  </div>
+                </a-form-item>
+              </template>
+              <template v-if="column.key === 'ip'">
+                <a-form-item
+                  label="IPv4 地址"
+                  :label-col="{ style: { width: '80px' } }"
+                  :name="['networks', index, 'ip']"
+                  :help="getNetworkInfo(record.name)?.subnet"
+                >
+                  <a-input
+                    v-model:value="record.ip"
+                    :disabled="['host', 'none', 'bridge'].includes(record.name)"
+                    placeholder="示例：172.20.0.7"
+                  />
+                </a-form-item>
+              </template>
+              <template v-if="column.key === 'ipV6'">
+                <a-form-item
+                  label="IPv6 地址"
+                  :label-col="{ style: { width: '80px' } }"
+                  :name="['networks', index, 'ipV6']"
+                  :help="getNetworkInfo(record.name)?.subnetV6"
+                >
+                  <a-input
+                    v-model:value="record.ipV6"
+                    :disabled="['host', 'none', 'bridge'].includes(record.name)"
+                    placeholder="示例：a:b:c:d::1234"
+                  />
+                </a-form-item>
+              </template>
+              <template v-if="column.key === 'mac'">
+                <a-form-item
+                  label="Mac 地址"
+                  :label-col="{ style: { width: '80px' } }"
+                  :name="['networks', index, 'mac']"
+                >
+                  <a-input
+                    v-model:value="record.mac"
+                    :disabled="['host', 'none'].includes(record.name)"
+                    placeholder="示例：12-34-56-78-9a-bc"
+                  />
+                </a-form-item>
+              </template>
+            </template>
+          </a-table>
+        </a-card>
+        <a-card
+          v-if="formData.networks[0]?.name !== 'host'"
           class="form-card"
           title="端口配置"
         >
@@ -516,7 +626,7 @@ import 'cropperjs/dist/cropper.css';
 import type { MountConfig } from '@common/types/container';
 import type { Image } from '@common/types/image';
 import type { Volume } from '@common/types/volume';
-import type { PortConfig, Network } from '@common/types/network';
+import type { PortConfig, Network, NetworkConfig } from '@common/types/network';
 import { restartPolicyList } from '@common/constants/const';
 
 import PageLayout from '@/components/desktop/PageLayout.vue';
@@ -534,6 +644,26 @@ import {
 import { dataURLtoFile, numberFormat } from '@/utils/utils';
 
 import type { TableColumnProps, UploadFile, FormInstance } from 'ant-design-vue';
+
+interface FormData {
+  id?: string;
+  name: string;
+  icon: UploadFile[];
+  image: string;
+  tag: string;
+  networks: NetworkConfig[];
+  runAffterCreated: boolean;
+  command?: string;
+  hostname?: string;
+  domainName?: string;
+  extraHosts?: string;
+  envs: { envKey: string; envValue: string }[];
+  mounts: MountConfig[];
+  ports: PortConfig[];
+  restart: string;
+  localUrl?: string;
+  internetUrl?: string;
+}
 
 const showIconCropper = ref(false);
 const showPreviewIcon = ref(false);
@@ -558,32 +688,18 @@ const fieldLayout = {
   xxl: 6,
 };
 
-interface FormData {
-  id?: string;
-  name: string;
-  icon: UploadFile[];
-  image: string;
-  tag: string;
-  network: string;
-  runAffterCreated: boolean;
-  command: string;
-  envs: { envKey: string; envValue: string }[];
-  mounts: MountConfig[];
-  ports: PortConfig[];
-  restart: string;
-  localUrl?: string;
-  internetUrl?: string;
-}
-
-const formData = ref<Partial<FormData>>({
+const formData = ref<FormData>({
   id: '',
   name: '',
   icon: [],
   image: route.query.image as string,
   tag: route.query.tag as string,
-  network: undefined,
+  networks: [],
   runAffterCreated: false,
-  command: '',
+  command: undefined,
+  hostname: undefined,
+  domainName: undefined,
+  extraHosts: undefined,
   envs: [],
   mounts: [],
   ports: [],
@@ -592,6 +708,50 @@ const formData = ref<Partial<FormData>>({
   internetUrl: '',
 });
 
+const getNetworkInfo = (name?: string) => {
+  if (!name || name === 'host') {
+    return null;
+  }
+  const item = networkList.value.find(item => item.Name === name);
+  return {
+    subnet: item?.IPAM.Config.find(item => item.Subnet.indexOf('.') > 0)?.Subnet,
+    subnetV6: item?.IPAM.Config.find(item => item.Subnet.indexOf(':') > 0)?.Subnet,
+  };
+};
+
+const networkColumns: TableColumnProps[] = [
+  {
+    key: 'index',
+    dataIndex: 'index',
+    title: '序号',
+    width: 50,
+    customRender: ({ index }) => index + 1,
+  },
+  {
+    key: 'name',
+    dataIndex: 'name',
+    title: '网络',
+    width: 300,
+  },
+  {
+    key: 'ip',
+    dataIndex: 'ip',
+    title: 'IPv4',
+    width: 300,
+  },
+  {
+    key: 'ipV6',
+    dataIndex: 'ipV6',
+    title: 'IPv6',
+    width: 400,
+  },
+  {
+    key: 'mac',
+    dataIndex: 'mac',
+    title: 'MAC地址',
+    width: 400,
+  },
+];
 const portColumns: TableColumnProps[] = [
   {
     key: 'index',
@@ -694,13 +854,24 @@ const getContainerData = async (id: string) => {
       icon,
       localUrl,
       internetUrl,
+      hostname,
+      domainName,
+      extraHosts,
     } = res.data;
     formData.value = {
       id: id,
       name: name,
       image: image.split(':')[0],
       tag: image.split(':')[1],
-      network: networks[0]?.type,
+      hostname,
+      domainName,
+      extraHosts,
+      networks: networks.map(network => ({
+        name: network.name,
+        ip: network.ip || undefined,
+        ipV6: network.ipV6 || undefined,
+        mac: network.mac || undefined,
+      })),
       restart: restartPolicyName,
       runAffterCreated: true,
       command: cmd?.map(item => (item.indexOf(' ') > 0 ? `"${item}"` : item))?.join(' ') || '',
@@ -719,13 +890,15 @@ const getContainerData = async (id: string) => {
           container: Number(port.containerPort),
           protocol: port.protocol as 'tcp' | 'udp',
         })) || [],
-      icon: [
-        {
-          uid: '',
-          url: icon,
-          name: icon || '',
-        },
-      ],
+      icon: icon
+        ? [
+            {
+              uid: '',
+              url: icon,
+              name: icon || '',
+            },
+          ]
+        : [],
       localUrl: localUrl || '',
       internetUrl: internetUrl || '',
     };
@@ -752,6 +925,19 @@ onMounted(async () => {
     getContainerData(route.query.id as string);
   }
 });
+
+const validatorNetworkName = () => {
+  const hasHostOrNone = formData.value.networks.some(item =>
+    ['host', 'none'].includes(item.name || ''),
+  );
+  if (hasHostOrNone && formData.value.networks.length > 2) {
+    return Promise.reject('host、none网络不能与其他网络一起存在');
+  }
+  return Promise.resolve();
+};
+const onNetworkNameChange = (value: string, index: number) => {
+  formData.value.networks[index] = { name: value };
+};
 
 const onIconReaded = ({ file }: { file: File }) => {
   if (!(file instanceof File)) return;
@@ -840,11 +1026,14 @@ const onSubmit = async () => {
     envs,
     command,
     name,
-    network,
+    networks,
     mounts,
     restart,
     runAffterCreated,
     id,
+    hostname,
+    domainName,
+    extraHosts,
   } = formData.value as FormData;
   submitLoading.value = true;
   if (formData.value.id) {
@@ -852,9 +1041,12 @@ const onSubmit = async () => {
       id: id as string,
       command,
       name,
-      network,
+      networks,
       mounts,
       restart,
+      hostname,
+      domainName,
+      extraHosts,
       runAffterCreated,
       image: `${image}:${tag}`,
       icon: icon[0]?.url || '',
@@ -867,7 +1059,7 @@ const onSubmit = async () => {
     });
     if (res.success) {
       message.success({
-        content: '更新成功',
+        content: '更新成功! ' + res.msg,
         onClose() {
           router.push('/d/container/list');
         },
@@ -877,9 +1069,12 @@ const onSubmit = async () => {
     const res = await createContainer({
       command,
       name,
-      network,
+      networks,
       mounts,
       restart,
+      hostname,
+      domainName,
+      extraHosts,
       runAffterCreated,
       image: `${image}:${tag}`,
       icon: icon[0]?.url || '',
@@ -892,7 +1087,7 @@ const onSubmit = async () => {
     });
     if (res.success) {
       message.success({
-        content: '创建成功',
+        content: '创建成功！' + res.msg,
         onClose() {
           router.push('/d/container/list');
         },
@@ -951,6 +1146,24 @@ const onSubmit = async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+.network-info {
+  margin-left: 36px;
+  display: flex;
+  .network-item {
+    border: solid 1px #ccc;
+    padding: 8px;
+    border-radius: 6px;
+    margin-left: 12px;
+  }
+  .name {
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .info {
+    font-size: 12px;
+    color: #555;
+  }
 }
 </style>
 <style lang="less">

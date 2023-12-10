@@ -4,6 +4,7 @@
     :columns="columns"
     :loading="loading"
     size="middle"
+    :pagination="{ showSizeChanger: true }"
   >
     <template #bodyCell="{ column, record }: { record: Volume; column: TableColumnProps<Volume> }">
       <template v-if="column.key === 'Containers'">

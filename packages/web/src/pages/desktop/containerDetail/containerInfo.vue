@@ -41,11 +41,26 @@
       <a-descriptions-item label="Entrypoint">
         {{ Array.isArray(detail.entrypoint) ? detail.entrypoint?.join(' ') : detail.entrypoint }}
       </a-descriptions-item>
+      <a-descriptions-item label="Hostname">
+        {{ detail.hostname }}
+      </a-descriptions-item>
+      <a-descriptions-item label="DomainName">
+        {{ detail.domainName }}
+      </a-descriptions-item>
       <a-descriptions-item label="内网地址">
         {{ detail.localUrl }}
       </a-descriptions-item>
       <a-descriptions-item label="外网地址">
         {{ detail.internetUrl }}
+      </a-descriptions-item>
+      <a-descriptions-item label="Hosts文件配置">
+        <div
+          v-for="line in detail.extraHosts?.split('\n') || []"
+          :key="line"
+          style="display: block"
+        >
+          {{ line }}
+        </div>
       </a-descriptions-item>
     </a-descriptions>
     <a-descriptions
@@ -57,6 +72,7 @@
       :data-source="detail.mounts"
       :columns="mountColumns"
       style="width: 100%"
+      :pagination="false"
     />
     <a-descriptions
       title="端口信息"
@@ -76,7 +92,7 @@
         </div>
       </a-descriptions-item>
     </a-descriptions>
-
+    <a-empty v-if="!detail.ports || detail.ports.length === 0" />
     <a-descriptions
       title="网络信息"
       bordered
@@ -86,6 +102,7 @@
       :data-source="detail.networks"
       :columns="networkColumns"
       style="width: 100%"
+      :pagination="false"
     />
     <a-descriptions
       title="环境变量"
@@ -159,8 +176,8 @@ const networkColumns: TableColumnProps<Network>[] = [
     customRender: ({ value }) => value.slice(0, 10) + '...' + value.slice(-10),
   },
   {
-    key: 'type',
-    dataIndex: 'type',
+    key: 'name',
+    dataIndex: 'name',
     title: '网络',
   },
   {

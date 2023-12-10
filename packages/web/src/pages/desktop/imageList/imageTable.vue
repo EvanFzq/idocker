@@ -4,6 +4,7 @@
     :columns="columns"
     :loading="false"
     size="middle"
+    :pagination="{ showSizeChanger: true }"
   >
     <template
       #bodyCell="{ column, record }: { record: ImageItem; column: TableColumnProps<ImageItem> }"

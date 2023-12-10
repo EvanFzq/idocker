@@ -27,7 +27,7 @@
         placeholder="选择网络"
         allow-clear
         :options="networkList"
-        :field-names="{ label: 'name', value: 'id' }"
+        :field-names="{ label: 'name', value: 'name' }"
       />
     </a-form-item>
     <a-form-item
@@ -85,7 +85,7 @@ const props = defineProps<{ defaultValue: FilterData }>();
 const filter = ref(props.defaultValue);
 
 const imageList = ref<{ name: string; id: string }[]>([]);
-const networkList = ref<{ name: string; id: string }[]>([]);
+const networkList = ref<{ name: string }[]>([]);
 const volumekList = ref<{ name: string }[]>([]);
 
 const emits = defineEmits(['search']);
@@ -100,7 +100,7 @@ onMounted(async () => {
     imageList.value = imageRes.data.map(item => ({ name: item.Name, id: item.Id }));
   }
   if (networkRes.success) {
-    networkList.value = networkRes.data.map(item => ({ name: item.Name, id: item.Id }));
+    networkList.value = networkRes.data.map(item => ({ name: item.Name }));
   }
   if (volumeRes.success) {
     volumekList.value = volumeRes.data.map(item => ({ name: item.Name }));

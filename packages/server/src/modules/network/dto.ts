@@ -38,11 +38,11 @@ export class AddContainerToNetworkDto {
 
   @IsIP('4')
   @IsOptional()
-  ip: string;
+  ip?: string;
 
   @IsIP('6')
   @IsOptional()
-  ipv6: string;
+  ipv6?: string;
 }
 
 export class RemoveContainerToNetworkDto {

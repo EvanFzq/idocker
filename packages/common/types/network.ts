@@ -46,3 +46,10 @@ export interface AddNetworkParams {
   IPv6subnet?: string;
   internal?: boolean;
 }
+
+export interface NetworkConfig {
+  name?: string;
+  mac?: string;
+  ip?: string;
+  ipV6?: string;
+}

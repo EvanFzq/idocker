@@ -166,7 +166,7 @@ onMounted(async () => {
       id: id,
       name: name,
       image: image,
-      network: networks[0]?.type,
+      network: networks[0]?.name,
       restart: restartPolicyName,
       runAffterCreated: true,
       command: cmd?.map(item => (item.indexOf(' ') > 0 ? `"${item}"` : item))?.join(' ') || '',
