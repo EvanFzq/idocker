@@ -28,7 +28,17 @@
           />
         </van-tab>
         <van-tab
-          v-if="formData.network !== 'host'"
+          class="tab"
+          title="网络"
+          :dot="networkError"
+        >
+          <NetworkTab
+            :form-data="formData"
+            @value-change="onFieldChange"
+          />
+        </van-tab>
+        <van-tab
+          v-if="formData.networks[0]?.name !== 'host'"
           class="tab"
           title="端口"
           :dot="portError"
@@ -88,7 +98,7 @@ import { useRoute, useRouter } from 'vue-router';
 import set from 'lodash-es/set';
 
 import type { CreateContainerParams, MountConfig, Env } from '@common/types/container';
-import type { PortConfig } from '@common/types/network';
+import type { PortConfig, NetworkConfig } from '@common/types/network';
 
 import { getContainerDetail } from '@/apis/container';
 import TitleBar from '@/components/mobile/TitleBar.vue';
@@ -97,6 +107,7 @@ import { createContainer, updateContainer } from '@/apis';
 import type { UploaderFileListItem } from 'vant';
 import BaseinfoCard from './BaseinfoCard.vue';
 import CommandTab from './CommandTab.vue';
+import NetworkTab from './NetworkTab.vue';
 import MountTab from './MountTab.vue';
 import PortTab from './PortTab.vue';
 import EnvVarTab from './EnvVarTab.vue';
@@ -107,7 +118,7 @@ export interface ContainerFormData {
   name: string;
   icon: UploaderFileListItem[];
   image: string;
-  network: string;
+  networks: NetworkConfig[];
   runAffterCreated: boolean;
   command: string;
   envs: Env[];
@@ -119,20 +130,21 @@ export interface ContainerFormData {
 }
 
 const activeTab = ref(0);
+const networkError = ref(false);
 const portError = ref(false);
 const mountError = ref(false);
 const envError = ref(false);
-const formData = ref({
+const formData = ref<ContainerFormData>({
   id: '',
   name: '',
-  icon: [] as UploaderFileListItem[],
+  icon: [],
   image: '',
-  network: '',
+  networks: [{ name: 'bridge' }],
   runAffterCreated: false,
   command: '',
-  envs: [] as Env[],
-  mounts: [] as MountConfig[],
-  ports: [] as PortConfig[],
+  envs: [],
+  mounts: [],
+  ports: [],
   restart: 'no',
   localUrl: '',
   internetUrl: '',
@@ -166,7 +178,7 @@ onMounted(async () => {
       id: id,
       name: name,
       image: image,
-      network: networks[0]?.name,
+      networks: networks,
       restart: restartPolicyName,
       runAffterCreated: true,
       command: cmd?.map(item => (item.indexOf(' ') > 0 ? `"${item}"` : item))?.join(' ') || '',
@@ -214,6 +226,12 @@ const onSubmit = async (values: Record<string, string | number | boolean>) => {
   Object.entries(values).forEach(([key, value]: [string, string | number | boolean]) => {
     set(params, key, value);
   });
+  params.networks = params.networks.map(item => ({
+    name: item.name,
+    ip: item.ip || undefined,
+    ipV6: item.ip || undefined,
+    mac: item.ip || undefined,
+  }));
   if (formData.value.id) {
     const res = await updateContainer({ id: formData.value.id, ...params });
     if (res.success) {
@@ -238,10 +256,14 @@ const onSubmit = async (values: Record<string, string | number | boolean>) => {
 };
 
 const onFailed = (errorInfo: { values: object; errors: { message: string; name: string }[] }) => {
+  networkError.value = false;
   mountError.value = false;
   portError.value = false;
   envError.value = false;
   errorInfo.errors.forEach(item => {
+    if (item.name.startsWith('networks')) {
+      mountError.value = true;
+    }
     if (item.name.startsWith('mounts')) {
       mountError.value = true;
     }

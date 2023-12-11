@@ -72,31 +72,6 @@
         </div>
       </van-popover>
       <van-field
-        v-model="form.network"
-        required
-        is-link
-        readonly
-        name="network"
-        label="网络"
-        placeholder="点击选择网络"
-        :rules="[{ required: true, message: '请选择网络' }]"
-        @click="showNetworkPicker = true"
-      />
-      <van-popup
-        v-model:show="showNetworkPicker"
-        position="bottom"
-      >
-        <van-picker
-          :columns="networkList"
-          :columns-field-names="{
-            text: 'Name',
-            value: 'Name',
-          }"
-          @confirm="onNetworkConfirm"
-          @cancel="showNetworkPicker = false"
-        />
-      </van-popup>
-      <van-field
         name="runAffterCreated"
         label="创建后启动"
       >
@@ -122,15 +97,14 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { showToast, type UploaderFileListItem } from 'vant';
 import Cropper from 'cropperjs';
 
 import 'cropperjs/dist/cropper.css';
 import type { Image } from '@common/types/image';
-import type { Network } from '@common/types/network';
 
-import { searchImage, getNetworkList, uploadImg } from '@/apis';
+import { searchImage, uploadImg } from '@/apis';
 import { numberFormat } from '@/utils/utils';
 import { dataURLtoFile } from '@/utils/utils';
 
@@ -142,7 +116,6 @@ const form = ref({
   name: '',
   icon: [] as UploaderFileListItem[],
   image: '',
-  network: '',
   runAffterCreated: false,
 });
 
@@ -153,7 +126,6 @@ watch(
       name: props.formData.name,
       icon: props.formData.icon,
       image: props.formData.image,
-      network: props.formData.network,
       runAffterCreated: props.formData.runAffterCreated,
     };
   },
@@ -168,19 +140,10 @@ watch(
 );
 
 const showImagePopover = ref(false);
-const showNetworkPicker = ref(false);
 const showIconCropper = ref(false);
 const iconCropper = ref<Cropper | null>(null);
 const iconFileName = ref<string | undefined>('');
 const imageList = ref<Image[]>([]);
-const networkList = ref<Network[]>([]);
-
-onMounted(async () => {
-  const res = await getNetworkList();
-  if (res.success) {
-    networkList.value = res.data;
-  }
-});
 
 let searchImageTimer: NodeJS.Timeout;
 const onImageChange = async (value: string) => {
@@ -199,11 +162,6 @@ const onImageChange = async (value: string) => {
 const onSelectImage = (selectImage: Image) => {
   form.value.image = selectImage.name;
   showImagePopover.value = false;
-};
-
-const onNetworkConfirm = ({ selectedValues }: { selectedValues: string[] }) => {
-  form.value.network = selectedValues[0];
-  showNetworkPicker.value = false;
 };
 
 const onIconOversize = () => {

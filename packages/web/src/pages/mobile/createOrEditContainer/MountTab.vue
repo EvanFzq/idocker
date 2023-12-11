@@ -40,18 +40,9 @@
       label="数据卷"
       placeholder="点击选择数据卷"
       :rules="[{ required: true, message: '请选择数据卷' }]"
-      @click="showVolumePicker = true"
+      @click="onSelectVolume(index)"
     />
-    <van-popup
-      v-model:show="showVolumePicker"
-      position="bottom"
-    >
-      <van-picker
-        :columns="volumeList"
-        @confirm="(value: PickerValue) => onVolumeConfirm(index, value)"
-        @cancel="showVolumePicker = false"
-      />
-    </van-popup>
+
     <van-field
       v-model="mount.container"
       :name="'mounts[' + index + '].container'"
@@ -79,6 +70,16 @@
       @click="() => onDeleteMount(index)"
     />
   </van-cell-group>
+  <van-popup
+    v-model:show="showVolumePicker"
+    position="bottom"
+  >
+    <van-picker
+      :columns="volumeList"
+      @confirm="onVolumeConfirm"
+      @cancel="showVolumePicker = false"
+    />
+  </van-popup>
   <div class="add-mount">
     <van-button
       size="small"
@@ -107,6 +108,7 @@ interface PickerValue {
 const mountList = ref<MountConfig[]>(props.formData.mounts || []);
 const volumeList = ref<{ text: string; value: string }[]>([]);
 const showVolumePicker = ref(false);
+const seletcVolumeIndex = ref(0);
 
 const emit = defineEmits(['valueChange']);
 
@@ -147,9 +149,12 @@ const onAddMount = () => {
 const onDeleteMount = (index: number) => {
   mountList.value.splice(index, 1);
 };
-
-const onVolumeConfirm = (index: number, { selectedValues }: PickerValue) => {
-  mountList.value[index].volume = selectedValues[0];
+const onSelectVolume = (index: number) => {
+  showVolumePicker.value = true;
+  seletcVolumeIndex.value = index;
+};
+const onVolumeConfirm = ({ selectedValues }: PickerValue) => {
+  mountList.value[seletcVolumeIndex.value].volume = selectedValues[0];
   showVolumePicker.value = false;
 };
 </script>

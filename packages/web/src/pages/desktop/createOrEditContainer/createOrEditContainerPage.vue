@@ -304,7 +304,7 @@
               </template>
               <template v-if="column.key === 'mac'">
                 <a-form-item
-                  label="Mac 地址"
+                  label="MAC 地址"
                   :label-col="{ style: { width: '80px' } }"
                   :name="['networks', index, 'mac']"
                 >
@@ -694,7 +694,7 @@ const formData = ref<FormData>({
   icon: [],
   image: route.query.image as string,
   tag: route.query.tag as string,
-  networks: [],
+  networks: [{ name: 'bridge' }],
   runAffterCreated: false,
   command: undefined,
   hostname: undefined,

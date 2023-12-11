@@ -8,7 +8,7 @@ import { isMobile } from '@/utils/utils';
 import type { AxiosRequestConfig } from 'axios';
 
 const showError = (msg: string, onClose?: () => void) => {
-  if (isMobile()) {
+  if (!isMobile()) {
     message.error(msg, undefined, onClose);
   } else {
     showFailToast({
