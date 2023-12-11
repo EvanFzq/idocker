@@ -8,7 +8,7 @@ export const webUrlTemplateFormat = (
 ) => {
   const { networks, exposedPorts, ports } = containerDetail;
   if (!template?.trim()) return;
-  const isHost = !!networks?.some(item => item.type === 'host');
+  const isHost = !!networks?.some(item => item.name === 'host');
 
   const arr = [...template.matchAll(/\[[a-zA-Z0-9]+\]/g)];
   for (let i = 0; i < arr.length; i++) {
@@ -33,3 +33,5 @@ export const webUrlTemplateFormat = (
   }
   return template;
 };
+
+export const sleep = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));

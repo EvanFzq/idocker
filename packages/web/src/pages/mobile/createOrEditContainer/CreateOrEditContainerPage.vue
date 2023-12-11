@@ -38,7 +38,7 @@
           />
         </van-tab>
         <van-tab
-          v-if="formData.networks[0]?.name !== 'host'"
+          v-if="!['host', 'none'].includes(formData.networks[0]?.name || '')"
           class="tab"
           title="端口"
           :dot="portError"

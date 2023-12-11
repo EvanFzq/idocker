@@ -1,0 +1,470 @@
+<!-- eslint-disable vue/html-quotes -->
+<template>
+  <a-row>
+    <a-col :span="24">
+      <a-form-item
+        label="图标"
+        name="icon"
+        :wrapper-col="{ style: { width: '220px', flex: 'none' } }"
+      >
+        <a-tooltip title="支持jpeg、webp、png, 裁剪后不超过10MB">
+          <a-upload
+            v-model:fileList="form.icon"
+            class="icon-upload-control"
+            accept="image/*"
+            list-type="picture-card"
+            :max-count="1"
+            :before-upload="() => false"
+            @change="onIconReaded"
+            @preview="onIconPreview"
+          >
+            <div>
+              <div class="upload-icon">
+                <InboxOutlined />
+              </div>
+              <div class="upload-text">拖拽上传<br />点击上传</div>
+            </div>
+          </a-upload>
+        </a-tooltip>
+      </a-form-item>
+    </a-col>
+    <a-col v-bind="fieldLayout">
+      <a-form-item
+        label="容器名"
+        name="name"
+        :rules="[{ required: true, message: '请输入', trigger: 'blur' }]"
+      >
+        <a-input
+          v-model:value="form.name"
+          placeholder="请输入"
+        />
+      </a-form-item>
+    </a-col>
+    <a-col
+      :xs="16"
+      :md="8"
+      :xl="6"
+      :xxl="4"
+    >
+      <a-form-item
+        label="镜像"
+        name="image"
+        :rules="[{ required: true, message: '请输入', trigger: 'blur' }]"
+      >
+        <a-select
+          v-model:value="form.image"
+          style="width: 100%"
+          show-search
+          placeholder="请输入选择"
+          :show-arrow="false"
+          :filter-option="false"
+          :not-found-content="null"
+          popup-class-name="image-search-list"
+          option-label-prop="label"
+          @search="onImageInputChange"
+          @change="onImageChange"
+        >
+          <a-select-option
+            v-for="item in imageList"
+            :key="item.name"
+            :title="item.name"
+            :value="item.name"
+          >
+            <div class="image-item">
+              <FireFilled
+                v-if="item.is_official"
+                style="margin-right: 6px; color: rgb(207, 8, 8)"
+              />
+              <div class="name">
+                <span>{{ item.name }}</span>
+              </div>
+              <div class="star">
+                {{ numberFormat(item.star_count) }}
+                <StarFilled style="color: rgb(255, 136, 0)" />
+              </div>
+            </div>
+          </a-select-option>
+        </a-select>
+      </a-form-item>
+    </a-col>
+    <a-col
+      :xs="8"
+      :md="4"
+      :xl="2"
+      :xxl="2"
+    >
+      <a-form-item
+        name="tag"
+        :rules="[{ required: true, message: '请输入', trigger: 'blur' }]"
+      >
+        <a-input
+          v-model:value="form.tag"
+          style="width: 100%"
+          placeholder="请输入"
+        />
+      </a-form-item>
+    </a-col>
+
+    <a-col v-bind="fieldLayout">
+      <a-form-item
+        label="重启策略"
+        name="restart"
+      >
+        <a-select
+          v-model:value="form.restart"
+          style="width: 100%"
+          placeholder="请选择"
+          :options="restartPolicyList"
+          :field-names="{ label: 'text', value: 'value' }"
+        />
+      </a-form-item>
+    </a-col>
+    <a-col v-bind="fieldLayout">
+      <a-form-item
+        label="hostname"
+        name="hostname"
+      >
+        <a-input
+          v-model:value="form.hostname"
+          placeholder="示例：web01"
+        />
+      </a-form-item>
+    </a-col>
+    <a-col v-bind="fieldLayout">
+      <a-form-item
+        label="domainName"
+        name="domainName"
+      >
+        <a-input
+          v-model:value="form.domainName"
+          placeholder="示例：example.com"
+        />
+      </a-form-item>
+    </a-col>
+    <a-col v-bind="fieldLayout">
+      <a-form-item
+        label="内网地址"
+        name="localUrl"
+      >
+        <a-input
+          v-model:value="form.localUrl"
+          placeholder="例：http://192.168.0.1:7880"
+        />
+      </a-form-item>
+    </a-col>
+    <a-col v-bind="fieldLayout">
+      <a-form-item
+        label="外网地址"
+        name="internetUrl"
+      >
+        <a-input
+          v-model:value="form.internetUrl"
+          placeholder="例：https://xxx.xxx.com"
+        />
+      </a-form-item>
+    </a-col>
+    <a-col v-bind="fieldLayout">
+      <a-form-item
+        label="启动命令"
+        name="command"
+      >
+        <a-textarea
+          v-model:value="form.command"
+          type="textarea"
+          :rows="2"
+          placeholder='请输入启动命令, 参数中间有空格使用双引号包裹,例：nginx -g "daemon off;"'
+        />
+      </a-form-item>
+    </a-col>
+    <a-col v-bind="fieldLayout">
+      <a-form-item
+        label="Hosts文件配置"
+        name="extraHosts"
+      >
+        <a-textarea
+          v-model:value="form.extraHosts"
+          :rows="4"
+          placeholder="示例：www.baidu.com:192.168.0.1,cn.bing.com:192.168.0.2，多个使用逗号、空格、换行符分隔"
+        />
+      </a-form-item>
+    </a-col>
+    <a-col v-bind="fieldLayout">
+      <a-form-item
+        label="创建后启动"
+        name="runAffterCreated"
+      >
+        <a-switch v-model:checked="form.runAffterCreated" />
+      </a-form-item>
+    </a-col>
+  </a-row>
+  <a-modal
+    v-model:open="showIconCropper"
+    title="编辑图片"
+    :width="472"
+    :closable="false"
+    :force-render="true"
+    :keyboard="false"
+    :mask-closable="false"
+  >
+    <div class="cropper-box">
+      <img id="container-icon-cropper" />
+    </div>
+    <template #footer>
+      <span class="dialog-footer">
+        <a-button @click="onIconCropperCancel">取消</a-button>
+        <a-button
+          type="primary"
+          @click="onIconCropperConfirm"
+        >
+          确认裁剪
+        </a-button>
+      </span>
+    </template>
+  </a-modal>
+  <a-modal
+    v-model:open="showPreviewIcon"
+    title="图标预览"
+    :footer="null"
+  >
+    <img
+      alt="example"
+      style="width: 100%"
+      :src="previewIconUrl"
+    />
+  </a-modal>
+</template>
+<script setup lang="ts">
+import { ref, watch } from 'vue';
+import { InboxOutlined, FireFilled, StarFilled } from '@ant-design/icons-vue';
+import { message } from 'ant-design-vue';
+import Cropper from 'cropperjs';
+import 'cropperjs/dist/cropper.css';
+
+import type { Image } from '@common/types/image';
+import { restartPolicyList } from '@common/constants/const';
+
+import { searchImage, uploadImg } from '@/apis';
+import { dataURLtoFile, numberFormat } from '@/utils/utils';
+
+import type { FormData } from './type';
+import type { UploadFile } from 'ant-design-vue';
+
+const fieldLayout = {
+  xs: 24,
+  md: 12,
+  xl: 8,
+  xxl: 6,
+};
+const props = defineProps<{ formData: FormData }>();
+const emit = defineEmits(['valueChange']);
+
+const showIconCropper = ref(false);
+const showPreviewIcon = ref(false);
+const previewIconUrl = ref('');
+const iconCropper = ref<Cropper | null>(null);
+const iconFileName = ref<string | undefined>('');
+const imageList = ref<Image[]>([]);
+
+const form = ref<
+  Pick<
+    FormData,
+    | 'name'
+    | 'icon'
+    | 'image'
+    | 'tag'
+    | 'networks'
+    | 'runAffterCreated'
+    | 'command'
+    | 'hostname'
+    | 'domainName'
+    | 'extraHosts'
+    | 'restart'
+    | 'localUrl'
+    | 'internetUrl'
+  >
+>({
+  name: '',
+  icon: [],
+  image: undefined,
+  tag: '',
+  networks: [{ name: 'bridge' }],
+  runAffterCreated: false,
+  command: undefined,
+  hostname: undefined,
+  domainName: undefined,
+  extraHosts: undefined,
+  restart: 'no',
+  localUrl: '',
+  internetUrl: '',
+});
+
+watch(
+  () => props.formData,
+  () => {
+    const {
+      name,
+      icon,
+      image,
+      tag,
+      networks,
+      runAffterCreated,
+      command,
+      hostname,
+      domainName,
+      extraHosts,
+      restart,
+      localUrl,
+      internetUrl,
+    } = props.formData;
+    form.value = {
+      name,
+      icon,
+      image,
+      tag,
+      networks,
+      runAffterCreated,
+      command,
+      hostname,
+      domainName,
+      extraHosts,
+      restart,
+      localUrl,
+      internetUrl,
+    };
+  },
+  { deep: true },
+);
+watch(
+  form,
+  () => {
+    emit('valueChange', form.value);
+  },
+  { deep: true },
+);
+
+const onIconReaded = ({ file }: { file: File }) => {
+  if (!(file instanceof File)) return;
+  iconFileName.value = file.name;
+  showIconCropper.value = true;
+  const image = document.getElementById('container-icon-cropper');
+  if (!image) {
+    return;
+  }
+  const reader = new FileReader();
+  reader.readAsDataURL(file);
+  reader.onload = e => {
+    const src = e.target?.result || '';
+    image.setAttribute('src', src as string);
+    image.onload = () => {
+      iconCropper.value?.destroy();
+      iconCropper.value = new Cropper(image as HTMLImageElement, {
+        aspectRatio: 1,
+        autoCrop: true,
+        modal: true,
+      });
+    };
+  };
+};
+
+const onIconCropperCancel = () => {
+  showIconCropper.value = false;
+  form.value.icon = [];
+};
+
+const onIconCropperConfirm = async () => {
+  const croppedData = iconCropper.value
+    ?.getCroppedCanvas({ fillColor: '#fff' })
+    .toDataURL('image/jpeg');
+  if (croppedData) {
+    const file = dataURLtoFile(croppedData, iconFileName.value as string);
+    const res = await uploadImg(file, { name: iconFileName.value, height: 240 });
+    if (res.success) {
+      message.success({
+        content: '上传成功',
+      });
+      form.value.icon = [
+        {
+          uid: '',
+          url: res.data,
+          name: iconFileName.value || '',
+        },
+      ];
+      showIconCropper.value = false;
+    }
+  }
+};
+
+const onIconPreview = (uploadFile: UploadFile) => {
+  previewIconUrl.value = uploadFile.url!;
+  showPreviewIcon.value = true;
+};
+
+let searchTimer: NodeJS.Timeout;
+const onImageInputChange = async (text: string) => {
+  if (!text.trim()) return;
+  clearTimeout(searchTimer);
+  searchTimer = setTimeout(async () => {
+    const res = await searchImage(text.trim());
+    if (res.success) {
+      imageList.value = res.data;
+    }
+  }, 500);
+};
+
+const onImageChange = () => {
+  form.value.tag = 'latest';
+};
+</script>
+<style scoped lang="less">
+.upload-icon {
+  font-size: 24px;
+  color: #409eff;
+}
+.upload-text {
+  font-size: 12px;
+  line-height: 18px !important;
+  line-height: 24px;
+  color: #777;
+}
+.cropper-box {
+  text-align: center;
+  margin: 12px;
+  width: 400px;
+  height: 400px;
+}
+#container-icon-cropper {
+  max-width: 100%;
+  max-height: 100%;
+}
+.image-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  .name {
+    flex: auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-right: 16px;
+  }
+  .star {
+    flex: none;
+  }
+  .icon {
+    margin-left: 6px;
+    color: #409eff;
+  }
+}
+</style>
+<style lang="less">
+.new-or-edit-container-page {
+  .icon-upload-control {
+    .ant-upload-select {
+      background-color: #fff !important;
+    }
+  }
+}
+.image-search-list {
+  width: 300px !important;
+}
+</style>

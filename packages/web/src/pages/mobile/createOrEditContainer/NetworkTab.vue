@@ -24,6 +24,12 @@
       :name="'networks[' + index + '].ip'"
       label="IPv4 地址"
       :placeholder="'网段：' + (getNetworkInfo(network.name)?.subnet || '无')"
+      :rules="[
+        {
+          pattern: IPv4AddressRegExp,
+          message: '请输入IPv4地址',
+        },
+      ]"
     />
     <van-field
       v-if="!['host', 'none', 'bridge'].includes(network.name || '')"
@@ -31,6 +37,12 @@
       :name="'networks[' + index + '].ipV6'"
       label="IPv6 地址"
       :placeholder="'网段：' + (getNetworkInfo(network.name)?.subnetV6 || '无')"
+      :rules="[
+        {
+          pattern: IPv6AddressRegExp,
+          message: '请输入IPv6地址',
+        },
+      ]"
     />
     <van-field
       v-if="!['host', 'none'].includes(network.name || '')"
@@ -73,6 +85,7 @@
 import { ref, onMounted, watch, computed } from 'vue';
 
 import type { NetworkConfig, Network } from '@common/types/network';
+import { IPv4AddressRegExp, IPv6AddressRegExp } from '@common/constants/const';
 
 import { getNetworkList } from '@/apis/network';
 

@@ -17,11 +17,12 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
-      exceptionFactory: errors =>
-        new HttpException(
+      exceptionFactory: errors => {
+        return new HttpException(
           'params error,property:' + errors.map(error => error.property).join(','),
           HttpStatus.BAD_REQUEST,
-        ),
+        );
+      },
     }),
   );
   app.useGlobalInterceptors(new LoggerInterceptor());

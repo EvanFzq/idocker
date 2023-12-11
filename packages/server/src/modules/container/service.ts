@@ -47,7 +47,7 @@ export class ContainerService {
       Hostname: params.hostname,
       Domainname: params.domainName,
       HostConfig: {
-        NetworkMode: params.networks[0]?.name,
+        NetworkMode: 'none',
         ExtraHosts: params.extraHosts?.split(/[,，\s]+/).filter(item => item),
         PortBindings: portBindings,
         RestartPolicy: {
@@ -62,9 +62,13 @@ export class ContainerService {
         })),
       },
     });
-    // 链接剩余网络
+
     let networkError = null;
     const networkList = await this.networkService.getNetworkList();
+    // 取消默认链接的none网络
+    const noneNetworkId = networkList.find(item => item.Name === 'none')?.Id;
+    await this.networkService.removeContainerToNetwork(noneNetworkId, container.id);
+    // 链接网络
     if (params.networks.length > 0) {
       for (let i = 0; i < params.networks.length; i++) {
         const network = params.networks[i];
@@ -159,7 +163,7 @@ export class ContainerService {
         CpusetCpus: containerDetail.HostConfig.CpusetCpus,
         CpusetMems: containerDetail.HostConfig.CpusetMems,
         BlkioWeight: containerDetail.HostConfig.BlkioWeight,
-        NetworkMode: params.networks[0]?.name,
+        NetworkMode: 'none',
         ExtraHosts: params.extraHosts?.split(/[,，\s]+/).filter(item => item),
         PortBindings: portBindings,
         RestartPolicy: {
@@ -174,9 +178,12 @@ export class ContainerService {
         })),
       },
     });
-    // 链接剩余网络
+    // 链接网络
     let networkError = null;
     const networkList = await this.networkService.getNetworkList();
+    // 取消默认链接的none网络
+    const noneNetworkId = networkList.find(item => item.Name === 'none')?.Id;
+    await this.networkService.removeContainerToNetwork(noneNetworkId, container.id);
     if (params.networks.length > 0) {
       for (let i = 0; i < params.networks.length; i++) {
         const network = params.networks[i];
@@ -442,11 +449,17 @@ export class ContainerService {
       ExposedPorts: containerDetail.Config.ExposedPorts,
       Hostname: containerDetail.Config.Hostname,
       Domainname: containerDetail.Config.Domainname,
-      HostConfig: containerDetail.HostConfig,
+      HostConfig: {
+        ...containerDetail.HostConfig,
+        NetworkMode: 'none',
+      },
     });
     // 链接网络
     let networkError = null;
     const networkList = await this.networkService.getNetworkList();
+    // 取消默认链接的none网络
+    const noneNetworkId = networkList.find(item => item.Name === 'none')?.Id;
+    await this.networkService.removeContainerToNetwork(noneNetworkId, container.id);
     if (networks.length > 0) {
       for (let i = 0; i < networks.length; i++) {
         const [name, config] = networks[i];
