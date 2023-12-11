@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.12.0](///compare/v1.11.1...v1.12.0) (2023-12-11)
+
+
+### Features
+
+* 移动端创建容器支持多网络 6892237
+* 桌面端新增容器时支持多网络 e8aa351
+
+
+### Bug Fixes
+
+* 修复容器列表资源占用展示异常 daeb201
+
 ### [1.11.1](///compare/v1.11.0...v1.11.1) (2023-12-04)
 
 
