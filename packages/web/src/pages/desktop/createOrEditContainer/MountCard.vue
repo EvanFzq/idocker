@@ -133,7 +133,7 @@ const showCreateVolumeModal = ref(false);
 const volumeList = ref<Volume[]>([]);
 
 const form = ref<Pick<FormData, 'mounts'>>({
-  mounts: [],
+  mounts: props.formData.mounts,
 });
 
 watch(

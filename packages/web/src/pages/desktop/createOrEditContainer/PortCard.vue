@@ -30,6 +30,8 @@
             <a-input-number
               v-model:value="record.host"
               :precision="0"
+              :min="1"
+              :max="65535"
               placeholder="请输入"
               style="width: 100%"
             />
@@ -44,6 +46,8 @@
             <a-input-number
               v-model:value="record.container"
               :precision="0"
+              :min="1"
+              :max="65535"
               placeholder="请输入"
               style="width: 100%"
             />
@@ -91,7 +95,7 @@ const props = defineProps<{ formData: FormData }>();
 const emit = defineEmits(['valueChange']);
 
 const form = ref<Pick<FormData, 'ports'>>({
-  ports: [],
+  ports: props.formData.ports,
 });
 
 watch(

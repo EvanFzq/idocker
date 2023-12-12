@@ -70,7 +70,7 @@ const props = defineProps<{ formData: FormData }>();
 const emit = defineEmits(['valueChange']);
 
 const form = ref<Pick<FormData, 'envs'>>({
-  envs: [],
+  envs: props.formData.envs,
 });
 
 watch(

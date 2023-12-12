@@ -7,6 +7,16 @@
     ]"
   >
     <template #extra>
+      <a-radio-group
+        v-if="!isEdit"
+        v-model:value="mode"
+        size="small"
+        button-style="solid"
+        style="margin-right: 16px"
+      >
+        <a-radio-button value="base">基础模式</a-radio-button>
+        <a-radio-button value="advanced">高级模式</a-radio-button>
+      </a-radio-group>
       <a-button
         type="primary"
         :loading="submitLoading"
@@ -23,11 +33,17 @@
       >
         <BaseinfoCard
           :form-data="formData"
+          :network-list="networkList"
+          :mode="mode"
           @value-change="onFieldChange"
+          @reload-network-list="getNetworkData()"
         />
         <NetworkCard
+          v-if="mode === 'advanced'"
           :form-data="formData"
+          :network-list="networkList"
           @value-change="onFieldChange"
+          @reload-network-list="getNetworkData()"
         />
         <PortCard
           v-if="!['host', 'none'].includes(formData.networks[0]?.name || '')"
@@ -51,8 +67,10 @@ import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { message } from 'ant-design-vue';
 
+import type { Network } from '@common/types/network';
+
 import PageLayout from '@/components/desktop/PageLayout.vue';
-import { getContainerDetail, updateContainer, createContainer } from '@/apis';
+import { getContainerDetail, updateContainer, createContainer, getNetworkList } from '@/apis';
 
 import BaseinfoCard from './BaseInfoCard.vue';
 import NetworkCard from './NetworkCard.vue';
@@ -64,11 +82,12 @@ import type { FormInstance } from 'ant-design-vue';
 
 const formRef = ref<FormInstance>();
 const submitLoading = ref(false);
+const networkList = ref<Network[]>([]);
 
 const route = useRoute();
 const router = useRouter();
 const isEdit = !!route.query.id;
-
+const mode = ref<'base' | 'advanced'>(isEdit ? 'advanced' : 'base');
 const formData = ref<FormData>({
   id: '',
   name: '',
@@ -161,8 +180,15 @@ const getContainerData = async (id: string) => {
     };
   }
 };
+const getNetworkData = async () => {
+  const res = await getNetworkList();
+  if (res.success) {
+    networkList.value = res.data;
+  }
+};
 
 onMounted(async () => {
+  getNetworkData();
   if (route.query.id) {
     getContainerData(route.query.id as string);
   }

@@ -122,9 +122,8 @@ const onClickApp = (app: AppInfo) => {
 </script>
 <style lang="less" scoped>
 .loading-box {
-  height: 0;
+  height: 100%;
   width: 100%;
-  flex: auto;
   display: flex;
   justify-content: center;
   align-items: center;

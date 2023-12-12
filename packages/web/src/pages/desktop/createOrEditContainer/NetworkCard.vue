@@ -98,6 +98,12 @@
           <a-form-item
             :label-col="{ style: { width: '0px' } }"
             :name="['networks', index, 'mac']"
+            :rules="[
+              {
+                pattern: macAddress48RegExp,
+                message: '请输入MAC地址',
+              },
+            ]"
           >
             <a-input
               v-model:value="record.mac"
@@ -120,30 +126,28 @@
   </a-card>
   <CreateNetworkModal
     v-model:open="showCreateNetworkModal"
-    @created="getNetworkData()"
+    @created="emit('reloadNetworkList')"
   />
 </template>
 <script setup lang="ts">
-import { ref, onMounted, h, watch } from 'vue';
+import { ref, h, watch } from 'vue';
 import { PlusOutlined } from '@ant-design/icons-vue';
 
 import type { Network, NetworkConfig } from '@common/types/network';
-import { IPv4AddressRegExp, IPv6AddressRegExp } from '@common/constants/const';
+import { IPv4AddressRegExp, IPv6AddressRegExp, macAddress48RegExp } from '@common/constants/const';
 
 import CreateNetworkModal from '@/components/desktop/CreateNetworkModal.vue';
-import { getNetworkList } from '@/apis';
 
 import type { FormData } from './type';
 import type { TableColumnProps } from 'ant-design-vue';
 
-const props = defineProps<{ formData: FormData }>();
-const emit = defineEmits(['valueChange']);
+const props = defineProps<{ formData: FormData; networkList: Network[] }>();
+const emit = defineEmits(['valueChange', 'reloadNetworkList']);
 
 const showCreateNetworkModal = ref(false);
-const networkList = ref<Network[]>([]);
 
 const form = ref<Pick<FormData, 'networks'>>({
-  networks: [{ name: 'bridge' }],
+  networks: props.formData.networks,
 });
 
 watch(
@@ -151,7 +155,7 @@ watch(
   () => {
     const { networks } = props.formData;
     form.value = {
-      networks,
+      networks: [...networks],
     };
   },
   { deep: true },
@@ -203,22 +207,11 @@ const networkColumns: TableColumnProps[] = [
   },
 ];
 
-const getNetworkData = async () => {
-  const res = await getNetworkList();
-  if (res.success) {
-    networkList.value = res.data;
-  }
-};
-
-onMounted(async () => {
-  getNetworkData();
-});
-
 const getNetworkInfo = (name?: string) => {
   if (!name || name === 'host') {
     return null;
   }
-  const item = networkList.value.find(item => item.Name === name);
+  const item = props.networkList.find(item => item.Name === name);
   return {
     subnet: item?.IPAM.Config.find(item => item.Subnet.indexOf('.') > 0)?.Subnet,
     subnetV6: item?.IPAM.Config.find(item => item.Subnet.indexOf(':') > 0)?.Subnet,

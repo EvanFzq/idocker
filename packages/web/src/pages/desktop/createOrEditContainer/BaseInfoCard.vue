@@ -104,7 +104,41 @@
         />
       </a-form-item>
     </a-col>
-
+    <a-col
+      v-if="mode === 'base'"
+      v-bind="fieldLayout"
+    >
+      <a-form-item
+        label="网络"
+        :name="['networks', 0, 'name']"
+        :rules="[
+          { required: true, message: '请输入' },
+          {
+            validator: validatorNetworkName,
+            message: 'host、none网络不能与其他网络共存',
+          },
+        ]"
+      >
+        <div style="display: flex; align-items: center">
+          <a-select
+            v-model:value="form.networks[0].name"
+            style="width: 100%"
+            placeholder="请选择"
+            :options="networkList"
+            :field-names="{ label: 'Name', value: 'Name' }"
+            @change="(value: string) => onNetworkNameChange(value, 0)"
+          />
+          <a-button
+            type="primary"
+            shape="circle"
+            size="small"
+            style="margin-left: 6px"
+            :icon="h(PlusOutlined)"
+            @click="showCreateNetworkModal = true"
+          />
+        </div>
+      </a-form-item>
+    </a-col>
     <a-col v-bind="fieldLayout">
       <a-form-item
         label="重启策略"
@@ -119,7 +153,10 @@
         />
       </a-form-item>
     </a-col>
-    <a-col v-bind="fieldLayout">
+    <a-col
+      v-if="mode === 'advanced'"
+      v-bind="fieldLayout"
+    >
       <a-form-item
         label="hostname"
         name="hostname"
@@ -130,7 +167,10 @@
         />
       </a-form-item>
     </a-col>
-    <a-col v-bind="fieldLayout">
+    <a-col
+      v-if="mode === 'advanced'"
+      v-bind="fieldLayout"
+    >
       <a-form-item
         label="domainName"
         name="domainName"
@@ -163,7 +203,10 @@
         />
       </a-form-item>
     </a-col>
-    <a-col v-bind="fieldLayout">
+    <a-col
+      v-if="mode === 'advanced'"
+      v-bind="fieldLayout"
+    >
       <a-form-item
         label="启动命令"
         name="command"
@@ -176,15 +219,18 @@
         />
       </a-form-item>
     </a-col>
-    <a-col v-bind="fieldLayout">
+    <a-col
+      v-if="mode === 'advanced'"
+      v-bind="fieldLayout"
+    >
       <a-form-item
         label="Hosts文件配置"
         name="extraHosts"
       >
         <a-textarea
           v-model:value="form.extraHosts"
-          :rows="4"
-          placeholder="示例：www.baidu.com:192.168.0.1,cn.bing.com:192.168.0.2，多个使用逗号、空格、换行符分隔"
+          :rows="3"
+          placeholder="示例：www.baidu.com:192.168.0.1, cn.bing.com:192.168.0.2，多个使用逗号、空格、换行符分隔"
         />
       </a-form-item>
     </a-col>
@@ -232,17 +278,23 @@
       :src="previewIconUrl"
     />
   </a-modal>
+  <CreateNetworkModal
+    v-model:open="showCreateNetworkModal"
+    @created="emit('reloadNetworkList')"
+  />
 </template>
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import { InboxOutlined, FireFilled, StarFilled } from '@ant-design/icons-vue';
+import { ref, watch, h } from 'vue';
+import { InboxOutlined, FireFilled, StarFilled, PlusOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
 
+import type { Network } from '@common/types/network';
 import type { Image } from '@common/types/image';
 import { restartPolicyList } from '@common/constants/const';
 
+import CreateNetworkModal from '@/components/desktop/CreateNetworkModal.vue';
 import { searchImage, uploadImg } from '@/apis';
 import { dataURLtoFile, numberFormat } from '@/utils/utils';
 
@@ -255,16 +307,35 @@ const fieldLayout = {
   xl: 8,
   xxl: 6,
 };
-const props = defineProps<{ formData: FormData }>();
-const emit = defineEmits(['valueChange']);
+const props = defineProps<{
+  formData: FormData;
+  mode: 'base' | 'advanced';
+  networkList: Network[];
+}>();
+const emit = defineEmits(['valueChange', 'reloadNetworkList']);
 
 const showIconCropper = ref(false);
 const showPreviewIcon = ref(false);
 const previewIconUrl = ref('');
 const iconCropper = ref<Cropper | null>(null);
 const iconFileName = ref<string | undefined>('');
+const showCreateNetworkModal = ref(false);
 const imageList = ref<Image[]>([]);
-
+const {
+  name,
+  icon,
+  image,
+  tag,
+  networks,
+  runAffterCreated,
+  command,
+  hostname,
+  domainName,
+  extraHosts,
+  restart,
+  localUrl,
+  internetUrl,
+} = props.formData;
 const form = ref<
   Pick<
     FormData,
@@ -283,19 +354,19 @@ const form = ref<
     | 'internetUrl'
   >
 >({
-  name: '',
-  icon: [],
-  image: undefined,
-  tag: '',
-  networks: [{ name: 'bridge' }],
-  runAffterCreated: false,
-  command: undefined,
-  hostname: undefined,
-  domainName: undefined,
-  extraHosts: undefined,
-  restart: 'no',
-  localUrl: '',
-  internetUrl: '',
+  name,
+  icon,
+  image,
+  tag,
+  networks,
+  runAffterCreated,
+  command,
+  hostname,
+  domainName,
+  extraHosts,
+  restart,
+  localUrl,
+  internetUrl,
 });
 
 watch(
@@ -413,6 +484,19 @@ const onImageInputChange = async (text: string) => {
 
 const onImageChange = () => {
   form.value.tag = 'latest';
+};
+
+const validatorNetworkName = () => {
+  const hasHostOrNone = form.value.networks.some(item =>
+    ['host', 'none'].includes(item.name || ''),
+  );
+  if (hasHostOrNone && form.value.networks.length > 2) {
+    return Promise.reject('host、none网络不能与其他网络一起存在');
+  }
+  return Promise.resolve();
+};
+const onNetworkNameChange = (value: string, index: number) => {
+  form.value.networks[index] = { name: value };
 };
 </script>
 <style scoped lang="less">

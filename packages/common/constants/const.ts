@@ -36,3 +36,6 @@ export const IPv6AddressRegExp = new RegExp(
     `(?::((?::${IPv6SegmentFormat}){0,5}:${IPv4AddressFormat}|(?::${IPv6SegmentFormat}){1,7}|:))` +
     ')(%[0-9a-zA-Z-.:]{1,})?$',
 );
+
+export const macAddress48RegExp =
+  /^(?:[0-9a-fA-F]{2}([-:\s]))([0-9a-fA-F]{2}\1){4}([0-9a-fA-F]{2})$/;
