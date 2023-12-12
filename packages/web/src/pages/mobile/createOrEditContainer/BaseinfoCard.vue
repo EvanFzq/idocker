@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-v-html -->
 <template>
   <div>
     <van-cell-group
@@ -13,7 +14,22 @@
         autocomplete="off"
         :rules="[{ required: true, message: '请填写容器名' }]"
       />
+      <van-field label="图标类型">
+        <template #input>
+          <van-radio-group
+            v-model="iconType"
+            direction="horizontal"
+            style="margin-bottom: 12px"
+            @change="onIconTypeChange"
+          >
+            <van-radio name="upload">上传</van-radio>
+            <van-radio name="url">URL</van-radio>
+            <van-radio name="svg">SVG</van-radio>
+          </van-radio-group>
+        </template>
+      </van-field>
       <van-field
+        v-if="iconType === 'upload'"
         name="icon"
         label="图标"
       >
@@ -28,6 +44,36 @@
           />
         </template>
       </van-field>
+      <van-field
+        v-if="iconType === 'url' && form.icon[0]"
+        v-model="form.icon[0].url"
+        :spellcheck="false"
+        name="icon[0].url"
+        label="图标URL"
+        placeholder="请输入URL"
+      />
+      <van-image
+        v-if="iconType === 'url' && form.icon[0]?.url"
+        class="img-view"
+        placeholder
+        style="max-width: 80px; max-height: 80px; margin-left: 36%; margin-top: 8px"
+        :src="form.icon[0].url"
+      />
+      <van-field
+        v-if="iconType === 'svg' && form.icon[0]"
+        v-model="form.icon[0].svg"
+        name="icon[0].svg"
+        label="图标SVG"
+        type="textarea"
+        :autosize="{ maxHeight: 200, minHeight: 50 }"
+        :spellcheck="false"
+        placeholder="请输入SVG"
+      />
+      <div
+        v-if="iconType === 'svg' && form.icon[0]?.svg"
+        class="svg-view"
+        v-html="safeSvg(form.icon[0]?.svg) ? form.icon[0]?.svg : ''"
+      />
       <van-popover
         v-model:show="showImagePopover"
         placement="bottom-end"
@@ -106,18 +152,20 @@ import type { Image } from '@common/types/image';
 
 import { searchImage, uploadImg } from '@/apis';
 import { numberFormat } from '@/utils/utils';
-import { dataURLtoFile } from '@/utils/utils';
+import { dataURLtoFile, safeSvg } from '@/utils/utils';
 
-import type { ContainerFormData } from './CreateOrEditContainerPage.vue';
+import type { ContainerFormData } from './type';
 
 const props = defineProps<{ formData: ContainerFormData }>();
 const emit = defineEmits(['valueChange']);
-const form = ref({
+const form = ref<Pick<ContainerFormData, 'name' | 'icon' | 'image' | 'runAffterCreated'>>({
   name: '',
-  icon: [] as UploaderFileListItem[],
+  icon: [],
   image: '',
   runAffterCreated: false,
 });
+
+const iconType = ref<'upload' | 'url' | 'svg'>(props.formData.icon[0]?.svg ? 'svg' : 'upload');
 
 watch(
   () => props.formData,
@@ -128,6 +176,12 @@ watch(
       image: props.formData.image,
       runAffterCreated: props.formData.runAffterCreated,
     };
+
+    if (props.formData.icon[0]?.svg && iconType.value !== 'svg') {
+      iconType.value = 'svg';
+    } else if (props.formData.icon[0]?.url?.startsWith('http') && iconType.value !== 'url') {
+      iconType.value = 'url';
+    }
   },
   { deep: true },
 );
@@ -144,6 +198,20 @@ const showIconCropper = ref(false);
 const iconCropper = ref<Cropper | null>(null);
 const iconFileName = ref<string | undefined>('');
 const imageList = ref<Image[]>([]);
+
+const onIconTypeChange = (value: 'upload' | 'url' | 'svg') => {
+  if (value === 'url' || value === 'svg') {
+    form.value.icon = [
+      {
+        url: value === 'url' ? form.value.icon[0]?.url : '',
+        svg: value === 'svg' ? form.value.icon[0]?.svg : '',
+      },
+    ];
+  }
+  if (value === 'upload') {
+    form.value.icon = [];
+  }
+};
 
 let searchImageTimer: NodeJS.Timeout;
 const onImageChange = async (value: string) => {
@@ -208,6 +276,27 @@ const onIconCropperConfirm = async () => {
 </script>
 
 <style scoped lang="less">
+.icon-url {
+  border: solid 1px #ccc;
+  border-radius: 6px;
+  width: 100%;
+}
+.icon-svg {
+  border: solid 1px #ccc;
+  border-radius: 6px;
+  height: 100px;
+  width: 100%;
+}
+.svg-view {
+  width: 80px;
+  height: 80px;
+  margin-left: 36%;
+  margin-top: 8px;
+  border: solid 1px #ccc;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+}
 .image-list {
   width: 270px;
 

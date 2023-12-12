@@ -183,7 +183,7 @@ export class ContainerService {
     const networkList = await this.networkService.getNetworkList();
     // 取消默认链接的none网络
     const noneNetworkId = networkList.find(item => item.Name === 'none')?.Id;
-    await this.networkService.removeContainerToNetwork(noneNetworkId, container.id);
+    await this.networkService.removeContainerToNetwork(noneNetworkId, nextContainer.id);
     if (params.networks.length > 0) {
       for (let i = 0; i < params.networks.length; i++) {
         const network = params.networks[i];

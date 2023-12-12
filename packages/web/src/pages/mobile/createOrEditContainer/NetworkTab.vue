@@ -89,7 +89,7 @@ import { IPv4AddressRegExp, IPv6AddressRegExp } from '@common/constants/const';
 
 import { getNetworkList } from '@/apis/network';
 
-import type { ContainerFormData } from './CreateOrEditContainerPage.vue';
+import type { ContainerFormData } from './type';
 
 const props = defineProps<{ formData: ContainerFormData }>();
 

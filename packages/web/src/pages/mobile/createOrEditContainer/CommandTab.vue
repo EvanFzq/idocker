@@ -18,7 +18,7 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue';
 
-import type { ContainerFormData } from './CreateOrEditContainerPage.vue';
+import type { ContainerFormData } from './type';
 
 const props = defineProps<{ formData: ContainerFormData }>();
 const command = ref(props.formData.command || '');

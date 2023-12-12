@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-v-html -->
 <template>
   <a-table
     :columns="columns"
@@ -17,14 +18,19 @@
     >
       <template v-if="column.key === 'icon'">
         <a-image
-          v-if="record.icon"
+          v-if="record.icon && getIcon(record.icon).type === 'url'"
           :width="60"
-          :src="record.icon"
+          :src="getIcon(record.icon).content"
           fit="cover"
           :preview="false"
         />
         <div
-          v-else
+          v-if="record.icon && getIcon(record.icon).type === 'svg'"
+          class="icon-svg"
+          v-html="getIcon(record.icon).content"
+        />
+        <div
+          v-if="!record.icon"
           class="no-icon"
         >
           {{
@@ -329,7 +335,17 @@ const tableWidth: number = (columns as { width: number }[]).reduce(
   (pre: number, cur: { width: number }) => pre + cur.width,
   0,
 );
-
+const getIcon = (icon: string) => {
+  const index = icon.indexOf('|');
+  // 在前10个字符中寻找｜，存在则判断类型，否则默认为URL（兼容之前版本）
+  if (index > 0 && index < 10) {
+    const iconType = icon.slice(0, index);
+    const iconContent = icon.slice(index + 1);
+    return { type: iconType, content: iconContent };
+  } else {
+    return { type: 'url', content: icon };
+  }
+};
 const handleActive = async (id: string, type: ContainerActive) => {
   activeLoadingId.value = id;
   const res = await activeContainer(id, type);
@@ -364,6 +380,13 @@ const onEdit = (id: string) => {
 };
 </script>
 <style scoped lang="less">
+.icon-svg {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 .no-icon {
   width: 60px;
   height: 60px;

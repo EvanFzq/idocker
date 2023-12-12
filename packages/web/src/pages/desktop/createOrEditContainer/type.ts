@@ -6,7 +6,7 @@ import type { UploadFile } from 'ant-design-vue';
 export interface FormData {
   id?: string;
   name: string;
-  icon: UploadFile[];
+  icon: (UploadFile & { svg?: string })[];
   image?: string;
   tag: string;
   networks: NetworkConfig[];

@@ -97,14 +97,12 @@ import { showSuccessToast, showLoadingToast } from 'vant';
 import { useRoute, useRouter } from 'vue-router';
 import set from 'lodash-es/set';
 
-import type { CreateContainerParams, MountConfig, Env } from '@common/types/container';
-import type { PortConfig, NetworkConfig } from '@common/types/network';
+import type { CreateContainerParams } from '@common/types/container';
 
 import { getContainerDetail } from '@/apis/container';
 import TitleBar from '@/components/mobile/TitleBar.vue';
 import { createContainer, updateContainer } from '@/apis';
 
-import type { UploaderFileListItem } from 'vant';
 import BaseinfoCard from './BaseinfoCard.vue';
 import CommandTab from './CommandTab.vue';
 import NetworkTab from './NetworkTab.vue';
@@ -112,22 +110,7 @@ import MountTab from './MountTab.vue';
 import PortTab from './PortTab.vue';
 import EnvVarTab from './EnvVarTab.vue';
 import OtherTab from './OtherTab.vue';
-
-export interface ContainerFormData {
-  id?: string;
-  name: string;
-  icon: UploaderFileListItem[];
-  image: string;
-  networks: NetworkConfig[];
-  runAffterCreated: boolean;
-  command: string;
-  envs: Env[];
-  mounts: MountConfig[];
-  ports: PortConfig[];
-  restart: string;
-  localUrl: string;
-  internetUrl: string;
-}
+import type { ContainerFormData } from './type';
 
 const activeTab = ref(0);
 const networkError = ref(false);
@@ -174,6 +157,30 @@ onMounted(async () => {
       localUrl,
       internetUrl,
     } = res.data;
+    // 处理icon
+    const iconList = [];
+    if (icon) {
+      const index = icon.indexOf('|');
+      // 在前10个字符中寻找｜，存在则判断类型，否则默认为URL（兼容之前版本）
+      if (index > 0 && index < 10) {
+        const iconType = icon.slice(0, index);
+        const iconContent = icon.slice(index + 1);
+        if (iconType === 'svg') {
+          iconList.push({
+            svg: iconContent,
+          });
+        } else {
+          iconList.push({
+            url: iconContent,
+          });
+        }
+      } else {
+        iconList.push({
+          url: icon,
+        });
+      }
+    }
+
     formData.value = {
       id: id,
       name: name,
@@ -197,11 +204,7 @@ onMounted(async () => {
           container: Number(port.containerPort),
           protocol: port.protocol as 'tcp' | 'udp',
         })) || [],
-      icon: [
-        {
-          url: icon,
-        },
-      ],
+      icon: iconList,
       localUrl: localUrl || '',
       internetUrl: internetUrl || '',
     };
@@ -220,8 +223,13 @@ const onSubmit = async (values: Record<string, string | number | boolean>) => {
     forbidClick: true,
     duration: 0,
   });
-  values.icon =
-    Array.isArray(values.icon) && values.icon.length > 0 ? values.icon[0].url : undefined;
+  const iconContent =
+    Array.isArray(values.icon) && values.icon.length > 0
+      ? values.icon[0].url
+      : values['icon[0].url'] || values['icon[0].svg'];
+  const icon = `${values['icon[0].svg'] ? 'svg' : 'url'}|${iconContent}`;
+  delete values['icon[0].url'];
+  delete values['icon[0].svg'];
   const params: CreateContainerParams = {} as CreateContainerParams;
   Object.entries(values).forEach(([key, value]: [string, string | number | boolean]) => {
     set(params, key, value);
@@ -233,7 +241,7 @@ const onSubmit = async (values: Record<string, string | number | boolean>) => {
     mac: item.ip || undefined,
   }));
   if (formData.value.id) {
-    const res = await updateContainer({ id: formData.value.id, ...params });
+    const res = await updateContainer({ id: formData.value.id, ...params, icon });
     if (res.success) {
       showSuccessToast({
         message: '更新成功',
@@ -243,7 +251,7 @@ const onSubmit = async (values: Record<string, string | number | boolean>) => {
       });
     }
   } else {
-    const res = await createContainer(params);
+    const res = await createContainer({ ...params, icon });
     if (res.success) {
       showSuccessToast({
         message: '创建成功',

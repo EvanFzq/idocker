@@ -134,6 +134,36 @@ const getContainerData = async (id: string) => {
       domainName,
       extraHosts,
     } = res.data;
+    // 处理icon
+    const iconList = [];
+    if (icon) {
+      const index = icon.indexOf('|');
+      // 在前10个字符中寻找｜，存在则判断类型，否则默认为URL（兼容之前版本）
+      if (index > 0 && index < 10) {
+        const iconType = icon.slice(0, index);
+        const iconContent = icon.slice(index + 1);
+        if (iconType === 'svg') {
+          iconList.push({
+            uid: '',
+            svg: iconContent,
+            name: '',
+          });
+        } else {
+          iconList.push({
+            uid: '',
+            url: iconContent,
+            name: iconContent,
+          });
+        }
+      } else {
+        iconList.push({
+          uid: '',
+          url: icon,
+          name: icon,
+        });
+      }
+    }
+
     formData.value = {
       id: id,
       name: name,
@@ -166,15 +196,7 @@ const getContainerData = async (id: string) => {
           container: Number(port.containerPort),
           protocol: port.protocol as 'tcp' | 'udp',
         })) || [],
-      icon: icon
-        ? [
-            {
-              uid: '',
-              url: icon,
-              name: icon || '',
-            },
-          ]
-        : [],
+      icon: iconList,
       localUrl: localUrl || '',
       internetUrl: internetUrl || '',
     };
@@ -214,26 +236,30 @@ const onSubmit = async () => {
     extraHosts,
   } = formData.value as FormData;
   submitLoading.value = true;
+  const { url, svg } = icon[0] || {};
+  const params = {
+    command,
+    name,
+    networks,
+    mounts,
+    restart,
+    hostname,
+    domainName,
+    extraHosts,
+    runAffterCreated,
+    image: `${image}:${tag}`,
+    icon: `${svg ? 'svg' : 'url'}|${svg ? svg : url}`,
+    envs: envs.map(env => ({ key: env.envKey, value: env.envValue })),
+    ports: ports.map(port => ({
+      host: port.host.toString(),
+      container: port.container.toString(),
+      protocol: port.protocol,
+    })),
+  };
   if (formData.value.id) {
     const res = await updateContainer({
       id: id as string,
-      command,
-      name,
-      networks,
-      mounts,
-      restart,
-      hostname,
-      domainName,
-      extraHosts,
-      runAffterCreated,
-      image: `${image}:${tag}`,
-      icon: icon[0]?.url || '',
-      envs: envs.map(env => ({ key: env.envKey, value: env.envValue })),
-      ports: ports.map(port => ({
-        host: port.host.toString(),
-        container: port.container.toString(),
-        protocol: port.protocol,
-      })),
+      ...params,
     });
     if (res.success) {
       message.success({
@@ -244,25 +270,7 @@ const onSubmit = async () => {
       });
     }
   } else {
-    const res = await createContainer({
-      command,
-      name,
-      networks,
-      mounts,
-      restart,
-      hostname,
-      domainName,
-      extraHosts,
-      runAffterCreated,
-      image: `${image}:${tag}`,
-      icon: icon[0]?.url || '',
-      envs: envs.map(env => ({ key: env.envKey, value: env.envValue })),
-      ports: ports.map(port => ({
-        host: port.host.toString(),
-        container: port.container.toString(),
-        protocol: port.protocol,
-      })),
-    });
+    const res = await createContainer(params);
     if (res.success) {
       message.success({
         content: '创建成功！' + res.msg,

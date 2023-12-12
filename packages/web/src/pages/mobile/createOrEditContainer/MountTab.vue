@@ -97,7 +97,7 @@ import type { MountConfig } from '@common/types/container';
 
 import { getVolumeList } from '@/apis/volume';
 
-import type { ContainerFormData } from './CreateOrEditContainerPage.vue';
+import type { ContainerFormData } from './type';
 
 const props = defineProps<{ formData: ContainerFormData }>();
 

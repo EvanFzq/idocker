@@ -165,7 +165,7 @@ const getList = async (hasMetrics: boolean, type?: string) => {
   // 获取列表
   const params: Record<string, ContainerListParams> = {
     ['network']: {
-      networkId: id as string,
+      networkName: name as string,
       hasMetrics,
     },
     ['image']: {

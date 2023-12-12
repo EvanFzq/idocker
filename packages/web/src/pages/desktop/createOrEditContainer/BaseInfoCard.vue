@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-v-html -->
 <!-- eslint-disable vue/html-quotes -->
 <template>
   <a-row>
@@ -5,9 +6,31 @@
       <a-form-item
         label="图标"
         name="icon"
-        :wrapper-col="{ style: { width: '220px', flex: 'none' } }"
+        :wrapper-col="iconType === 'upload' ? { style: { width: '220px', flex: 'none' } } : {}"
+        :rules="[
+          {
+            validator: validatorSvg,
+          },
+        ]"
       >
-        <a-tooltip title="支持jpeg、webp、png, 裁剪后不超过10MB">
+        <a-form-item-rest>
+          <a-radio-group
+            v-model:value="iconType"
+            size="small"
+            button-style="solid"
+            style="margin-bottom: 16px"
+            @change="onIconTypeChange"
+          >
+            <a-radio-button value="upload">上传</a-radio-button>
+            <a-radio-button value="url">URL</a-radio-button>
+            <a-radio-button value="svg">SVG</a-radio-button>
+          </a-radio-group>
+        </a-form-item-rest>
+        <a-tooltip
+          v-if="iconType === 'upload'"
+          title="支持jpeg、webp、png, 裁剪后不超过10MB"
+          placement="right"
+        >
           <a-upload
             v-model:fileList="form.icon"
             class="icon-upload-control"
@@ -26,6 +49,38 @@
             </div>
           </a-upload>
         </a-tooltip>
+        <div
+          v-if="iconType === 'url'"
+          class="icon-img"
+        >
+          <a-input
+            v-model:value="form.icon[0].url"
+            placeholder="请输入URL"
+            spellcheck="false"
+          />
+          <a-image
+            class="img-view"
+            placeholder
+            style="max-width: 80px; max-height: 80px; margin-left: 16px"
+            :src="form.icon[0].url"
+          />
+        </div>
+
+        <div
+          v-if="iconType === 'svg'"
+          class="icon-svg"
+        >
+          <a-textarea
+            v-model:value="form.icon[0].svg"
+            :rows="3"
+            placeholder="请输入SVG"
+            spellcheck="false"
+          />
+          <div
+            class="svg-view"
+            v-html="safeSvg(form.icon[0]?.svg) ? form.icon[0]?.svg : ''"
+          />
+        </div>
       </a-form-item>
     </a-col>
     <a-col v-bind="fieldLayout">
@@ -296,10 +351,10 @@ import { restartPolicyList } from '@common/constants/const';
 
 import CreateNetworkModal from '@/components/desktop/CreateNetworkModal.vue';
 import { searchImage, uploadImg } from '@/apis';
-import { dataURLtoFile, numberFormat } from '@/utils/utils';
+import { dataURLtoFile, numberFormat, safeSvg } from '@/utils/utils';
 
 import type { FormData } from './type';
-import type { UploadFile } from 'ant-design-vue';
+import type { UploadFile, RadioChangeEvent } from 'ant-design-vue';
 
 const fieldLayout = {
   xs: 24,
@@ -314,6 +369,7 @@ const props = defineProps<{
 }>();
 const emit = defineEmits(['valueChange', 'reloadNetworkList']);
 
+const iconType = ref<'upload' | 'url' | 'svg'>(props.formData.icon[0]?.svg ? 'svg' : 'upload');
 const showIconCropper = ref(false);
 const showPreviewIcon = ref(false);
 const previewIconUrl = ref('');
@@ -402,6 +458,11 @@ watch(
       localUrl,
       internetUrl,
     };
+    if (icon[0]?.svg && iconType.value !== 'svg') {
+      iconType.value = 'svg';
+    } else if (icon[0]?.url?.startsWith('http') && iconType.value !== 'url') {
+      iconType.value = 'url';
+    }
   },
   { deep: true },
 );
@@ -412,6 +473,23 @@ watch(
   },
   { deep: true },
 );
+
+const onIconTypeChange = (e: RadioChangeEvent) => {
+  const type = e.target.value;
+  if (type === 'url' || type === 'svg') {
+    form.value.icon = [
+      {
+        url: type === 'url' ? form.value.icon[0]?.url : '',
+        uid: '',
+        name: '',
+        svg: type === 'svg' ? form.value.icon[0]?.svg : '',
+      },
+    ];
+  }
+  if (type === 'upload') {
+    form.value.icon = [];
+  }
+};
 
 const onIconReaded = ({ file }: { file: File }) => {
   if (!(file instanceof File)) return;
@@ -485,7 +563,11 @@ const onImageInputChange = async (text: string) => {
 const onImageChange = () => {
   form.value.tag = 'latest';
 };
-
+const validatorSvg = () => {
+  const svg = form.value.icon[0]?.svg;
+  if (!svg || safeSvg(svg)) return Promise.resolve();
+  return Promise.reject('SVG存在不安全代码');
+};
 const validatorNetworkName = () => {
   const hasHostOrNone = form.value.networks.some(item =>
     ['host', 'none'].includes(item.name || ''),
@@ -495,6 +577,7 @@ const validatorNetworkName = () => {
   }
   return Promise.resolve();
 };
+
 const onNetworkNameChange = (value: string, index: number) => {
   form.value.networks[index] = { name: value };
 };
@@ -519,6 +602,23 @@ const onNetworkNameChange = (value: string, index: number) => {
 #container-icon-cropper {
   max-width: 100%;
   max-height: 100%;
+}
+.icon-svg {
+  display: flex;
+  align-items: center;
+  .svg-view {
+    margin-left: 16px;
+    width: 80px;
+    height: 80px;
+    border: solid 1px #ccc;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+  }
+}
+.icon-img {
+  display: flex;
+  align-items: center;
 }
 .image-item {
   display: flex;
