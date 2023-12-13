@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.13.0](///compare/v1.12.0...v1.13.0) (2023-12-13)
+
+
+### Features
+
+* 容器图标支持本地上传、URL、SVG三种形式 5fc35fe
+* 桌面端创建容器增加简单模式 375c27c
+* 桌面端新增更新镜像版本，修复一些bug，导航页优化 eb9f0b4
+
+
+### Bug Fixes
+
+* 修复创建多网络容器时IP异常问题，增加IP地址输入校验，桌面端创建容器表单代码优化 2fa6585
+
 ## [1.12.0](///compare/v1.11.1...v1.12.0) (2023-12-11)
 
 
