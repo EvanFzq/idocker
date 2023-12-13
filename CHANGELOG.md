@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.13.1](///compare/v1.13.0...v1.13.1) (2023-12-13)
+
+
+### Bug Fixes
+
+* 修复容器自身判断 95d6c38
+
 ## [1.13.0](///compare/v1.12.0...v1.13.0) (2023-12-13)
 
 
