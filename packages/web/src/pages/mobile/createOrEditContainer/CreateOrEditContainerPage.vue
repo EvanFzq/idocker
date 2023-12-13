@@ -188,7 +188,7 @@ onMounted(async () => {
       networks: networks,
       restart: restartPolicyName,
       runAffterCreated: true,
-      command: cmd?.map(item => (item.indexOf(' ') > 0 ? `"${item}"` : item))?.join(' ') || '',
+      command: cmd,
       envs,
       mounts:
         mounts?.map(item => ({

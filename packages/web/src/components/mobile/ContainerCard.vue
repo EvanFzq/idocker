@@ -161,6 +161,7 @@ import {
   ContainerStatusColor,
   ContainerStatusName,
 } from '@common/constants/enum';
+import { getIcon } from '@common/utils/utils';
 
 import { fileSizeFormat, timeLongFormat } from '@/utils/utils';
 import { activeContainer, updateContainerImage } from '@/apis/container';
@@ -194,18 +195,6 @@ const isPaused = computed(() => props.status === 'paused');
 const isExited = computed(() => props.status === 'exited');
 const isCreated = computed(() => props.status === 'created');
 const isRestarting = computed(() => props.status === 'restarting');
-
-const getIcon = (icon: string) => {
-  const index = icon.indexOf('|');
-  // 在前10个字符中寻找｜，存在则判断类型，否则默认为URL（兼容之前版本）
-  if (index > 0 && index < 10) {
-    const iconType = icon.slice(0, index);
-    const iconContent = icon.slice(index + 1);
-    return { type: iconType, content: iconContent };
-  } else {
-    return { type: 'url', content: icon };
-  }
-};
 
 const onActive = async (e: MouseEvent, type: ContainerActive) => {
   e.stopPropagation();

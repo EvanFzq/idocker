@@ -31,7 +31,7 @@
       />
       <van-cell
         title="CMD"
-        :value="data.cmd?.join(' ') || '-'"
+        :value="data.cmd || '-'"
       />
       <van-cell
         title="Entrypoint"

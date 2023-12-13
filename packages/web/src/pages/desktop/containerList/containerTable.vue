@@ -41,6 +41,16 @@
           }}
         </div>
       </template>
+      <template v-if="column.key === 'name'">
+        <div>
+          {{ record.name }}
+          <UpCircleOutlined
+            v-if="record.canUpdate"
+            style="color: #07c160"
+            @click="onUpdate(record.id)"
+          />
+        </div>
+      </template>
       <template v-if="column.key === 'status'">
         <a-tag :color="ContainerStatusColor[record.status]">
           {{ ContainerStatusName[record.status] }}
@@ -123,22 +133,52 @@
       </template>
       <template v-if="column.key === 'operate'">
         <a-space class="button-row">
-          <a-button
-            :icon="h(EyeOutlined)"
-            type="link"
-            size="small"
-            @click="onView(record.id)"
+          <a-tooltip
+            v-if="record.canUpdate"
+            title="更新镜像"
+            placement="top"
           >
-            详情
-          </a-button>
-          <a-button
-            :icon="h(EditOutlined)"
-            type="link"
-            size="small"
-            @click="onEdit(record.id)"
+            <a-button
+              :icon="h(UpCircleOutlined)"
+              type="link"
+              size="small"
+              @click="onUpdate(record.id)"
+            />
+          </a-tooltip>
+          <a-tooltip
+            title="日志"
+            placement="top"
           >
-            编辑
-          </a-button>
+            <a-button
+              :icon="h(FileTextOutlined)"
+              type="link"
+              size="small"
+              @click="onLog(record.id)"
+            />
+          </a-tooltip>
+          <a-tooltip
+            title="信息"
+            placement="top"
+          >
+            <a-button
+              :icon="h(InfoCircleOutlined)"
+              type="link"
+              size="small"
+              @click="onView(record.id)"
+            />
+          </a-tooltip>
+
+          <a-tooltip
+            title="编辑"
+            placement="top"
+          >
+            <a-button
+              :icon="h(EditOutlined)"
+              type="link"
+              size="small"
+              @click="onEdit(record.id)"
+            />
+          </a-tooltip>
         </a-space>
         <div class="button-row">
           <a-tooltip
@@ -146,7 +186,7 @@
               record.status === ContainerStatus.created || record.status === ContainerStatus.exited
             "
             title="启动"
-            placement="top"
+            placement="bottom"
           >
             <a-button
               class="button"
@@ -160,7 +200,7 @@
           <a-tooltip
             v-if="record.status === ContainerStatus.paused"
             title="恢复"
-            placement="top"
+            placement="bottom"
           >
             <a-button
               class="button"
@@ -174,7 +214,7 @@
           <a-tooltip
             v-if="record.status === ContainerStatus.running"
             title="暂停"
-            placement="top"
+            placement="bottom"
           >
             <a-button
               class="button"
@@ -189,7 +229,7 @@
           <a-tooltip
             v-if="record.status !== ContainerStatus.restarting"
             title="重启"
-            placement="top"
+            placement="bottom"
           >
             <a-button
               class="button"
@@ -206,7 +246,7 @@
               )
             "
             title="关闭"
-            placement="top"
+            placement="bottom"
           >
             <a-button
               class="button"
@@ -218,7 +258,7 @@
           </a-tooltip>
           <a-tooltip
             title="删除"
-            placement="top"
+            placement="bottom"
           >
             <a-button
               class="button"
@@ -240,7 +280,6 @@ import { h, ref } from 'vue';
 import { message, Modal } from 'ant-design-vue';
 import { useRouter } from 'vue-router';
 import {
-  EyeOutlined,
   EditOutlined,
   DeleteOutlined,
   PlayCircleOutlined,
@@ -248,6 +287,9 @@ import {
   PauseCircleOutlined,
   ReloadOutlined,
   StopOutlined,
+  UpCircleOutlined,
+  InfoCircleOutlined,
+  FileTextOutlined,
 } from '@ant-design/icons-vue';
 
 import type { ContainerDetail } from '@common/types/container';
@@ -257,8 +299,9 @@ import {
   ContainerStatus,
   ContainerActive,
 } from '@common/constants/enum';
+import { getIcon } from '@common/utils/utils';
 
-import { activeContainer } from '@/apis/container';
+import { activeContainer, updateContainerImage } from '@/apis/container';
 import { fileSizeFormat, timeLongFormat } from '@/utils/utils';
 
 import type { TableColumnProps } from 'ant-design-vue';
@@ -335,17 +378,7 @@ const tableWidth: number = (columns as { width: number }[]).reduce(
   (pre: number, cur: { width: number }) => pre + cur.width,
   0,
 );
-const getIcon = (icon: string) => {
-  const index = icon.indexOf('|');
-  // 在前10个字符中寻找｜，存在则判断类型，否则默认为URL（兼容之前版本）
-  if (index > 0 && index < 10) {
-    const iconType = icon.slice(0, index);
-    const iconContent = icon.slice(index + 1);
-    return { type: iconType, content: iconContent };
-  } else {
-    return { type: 'url', content: icon };
-  }
-};
+
 const handleActive = async (id: string, type: ContainerActive) => {
   activeLoadingId.value = id;
   const res = await activeContainer(id, type);
@@ -375,8 +408,24 @@ const onActive = async (id: string, type: ContainerActive) => {
 const onView = (id: string) => {
   router.push('/d/container/' + id);
 };
+const onLog = (id: string) => {
+  router.push(`/d/container/${id}?tab=logs`);
+};
 const onEdit = (id: string) => {
   router.push('/d/container/newOrEdit?id=' + id);
+};
+const onUpdate = (id: string) => {
+  Modal.confirm({
+    title: '确认更新容器镜像吗？',
+    content: '可能存在不兼容情况，请关注容器更新日志',
+    async onOk() {
+      const res = await updateContainerImage(id);
+      if (res.success) {
+        emit('reload');
+        message.success('更新成功');
+      }
+    },
+  });
 };
 </script>
 <style scoped lang="less">

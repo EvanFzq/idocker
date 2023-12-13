@@ -180,7 +180,7 @@ const getContainerData = async (id: string) => {
       })),
       restart: restartPolicyName,
       runAffterCreated: true,
-      command: cmd?.map(item => (item.indexOf(' ') > 0 ? `"${item}"` : item))?.join(' ') || '',
+      command: cmd,
       envs: envs.map(env => ({ envKey: env.key, envValue: env.value })),
       mounts:
         mounts?.map(item => ({
@@ -218,35 +218,11 @@ onMounted(async () => {
 
 const onSubmit = async () => {
   await formRef.value?.validate();
-  const {
-    image,
-    icon,
-    tag,
-    ports,
-    envs,
-    command,
-    name,
-    networks,
-    mounts,
-    restart,
-    runAffterCreated,
-    id,
-    hostname,
-    domainName,
-    extraHosts,
-  } = formData.value as FormData;
+  const { image, icon, tag, ports, envs, id, ...args } = formData.value as FormData;
   submitLoading.value = true;
   const { url, svg } = icon[0] || {};
   const params = {
-    command,
-    name,
-    networks,
-    mounts,
-    restart,
-    hostname,
-    domainName,
-    extraHosts,
-    runAffterCreated,
+    ...args,
     image: `${image}:${tag}`,
     icon: `${svg ? 'svg' : 'url'}|${svg ? svg : url}`,
     envs: envs.map(env => ({ key: env.envKey, value: env.envValue })),

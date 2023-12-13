@@ -35,3 +35,16 @@ export const webUrlTemplateFormat = (
 };
 
 export const sleep = (ms: number) => new Promise<void>(resolve => setTimeout(resolve, ms));
+
+export const getIcon = (icon?: string): { type: 'url' | 'svg'; content: string } => {
+  if (!icon) return { type: 'url', content: icon };
+  const index = icon.indexOf('|');
+  // 在前10个字符中寻找｜，存在则判断类型，否则默认为URL（兼容之前版本）
+  if (index > 0 && index < 10) {
+    const iconType = icon.slice(0, index);
+    const iconContent = icon.slice(index + 1);
+    return { type: iconType as 'url' | 'svg', content: iconContent };
+  } else {
+    return { type: 'url', content: icon };
+  }
+};

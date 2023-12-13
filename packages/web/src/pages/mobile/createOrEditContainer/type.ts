@@ -10,7 +10,7 @@ export interface ContainerFormData {
   image: string;
   networks: NetworkConfig[];
   runAffterCreated: boolean;
-  command: string;
+  command?: string;
   envs: Env[];
   mounts: MountConfig[];
   ports: PortConfig[];

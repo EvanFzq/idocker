@@ -273,7 +273,9 @@ export class ContainerService {
       canUpdate: await this.dockerService.imageCanUpdate(detail.Config.Image, detail.Image),
       restartPolicyName: detail.HostConfig.RestartPolicy?.Name,
       restartPolicyMaximumRetryCount: detail.HostConfig.RestartPolicy?.MaximumRetryCount,
-      cmd: detail.Config.Cmd,
+      cmd:
+        detail.Config.Cmd?.map(item => (item.indexOf(' ') > 0 ? `"${item}"` : item))?.join(' ') ||
+        '',
       entrypoint: detail.Config.Entrypoint,
       hostname: detail.Config.Hostname,
       domainName: detail.Config.Domainname,
@@ -459,7 +461,7 @@ export class ContainerService {
     const networkList = await this.networkService.getNetworkList();
     // 取消默认链接的none网络
     const noneNetworkId = networkList.find(item => item.Name === 'none')?.Id;
-    await this.networkService.removeContainerToNetwork(noneNetworkId, container.id);
+    await this.networkService.removeContainerToNetwork(noneNetworkId, nextContainer.id);
     if (networks.length > 0) {
       for (let i = 0; i < networks.length; i++) {
         const [name, config] = networks[i];

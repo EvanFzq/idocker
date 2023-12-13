@@ -112,7 +112,7 @@ export interface Env {
 export interface ContainerDetail extends ContainerListItem {
   restartPolicyName: string;
   restartPolicyMaximumRetryCount: number;
-  cmd?: string[];
+  cmd?: string;
   entrypoint?: string | string[];
   mounts?: Mount[];
   ports?: Port[];

@@ -82,7 +82,7 @@ const wrapperCol = { style: { width: '210px' } };
 
 const props = defineProps<{ defaultValue: FilterData }>();
 
-const filter = ref(props.defaultValue);
+const filter = ref({ ...props.defaultValue });
 
 const imageList = ref<{ name: string; id: string }[]>([]);
 const networkList = ref<{ name: string }[]>([]);

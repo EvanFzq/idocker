@@ -36,7 +36,7 @@
         {{ detail.created ? dayjs(detail.created).format('YYYY-MM-DD HH:mm:ss') : '-' }}
       </a-descriptions-item>
       <a-descriptions-item label="CMD">
-        {{ detail.cmd?.join(' ') || '-' }}
+        {{ detail.cmd || '-' }}
       </a-descriptions-item>
       <a-descriptions-item label="Entrypoint">
         {{ Array.isArray(detail.entrypoint) ? detail.entrypoint?.join(' ') : detail.entrypoint }}
@@ -64,16 +64,24 @@
       </a-descriptions-item>
     </a-descriptions>
     <a-descriptions
-      title="挂载信息"
+      title="网络信息"
       bordered
       class="block"
     />
     <a-table
-      :data-source="detail.mounts"
-      :columns="mountColumns"
+      :data-source="detail.networks"
+      :columns="networkColumns"
       style="width: 100%"
       :pagination="false"
-    />
+    >
+      <template #emptyText>
+        <a-empty
+          :image="Empty.PRESENTED_IMAGE_SIMPLE"
+          style="margin: 0"
+          description="未配置网络信息"
+        />
+      </template>
+    </a-table>
     <a-descriptions
       title="端口信息"
       bordered
@@ -92,18 +100,35 @@
         </div>
       </a-descriptions-item>
     </a-descriptions>
-    <a-empty v-if="!detail.ports || detail.ports.length === 0" />
+    <div
+      v-if="!detail.ports || detail.ports.length === 0"
+      style="background-color: #fff; padding: 12px 0 1px"
+    >
+      <a-empty
+        :image="Empty.PRESENTED_IMAGE_SIMPLE"
+        style="margin: 0"
+        description="未配置端口信息"
+      />
+    </div>
     <a-descriptions
-      title="网络信息"
+      title="挂载信息"
       bordered
       class="block"
     />
     <a-table
-      :data-source="detail.networks"
-      :columns="networkColumns"
+      :data-source="detail.mounts"
+      :columns="mountColumns"
       style="width: 100%"
       :pagination="false"
-    />
+    >
+      <template #emptyText>
+        <a-empty
+          :image="Empty.PRESENTED_IMAGE_SIMPLE"
+          style="margin: 0"
+          description="未配置挂载信息"
+        />
+      </template>
+    </a-table>
     <a-descriptions
       title="环境变量"
       bordered
@@ -119,11 +144,21 @@
         <div style="word-break: break-all"> {{ env.value }}</div>
       </a-descriptions-item>
     </a-descriptions>
+    <div
+      v-if="!detail.envs || detail.envs.length === 0"
+      style="background-color: #fff; padding: 12px 0 1px"
+    >
+      <a-empty
+        :image="Empty.PRESENTED_IMAGE_SIMPLE"
+        style="margin: 0"
+        description="未配置环境变量"
+      />
+    </div>
   </div>
 </template>
 <script setup lang="ts">
 import dayjs from 'dayjs';
-import { Spin } from 'ant-design-vue';
+import { Spin, Empty } from 'ant-design-vue';
 
 import type { ContainerDetail, Mount, Network } from '@common/types/container';
 import { restartPolicyList } from '@common/constants/const';

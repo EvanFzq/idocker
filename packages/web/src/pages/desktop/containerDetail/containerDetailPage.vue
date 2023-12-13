@@ -61,7 +61,7 @@ import ContainerLogs from './containerLogs.vue';
 
 const route = useRoute();
 const router = useRouter();
-const activeTab = ref('info');
+const activeTab = ref(route.query.tab || 'info');
 const detail = ref<ContainerDetail | null>(null);
 const id = computed(() => route.params.id as string);
 
