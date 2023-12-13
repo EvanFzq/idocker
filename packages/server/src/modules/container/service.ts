@@ -269,7 +269,7 @@ export class ContainerService {
         null,
       localUrl: detail.Config.Labels['docker.idocker.localUrl'] || null,
       internetUrl: detail.Config.Labels['docker.idocker.internetUrl'] || null,
-      isSelf: this.dockerService.currentContainerId === detail.Id,
+      isSelf: detail.Id.startsWith(this.dockerService.currentContainerId),
       canUpdate: await this.dockerService.imageCanUpdate(detail.Config.Image, detail.Image),
       restartPolicyName: detail.HostConfig.RestartPolicy?.Name,
       restartPolicyMaximumRetryCount: detail.HostConfig.RestartPolicy?.MaximumRetryCount,
