@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.13.2](///compare/v1.13.1...v1.13.2) (2023-12-14)
+
+
+### Bug Fixes
+
+* 修复时区导致的登录失败、桌面端面板指示条显示异常 cbdf8a0
+
 ### [1.13.1](///compare/v1.13.0...v1.13.1) (2023-12-13)
 
 
