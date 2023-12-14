@@ -22,6 +22,7 @@ import {
   UserOutlined,
   NotificationOutlined,
   ContainerOutlined,
+  TrophyOutlined,
 } from '@ant-design/icons-vue';
 import { useRouter, useRoute } from 'vue-router';
 import { ref, h } from 'vue';
@@ -79,6 +80,12 @@ const items = ref([
         key: '/d/setting/notice',
         label: '通知',
         title: '通知',
+      },
+      {
+        icon: () => h(TrophyOutlined),
+        key: '/about',
+        label: '关于',
+        title: '关于',
       },
     ],
   },

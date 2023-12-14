@@ -227,7 +227,7 @@ const onSubmit = async (values: Record<string, string | number | boolean>) => {
     Array.isArray(values.icon) && values.icon.length > 0
       ? values.icon[0].url
       : values['icon[0].url'] || values['icon[0].svg'];
-  const icon = `${values['icon[0].svg'] ? 'svg' : 'url'}|${iconContent}`;
+  const icon = iconContent ? `${values['icon[0].svg'] ? 'svg' : 'url'}|${iconContent}` : '';
   delete values['icon[0].url'];
   delete values['icon[0].svg'];
   const params: CreateContainerParams = {} as CreateContainerParams;

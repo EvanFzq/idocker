@@ -15,7 +15,7 @@ import { isMobile } from '@/utils/utils';
 
 const router = useRouter();
 // 判断显示页面类型 ，白名单路径不做处理
-const whitelist = ['/apps/local', '/apps/internet'];
+const whitelist = ['/apps/local', '/apps/internet', '/about'];
 if (!whitelist.includes(location.pathname)) {
   if (
     (isMobile() && !location.pathname.startsWith('/m')) ||
@@ -30,7 +30,7 @@ if (!whitelist.includes(location.pathname)) {
 </script>
 <style scoped>
 .page {
-  height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
 }

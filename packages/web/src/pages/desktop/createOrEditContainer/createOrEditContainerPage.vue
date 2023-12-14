@@ -224,7 +224,7 @@ const onSubmit = async () => {
   const params = {
     ...args,
     image: `${image}:${tag}`,
-    icon: `${svg ? 'svg' : 'url'}|${svg ? svg : url}`,
+    icon: url || svg ? `${svg ? 'svg' : 'url'}|${svg ? svg : url}` : '',
     envs: envs.map(env => ({ key: env.envKey, value: env.envValue })),
     ports: ports.map(port => ({
       host: port.host.toString(),

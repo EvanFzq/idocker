@@ -6,6 +6,10 @@ export const routes = [
   { path: '/apps/local', component: AppsPage },
   { path: '/apps/internet', component: AppsPage },
   {
+    path: '/about',
+    component: () => import('@/pages/common/about/aboutPage.vue'),
+  },
+  {
     path: '/m',
     component: MobilePage,
     children: [
@@ -93,6 +97,7 @@ export const routes = [
         path: '/d/setting/notice',
         component: () => import('@/pages/desktop/setting/notice/noticeSettingPage.vue'),
       },
+
       { path: '/d/:error*', component: () => import('@/pages/desktop/error404/ErrerPage.vue') },
     ],
   },

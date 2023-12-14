@@ -55,6 +55,11 @@ SettingTab
         is-link
         to="/m/notice/setting"
       />
+      <van-cell
+        title="关于"
+        is-link
+        to="/about"
+      />
     </van-cell-group>
     <div class="btns">
       <van-button
