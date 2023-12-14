@@ -60,7 +60,7 @@ export class DockerService {
     );
     this.docker = new Docker({ socketPath: '/var/run/docker.sock' });
     try {
-      this.currentContainerId = execSync('hostname', { timeout: 1000, encoding: 'utf-8' });
+      this.currentContainerId = execSync('hostname', { timeout: 1000, encoding: 'utf-8' }).trim();
       console.info(this.currentContainerId);
     } catch (error) {
       console.error('获取容器本身ID失败，', error);

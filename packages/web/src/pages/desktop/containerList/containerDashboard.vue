@@ -15,7 +15,7 @@
     <div class="dashboard-item">
       <a-progress
         type="dashboard"
-        :percent="totalData.memoryUsage / totalData.memoryLimit"
+        :percent="(totalData.memoryUsage * 100) / totalData.memoryLimit"
       >
         <template #format>
           <div class="percentage-value">
