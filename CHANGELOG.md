@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.14.0](///compare/v1.13.2...v1.14.0) (2023-12-15)
+
+
+### Features
+
+* 新增关于页面，修改图标异常，修复移动端页面滚动异常 f84876a
+* 新增桌面端容器终端功能 8a391a4
+
 ### [1.13.2](///compare/v1.13.1...v1.13.2) (2023-12-14)
 
 
