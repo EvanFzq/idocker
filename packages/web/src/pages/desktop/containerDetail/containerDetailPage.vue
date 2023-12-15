@@ -41,6 +41,12 @@
         >
           <ContainerLogs :id="id" />
         </a-tab-pane>
+        <a-tab-pane
+          key="termianl"
+          tab="终端"
+        >
+          <ContainerTermianl :id="id" />
+        </a-tab-pane>
       </a-tabs>
     </div>
   </PageLayout>
@@ -58,6 +64,7 @@ import PageLayout from '@/components/desktop/PageLayout.vue';
 
 import ContainerInfo from './containerInfo.vue';
 import ContainerLogs from './containerLogs.vue';
+import ContainerTermianl from './containerTermianl.vue';
 
 const route = useRoute();
 const router = useRouter();

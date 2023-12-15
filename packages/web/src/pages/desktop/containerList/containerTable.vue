@@ -157,6 +157,17 @@
             />
           </a-tooltip>
           <a-tooltip
+            title="终端"
+            placement="top"
+          >
+            <a-button
+              :icon="h(CodeOutlined)"
+              type="link"
+              size="small"
+              @click="onTermianl(record.id)"
+            />
+          </a-tooltip>
+          <a-tooltip
             title="信息"
             placement="top"
           >
@@ -290,6 +301,7 @@ import {
   UpCircleOutlined,
   InfoCircleOutlined,
   FileTextOutlined,
+  CodeOutlined,
 } from '@ant-design/icons-vue';
 
 import type { ContainerDetail } from '@common/types/container';
@@ -410,6 +422,9 @@ const onView = (id: string) => {
 };
 const onLog = (id: string) => {
   router.push(`/d/container/${id}?tab=logs`);
+};
+const onTermianl = (id: string) => {
+  router.push(`/d/container/${id}?tab=termianl`);
 };
 const onEdit = (id: string) => {
   router.push('/d/container/newOrEdit?id=' + id);
