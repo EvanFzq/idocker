@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.14.1](///compare/v1.14.0...v1.14.1) (2023-12-16)
+
+
+### Bug Fixes
+
+* 修复桌面端导航页切换环境异常 b3137f3
+
 ## [1.14.0](///compare/v1.13.2...v1.14.0) (2023-12-15)
 
 
