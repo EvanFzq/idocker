@@ -26,7 +26,7 @@
         </a-button>
       </a-space>
     </template>
-    <AppsPage />
+    <AppsPage :is-local="isLocal" />
   </PageLayout>
 </template>
 <script setup lang="ts">
