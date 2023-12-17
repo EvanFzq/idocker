@@ -15,20 +15,25 @@
           v-model="mount.type"
           direction="horizontal"
         >
-          <van-radio name="bind"> 路径 </van-radio>
-          <van-radio name="volume"> 数据卷 </van-radio>
+          <van-radio
+            v-for="item in MountTypeList"
+            :key="item.value"
+            :name="item.value"
+          >
+            {{ item.label }}
+          </van-radio>
         </van-radio-group>
       </template>
     </van-field>
 
     <van-field
-      v-if="mount.type === 'bind'"
+      v-if="['bind', 'device'].includes(mount.type)"
       v-model="mount.hostBind"
       :name="'mounts[' + index + '].hostBind'"
-      label="主机路径"
-      placeholder="请输入主机路径"
+      label="主机(设备)路径"
+      placeholder="请输入主机(设备)路径"
       required
-      :rules="[{ required: true, message: '请输入主机路径' }]"
+      :rules="[{ required: true, message: '请输入主机(设备)路径' }]"
     />
     <van-field
       v-if="mount.type === 'volume'"
@@ -94,6 +99,7 @@
 import { ref, onMounted, watch } from 'vue';
 
 import type { MountConfig } from '@common/types/container';
+import { MountTypeList } from '@common/constants/enum';
 
 import { getVolumeList } from '@/apis/volume';
 

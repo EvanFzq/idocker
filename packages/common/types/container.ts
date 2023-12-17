@@ -9,7 +9,7 @@ export interface ContainerStats {
 }
 
 export interface MountConfig {
-  type: 'bind' | 'volume';
+  type: 'bind' | 'volume' | 'device';
   hostBind?: string;
   volume?: string;
   container: string;
@@ -51,6 +51,11 @@ export interface CreateContainerParams {
   ports: NewPort[];
   mounts: NewMount[];
   envs: NewEnv[];
+  privileged?: boolean;
+  capAdd?: string[];
+  capDrop?: string[];
+  memory?: number;
+  nanoCpus?: number;
 }
 
 export type UpdateContainerParams = CreateContainerParams & { id: string };
@@ -82,7 +87,7 @@ export interface ContainerListItem {
 }
 
 export interface Mount {
-  type: 'volume' | 'bind' | 'tmpfs';
+  type: 'volume' | 'bind' | 'tmpfs' | 'device';
   source: string;
   target: string;
   rw: boolean;
@@ -122,4 +127,9 @@ export interface ContainerDetail extends ContainerListItem {
   exposedPorts?: Pick<Port, 'hostPort' | 'protocol'>[];
   networks: Network[];
   envs: Env[];
+  privileged?: boolean;
+  capAdd?: string[];
+  capDrop?: string[];
+  memory?: number;
+  nanoCpus?: number;
 }

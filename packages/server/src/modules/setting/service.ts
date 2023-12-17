@@ -141,4 +141,29 @@ export class SettingService {
       this.configService.setUserConfig('noticeEvents', data.events);
     }
   }
+  async getSystemInfo() {
+    const data = await this.dockerService.docker.info();
+    return {
+      containers: data.Containers,
+      containersRunning: data.ContainersRunning,
+      containersPaused: data.ContainersPaused,
+      containersStopped: data.ContainersStopped,
+      images: data.Images,
+      kernelVersion: data.KernelVersion,
+      operatingSystem: data.OperatingSystem,
+      oSType: data.OSType,
+      architecture: data.Architecture,
+      nCPU: data.NCPU,
+      memTotal: data.MemTotal,
+      indexServerAddress: data.IndexServerAddress,
+      registryConfig: data.RegistryConfig,
+      httpProxy: data.HttpProxy,
+      httpsProxy: data.HttpsProxy,
+      noProxy: data.NoProxy,
+      name: data.Name,
+      serverVersion: data.ServerVersion,
+      runtimes: data.Runtimes,
+      defaultRuntime: data.DefaultRuntime,
+    };
+  }
 }

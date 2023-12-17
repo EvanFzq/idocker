@@ -8,6 +8,7 @@ import {
   IsInt,
   IsIP,
   IsMACAddress,
+  IsNumber,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -80,7 +81,7 @@ export class NewPort {
 
 export class NewMount {
   @IsEnum(MountType)
-  type: 'bind' | 'volume';
+  type: 'bind' | 'volume' | 'device';
 
   @IsString()
   @IsOptional()
@@ -185,6 +186,26 @@ export class CreateContainerDto {
   @IsString()
   @IsOptional()
   internetUrl?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  privileged?: boolean;
+
+  @IsString({ each: true })
+  @IsOptional()
+  capAdd?: string[];
+
+  @IsString({ each: true })
+  @IsOptional()
+  capDrop?: string[];
+
+  @IsNumber()
+  @IsOptional()
+  memory?: number;
+
+  @IsNumber()
+  @IsOptional()
+  nanoCpus?: number;
 }
 
 export class UpdateContainerDto extends CreateContainerDto {

@@ -21,4 +21,9 @@ export interface FormData {
   restart: string;
   localUrl?: string;
   internetUrl?: string;
+  privileged?: boolean;
+  capAdd?: string[];
+  capDrop?: string[];
+  memory?: number;
+  nanoCpus?: number;
 }

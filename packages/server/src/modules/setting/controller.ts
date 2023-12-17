@@ -1,6 +1,6 @@
 import { Controller, Post, Body, Put, Req } from '@nestjs/common';
 
-import { AppInfo, UserInfo, NoticeInfo } from '@common/types/setting';
+import { AppInfo, UserInfo, NoticeInfo, SystemInfo } from '@common/types/setting';
 
 import { wallpaperDir } from '@/constants/fs';
 import { mkdir } from '@/utils/fs';
@@ -58,5 +58,9 @@ export class SettingController {
   @Put('notice')
   async updateNoticeSetting(@Body() body: UpdateNoticeInfoDto): Promise<void> {
     return this.settingService.updateNoticeSetting(body);
+  }
+  @Post('system/info')
+  async getSystemInfo(): Promise<SystemInfo> {
+    return this.settingService.getSystemInfo();
   }
 }

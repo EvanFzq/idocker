@@ -113,7 +113,9 @@
           :key="index"
           class="mount"
         >
-          <span class="type">{{ mount.type == 'bind' ? '路径' : '卷' }}</span>
+          <span class="type">{{
+            MountTypeList.find(item => item.value === mount.type)?.label
+          }}</span>
           <span> : </span>
           <span>
             {{ mount.type === 'bind' ? mount.source : mount.source.slice(0, 8) }} ->
@@ -310,6 +312,7 @@ import {
   ContainerStatusColor,
   ContainerStatus,
   ContainerActive,
+  MountTypeList,
 } from '@common/constants/enum';
 import { getIcon } from '@common/utils/utils';
 

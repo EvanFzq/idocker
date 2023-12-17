@@ -194,7 +194,7 @@ onMounted(async () => {
         mounts?.map(item => ({
           type: item.type as 'bind' | 'volume',
           container: item.target,
-          hostBind: item.type === 'bind' ? item.source : undefined,
+          hostBind: ['bind', 'device'].includes(item.type as string) ? item.source : undefined,
           volume: item.type === 'volume' ? item.source : undefined,
           readonly: !item.rw,
         })) || [],

@@ -13,7 +13,7 @@
       title="基础信息"
       bordered
       :content-style="{ background: '#fff' }"
-      :label-style="{ background: '#f5f7fa' }"
+      :label-style="{ background: '#f5f7fa', width: '150px' }"
     >
       <a-descriptions-item label="ID">
         {{ detail.id.slice(0, 16) }}
@@ -87,13 +87,12 @@
       bordered
       class="block"
       :content-style="{ background: '#fff' }"
-      :label-style="{ background: '#f5f7fa' }"
+      :label-style="{ background: '#f5f7fa', width: '150px' }"
     >
       <a-descriptions-item
         v-for="(port, index) in detail.ports"
         :key="index"
         :label="'端口' + (index + 1)"
-        width="15%"
       >
         <div style="word-break: break-all">
           {{ port.hostPort }}（主机） -> {{ port.containerPort }}（容器） / {{ port.protocol }}
@@ -134,7 +133,7 @@
       bordered
       class="block"
       :content-style="{ background: '#fff' }"
-      :label-style="{ background: '#f5f7fa', maxWidth: '240px', wordBreak: 'break-all' }"
+      :label-style="{ background: '#f5f7fa', width: '150px', wordBreak: 'break-all' }"
     >
       <a-descriptions-item
         v-for="(env, index) in detail.envs"
@@ -154,6 +153,51 @@
         description="未配置环境变量"
       />
     </div>
+    <a-descriptions
+      title="能力配置"
+      bordered
+      class="block"
+      :content-style="{ background: '#fff' }"
+      :label-style="{ background: '#f5f7fa', width: '120px' }"
+    >
+      <a-descriptions-item label="特权模式">
+        {{ detail.privileged ? '是' : '否' }}
+      </a-descriptions-item>
+      <a-descriptions-item label="CPU限制">
+        {{ detail.nanoCpus !== undefined ? `${detail.nanoCpus}x` : '无限制' }}
+      </a-descriptions-item>
+      <a-descriptions-item label="内存限制">
+        {{
+          detail.memory === undefined
+            ? '无限制'
+            : detail.memory > 1024
+              ? (detail.memory / 1024).toFixed(1) + 'GB'
+              : detail.memory + 'MB'
+        }}
+      </a-descriptions-item>
+      <a-descriptions-item label="启用能力">
+        <div v-if="!detail.capAdd">默认值</div>
+        <a-tag
+          v-for="item in detail.capAdd"
+          :key="item"
+          color="success"
+          style="margin-bottom: 12px"
+        >
+          {{ item }}
+        </a-tag>
+      </a-descriptions-item>
+      <a-descriptions-item label="禁用能力">
+        <div v-if="!detail.capAdd">默认值</div>
+        <a-tag
+          v-for="item in detail.capDrop"
+          :key="item"
+          color="error"
+          style="margin-bottom: 12px"
+        >
+          {{ item }}
+        </a-tag>
+      </a-descriptions-item>
+    </a-descriptions>
   </div>
 </template>
 <script setup lang="ts">
@@ -162,6 +206,7 @@ import { Spin, Empty } from 'ant-design-vue';
 
 import type { ContainerDetail, Mount, Network } from '@common/types/container';
 import { restartPolicyList } from '@common/constants/const';
+import { MountTypeList } from '@common/constants/enum';
 
 import type { TableColumnProps } from 'ant-design-vue';
 
@@ -178,7 +223,7 @@ const mountColumns: TableColumnProps<Mount>[] = [
     key: 'type',
     dataIndex: 'type',
     title: '类型',
-    customRender: ({ value }) => (value === 'bind' ? '路径' : '卷'),
+    customRender: ({ value }) => MountTypeList.find(item => item.value === value)?.label,
   },
   {
     key: 'source',

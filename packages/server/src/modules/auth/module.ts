@@ -19,11 +19,10 @@ import { AuthController } from './controller';
       inject: [ConfigService],
       async useFactory(configService: ConfigService) {
         const secret: string = configService.getSystemConfig('secret', uuidV4());
-
         return {
           secret,
           signOptions: {
-            expiresIn: '36000s',
+            expiresIn: 24 * 60 * 60 + 's',
           },
         };
       },

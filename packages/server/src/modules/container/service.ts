@@ -34,6 +34,22 @@ export class ContainerService {
         portBindings[`${port.container}/${port.protocol}`].push({ HostPort: port.host });
       }
     });
+    const devices = params.mounts
+      .filter(item => item.type === 'device')
+      .map(item => ({
+        PathOnHost: item.hostBind,
+        PathInContainer: item.container,
+        CgroupPermissions: item.readonly ? 'r' : 'rwm',
+      }));
+    const mounts = params.mounts
+      .filter(item => item.type !== 'device')
+      ?.map(mount => ({
+        Target: mount.container,
+        Source: mount.type === 'bind' ? mount.hostBind : mount.volume,
+        Type: mount.type as 'bind' | 'volume',
+        ReadOnly: mount.readonly,
+      }));
+
     const container = await this.dockerService.docker.createContainer({
       name: params.name,
       Labels: {
@@ -54,12 +70,13 @@ export class ContainerService {
           Name: params.restart,
           MaximumRetryCount: params.restart === RestartPolicy.OnFailure ? 5 : undefined,
         },
-        Mounts: params.mounts?.map(mount => ({
-          Target: mount.container,
-          Source: mount.type === 'bind' ? mount.hostBind : mount.volume,
-          Type: mount.type,
-          ReadOnly: mount.readonly,
-        })),
+        Devices: devices,
+        Mounts: mounts,
+        Privileged: params.privileged,
+        CapAdd: params.capAdd,
+        CapDrop: params.capDrop,
+        Memory: params.memory ? params.memory * 1024 * 1024 : undefined,
+        NanoCpus: params.nanoCpus ? params.nanoCpus * 10 ** 9 : undefined,
       },
     });
 
@@ -124,6 +141,21 @@ export class ContainerService {
       }
     });
     const imageTag = params.image.indexOf(':') > 0 ? params.image : params.image + ':latest';
+    const devices = params.mounts
+      .filter(item => item.type === 'device')
+      .map(item => ({
+        PathOnHost: item.hostBind,
+        PathInContainer: item.container,
+        CgroupPermissions: item.readonly ? 'r' : 'rwm',
+      }));
+    const mounts = params.mounts
+      .filter(item => item.type !== 'device')
+      ?.map(mount => ({
+        Target: mount.container,
+        Source: mount.type === 'bind' ? mount.hostBind : mount.volume,
+        Type: mount.type as 'bind' | 'volume',
+        ReadOnly: mount.readonly,
+      }));
     const nextContainer = await this.dockerService.docker.createContainer({
       name: params.name,
       AttachStdin: containerDetail.Config.AttachStdin,
@@ -149,11 +181,9 @@ export class ContainerService {
       Domainname: params.domainName,
       HostConfig: {
         Links: containerDetail.HostConfig.Links,
-        Memory: containerDetail.HostConfig.Memory,
         MemorySwap: containerDetail.HostConfig.MemorySwap,
         MemoryReservation: containerDetail.HostConfig.MemoryReservation,
         KernelMemory: containerDetail.HostConfig.KernelMemory,
-        NanoCpus: containerDetail.HostConfig.NanoCpus,
         CpuPercent: containerDetail.HostConfig.CpuPercent,
         CpuShares: containerDetail.HostConfig.CpuShares,
         CpuPeriod: containerDetail.HostConfig.CpuPeriod,
@@ -170,12 +200,22 @@ export class ContainerService {
           Name: params.restart,
           MaximumRetryCount: params.restart === RestartPolicy.OnFailure ? 5 : undefined,
         },
-        Mounts: params.mounts?.map(mount => ({
-          Target: mount.container,
-          Source: mount.type === 'bind' ? mount.hostBind : mount.volume,
-          Type: mount.type,
-          ReadOnly: mount.readonly,
-        })),
+        Devices: devices,
+        Mounts: mounts,
+        Privileged:
+          params.privileged !== undefined
+            ? params.privileged
+            : containerDetail.HostConfig.Privileged,
+        CapAdd: params.capAdd !== undefined ? params.capAdd : containerDetail.HostConfig.CapAdd,
+        CapDrop: params.capDrop !== undefined ? params.capDrop : containerDetail.HostConfig.CapDrop,
+        Memory:
+          params.memory !== undefined
+            ? params.memory * 1024 * 1024
+            : containerDetail.HostConfig.Memory,
+        NanoCpus:
+          params.nanoCpus !== undefined
+            ? params.nanoCpus * 10 ** 9
+            : containerDetail.HostConfig.NanoCpus,
       },
     });
     // 链接网络
@@ -254,6 +294,7 @@ export class ContainerService {
         },
       );
     }
+
     return {
       id: detail.Id,
       name: detail.Name.slice(1),
@@ -291,12 +332,21 @@ export class ContainerService {
           RW: boolean;
           Propagation: string;
         }[]
-      )?.map(item => ({
-        type: item.Type,
-        source: item.Type === 'bind' ? item.Source : item.Name,
-        target: item.Destination,
-        rw: item.RW,
-      })),
+      )
+        ?.map(item => ({
+          type: item.Type,
+          source: item.Type === 'bind' ? item.Source : item.Name,
+          target: item.Destination,
+          rw: item.RW,
+        }))
+        .concat(
+          detail.HostConfig.Devices?.map(device => ({
+            type: 'device',
+            source: device.PathOnHost,
+            target: device.PathInContainer,
+            rw: device.CgroupPermissions !== 'r',
+          })) || [],
+        ),
       ports,
       exposedPorts: detail.Config.ExposedPorts
         ? Object.keys(detail.Config.ExposedPorts).map(key => {
@@ -321,6 +371,15 @@ export class ContainerService {
         const [key, value] = item.split('=');
         return { key, value };
       }),
+      privileged: detail.HostConfig.Privileged,
+      capAdd: detail.HostConfig.CapAdd,
+      capDrop: detail.HostConfig.CapDrop,
+      memory: detail.HostConfig.Memory
+        ? Math.floor(detail.HostConfig.Memory / (1024 * 1024))
+        : undefined,
+      nanoCpus: detail.HostConfig.NanoCpus
+        ? Math.floor(detail.HostConfig.NanoCpus / 10 ** 9)
+        : undefined,
     };
   }
 

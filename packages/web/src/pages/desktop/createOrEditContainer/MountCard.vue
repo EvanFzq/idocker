@@ -31,16 +31,13 @@
               v-model:value="record.type"
               placeholder="请选择"
               style="width: 100%"
-              :options="[
-                { label: '路径', value: 'bind' },
-                { label: '卷', value: 'volume' },
-              ]"
+              :options="MountTypeList"
             />
           </a-form-item>
         </template>
         <template v-if="column.key === 'host'">
           <a-form-item
-            v-if="record.type === 'bind'"
+            v-if="['bind', 'device'].includes(record.type)"
             label-width="0"
             :name="['mounts', index, 'hostBind']"
             :rules="[{ required: true, message: '请输入' }]"
@@ -119,6 +116,7 @@ import { ref, onMounted, h, watch } from 'vue';
 import { PlusOutlined } from '@ant-design/icons-vue';
 
 import type { Volume } from '@common/types/volume';
+import { MountTypeList } from '@common/constants/enum';
 
 import CreateVolumeModal from '@/components/desktop/CreateVolumeModal.vue';
 import { getVolumeList } from '@/apis';

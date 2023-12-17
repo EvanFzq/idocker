@@ -78,7 +78,22 @@ export enum PortType {
 export enum MountType {
   Bind = 'bind',
   Volume = 'volume',
+  Device = 'device',
 }
+export const MountTypeList = [
+  {
+    label: '路径',
+    value: MountType.Bind,
+  },
+  {
+    label: '卷',
+    value: MountType.Volume,
+  },
+  {
+    label: '设备',
+    value: MountType.Device,
+  },
+];
 
 export enum ImageFit {
   Cover = 'cover',
@@ -202,3 +217,60 @@ export const EventTypeActions: Record<string, string[]> = {
   ],
   [EventType.Daemon]: [EventAction.Reload],
 };
+
+export const Capability = {
+  AUDIT_CONTROL: 'AUDIT_CONTROL',
+  AUDIT_WRITE: 'AUDIT_WRITE',
+  BLOCK_SUSPEND: 'BLOCK_SUSPEND',
+  CHOWN: 'CHOWN',
+  DAC_OVERRIDE: 'DAC_OVERRIDE',
+  DAC_READ_SEARCH: 'DAC_READ_SEARCH',
+  FOWNER: 'FOWNER',
+  FSETID: 'FSETID',
+  IPC_LOCK: 'IPC_LOCK',
+  IPC_OWNER: 'IPC_OWNER',
+  KILL: 'KILL',
+  LEASE: 'LEASE',
+  LINUX_IMMUTABLE: 'LINUX_IMMUTABLE',
+  MAC_ADMIN: 'MAC_ADMIN',
+  MAC_OVERRIDE: 'MAC_OVERRIDE',
+  MKNOD: 'MKNOD',
+  NET_ADMIN: 'NET_ADMIN',
+  NET_BIND_SERVICE: 'NET_BIND_SERVICE',
+  NET_BROADCAST: 'NET_BROADCAST',
+  NET_RAW: 'NET_RAW',
+  SETFCAP: 'SETFCAP',
+  SETGID: 'SETGID',
+  SETPCAP: 'SETPCAP',
+  SETUID: 'SETUID',
+  SYSLOG: 'SYSLOG',
+  SYS_ADMIN: 'SYS_ADMIN',
+  SYS_BOOT: 'SYS_BOOT',
+  SYS_CHROOT: 'SYS_CHROOT',
+  SYS_MODULE: 'SYS_MODULE',
+  SYS_NICE: 'SYS_NICE',
+  SYS_PACCT: 'SYS_PACCT',
+  SYS_PTRACE: 'SYS_PTRACE',
+  SYS_RAWIO: 'SYS_RAWIO',
+  SYS_RESOURCE: 'SYS_RESOURCE',
+  SYS_TIME: 'SYS_TIME',
+  SYS_TTY_CONFIG: 'SYS_TTY_CONFIG',
+  WAKE_ALARM: 'WAKE_ALARM',
+};
+
+export const defaultCapability = [
+  Capability.AUDIT_WRITE,
+  Capability.CHOWN,
+  Capability.DAC_OVERRIDE,
+  Capability.FOWNER,
+  Capability.FSETID,
+  Capability.KILL,
+  Capability.MKNOD,
+  Capability.SETGID,
+  Capability.SYS_CHROOT,
+  Capability.NET_RAW,
+  Capability.SETFCAP,
+  Capability.NET_BIND_SERVICE,
+  Capability.SETPCAP,
+  Capability.SETUID,
+];

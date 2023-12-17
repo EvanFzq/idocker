@@ -58,6 +58,11 @@
           :form-data="formData"
           @value-change="onFieldChange"
         />
+        <CapabilityCard
+          v-if="mode === 'advanced'"
+          :form-data="formData"
+          @value-change="onFieldChange"
+        />
       </a-form>
     </div>
   </PageLayout>
@@ -68,6 +73,7 @@ import { useRoute, useRouter } from 'vue-router';
 import { message } from 'ant-design-vue';
 
 import type { Network } from '@common/types/network';
+import { defaultCapability, Capability } from '@common/constants/enum';
 
 import PageLayout from '@/components/desktop/PageLayout.vue';
 import { getContainerDetail, updateContainer, createContainer, getNetworkList } from '@/apis';
@@ -77,6 +83,7 @@ import NetworkCard from './NetworkCard.vue';
 import PortCard from './PortCard.vue';
 import MountCard from './MountCard.vue';
 import EnvCard from './EnvCard.vue';
+import CapabilityCard from './CapabilityCard.vue';
 import type { FormData } from './type';
 import type { FormInstance } from 'ant-design-vue';
 
@@ -106,6 +113,11 @@ const formData = ref<FormData>({
   restart: 'no',
   localUrl: '',
   internetUrl: '',
+  privileged: false,
+  capAdd: defaultCapability,
+  capDrop: Object.keys(Capability).filter(capability => !defaultCapability.includes(capability)),
+  memory: undefined,
+  nanoCpus: undefined,
 });
 
 const onFieldChange = (value: FormData) => {
@@ -133,6 +145,11 @@ const getContainerData = async (id: string) => {
       hostname,
       domainName,
       extraHosts,
+      privileged,
+      capAdd,
+      capDrop,
+      memory,
+      nanoCpus,
     } = res.data;
     // 处理icon
     const iconList = [];
@@ -186,7 +203,7 @@ const getContainerData = async (id: string) => {
         mounts?.map(item => ({
           type: item.type as 'bind' | 'volume',
           container: item.target,
-          hostBind: item.type === 'bind' ? item.source : undefined,
+          hostBind: ['bind', 'device'].includes(item.type as string) ? item.source : undefined,
           volume: item.type === 'volume' ? item.source : undefined,
           readonly: !item.rw,
         })) || [],
@@ -199,6 +216,13 @@ const getContainerData = async (id: string) => {
       icon: iconList,
       localUrl: localUrl || '',
       internetUrl: internetUrl || '',
+      privileged: privileged || false,
+      capAdd: capAdd || defaultCapability,
+      capDrop:
+        capDrop ||
+        Object.keys(Capability).filter(capability => !defaultCapability.includes(capability)),
+      memory: memory || undefined,
+      nanoCpus: nanoCpus || undefined,
     };
   }
 };
