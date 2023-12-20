@@ -7,6 +7,7 @@ import {
   Mode,
   OpenMode,
   WriteFileOptions,
+  constants,
 } from 'fs';
 import path from 'path';
 import { Stream } from 'node:stream';
@@ -17,7 +18,7 @@ export const mkdir = async (dirPath: string) => {
   while (dirPaths.length > 0) {
     try {
       const _dirpath = path.join(...dirPaths);
-      await fs.access(_dirpath, fs.constants.W_OK);
+      await fs.access(_dirpath, constants.W_OK);
       break;
     } catch (error) {
       dirPaths.pop();
@@ -35,12 +36,14 @@ export const mkdirSync = (dirPath: string) => {
   while (dirPaths.length > 0) {
     try {
       const _dirpath = path.join(...dirPaths);
-      accessSync(_dirpath, fs.constants.W_OK);
+      accessSync(_dirpath, constants.W_OK);
       break;
     } catch (error) {
+      console.error(error);
       dirPaths.pop();
     }
   }
+
   while (dirPaths.length < fullPaths.length) {
     dirPaths.push(fullPaths[dirPaths.length]);
     const _dirpath = path.join(...dirPaths);

@@ -1,8 +1,8 @@
-import { swcPlugin } from 'electron-vite';
 import path from 'path';
 
-const PACKAGE_ROOT = __dirname;
+import { swcPlugin } from 'electron-vite';
 
+const PACKAGE_ROOT = __dirname;
 
 /**
  * @type {import('vite').UserConfig}
@@ -15,13 +15,13 @@ const config = {
   resolve: {
     alias: {
       '@/': path.join(PACKAGE_ROOT, 'src') + '/',
-      "@common/": path.join(__dirname, "..", "common") + "/",
+      '@common/': path.join(__dirname, '..', 'common') + '/',
     },
   },
   build: {
     ssr: true,
     sourcemap: 'inline',
-    target: `node18`,
+    target: 'node18',
     outDir: 'dist',
     assetsDir: '.',
     minify: process.env.MODE !== 'development',

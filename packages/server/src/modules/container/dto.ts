@@ -6,6 +6,9 @@ import {
   ValidateNested,
   IsNumberString,
   IsInt,
+  IsIP,
+  IsMACAddress,
+  IsNumber,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -46,7 +49,7 @@ export class ContainerListDto {
 
   @IsString()
   @IsOptional()
-  networkId?: string;
+  networkName?: string;
 
   @IsString()
   @IsOptional()
@@ -55,6 +58,14 @@ export class ContainerListDto {
   @IsBoolean()
   @IsOptional()
   hasMetrics?: boolean;
+
+  @IsString()
+  @IsOptional()
+  sortBy?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  sortAsc?: boolean;
 }
 
 export class NewPort {
@@ -70,7 +81,7 @@ export class NewPort {
 
 export class NewMount {
   @IsEnum(MountType)
-  type: 'bind' | 'volume';
+  type: 'bind' | 'volume' | 'device';
 
   @IsString()
   @IsOptional()
@@ -96,6 +107,24 @@ export class NewEnv {
   value: string;
 }
 
+export class NewNetwork {
+  @IsString()
+  @IsOptional()
+  name?: string;
+
+  @IsMACAddress()
+  @IsOptional()
+  mac?: string;
+
+  @IsIP('4')
+  @IsOptional()
+  ip?: string;
+
+  @IsIP('6')
+  @IsOptional()
+  ipV6?: string;
+}
+
 export class CreateContainerDto {
   @IsString()
   name: string;
@@ -107,8 +136,9 @@ export class CreateContainerDto {
   @IsString()
   image: string;
 
-  @IsString()
-  network: string;
+  @ValidateNested({ each: true })
+  @Type(() => NewNetwork)
+  networks: NewNetwork[];
 
   @IsEnum(RestartPolicy)
   @IsOptional()
@@ -121,6 +151,18 @@ export class CreateContainerDto {
   @IsString()
   @IsOptional()
   command?: string;
+
+  @IsString()
+  @IsOptional()
+  hostname?: string;
+
+  @IsString()
+  @IsOptional()
+  domainName?: string;
+
+  @IsString()
+  @IsOptional()
+  extraHosts?: string;
 
   @ValidateNested({ each: true })
   @Type(() => NewPort)
@@ -144,6 +186,26 @@ export class CreateContainerDto {
   @IsString()
   @IsOptional()
   internetUrl?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  privileged?: boolean;
+
+  @IsString({ each: true })
+  @IsOptional()
+  capAdd?: string[];
+
+  @IsString({ each: true })
+  @IsOptional()
+  capDrop?: string[];
+
+  @IsNumber()
+  @IsOptional()
+  memory?: number;
+
+  @IsNumber()
+  @IsOptional()
+  nanoCpus?: number;
 }
 
 export class UpdateContainerDto extends CreateContainerDto {

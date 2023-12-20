@@ -5,17 +5,20 @@ import dayjs from 'dayjs';
 import { ContainerStats, ContainerDetail, Port } from '@common/types/container';
 import { ContainerActive, RestartPolicy } from '@common/constants/enum';
 
+import { BusinessErrorCode, BusinessException } from '@/constants/exception';
 import { commandFormat } from '@/utils/utils';
 
 import { DockerService } from '../docker';
 import { CreateContainerDto, UpdateContainerDto } from './dto';
 import { ImageService } from '../image';
+import { NetworkService } from '../network';
 
 @Injectable()
 export class ContainerService {
   constructor(
     private readonly dockerService: DockerService,
     private readonly imageService: ImageService,
+    private readonly networkService: NetworkService,
   ) {}
 
   async createContainer(params: CreateContainerDto) {
@@ -31,6 +34,22 @@ export class ContainerService {
         portBindings[`${port.container}/${port.protocol}`].push({ HostPort: port.host });
       }
     });
+    const devices = params.mounts
+      .filter(item => item.type === 'device')
+      .map(item => ({
+        PathOnHost: item.hostBind,
+        PathInContainer: item.container,
+        CgroupPermissions: item.readonly ? 'r' : 'rwm',
+      }));
+    const mounts = params.mounts
+      .filter(item => item.type !== 'device')
+      ?.map(mount => ({
+        Target: mount.container,
+        Source: mount.type === 'bind' ? mount.hostBind : mount.volume,
+        Type: mount.type as 'bind' | 'volume',
+        ReadOnly: mount.readonly,
+      }));
+
     const container = await this.dockerService.docker.createContainer({
       name: params.name,
       Labels: {
@@ -41,23 +60,66 @@ export class ContainerService {
       Env: params.envs?.map(env => `${env.key}=${env.value}`),
       Cmd: commandFormat(params.command),
       Image: imageTag,
+      Hostname: params.hostname,
+      Domainname: params.domainName,
       HostConfig: {
-        NetworkMode: params.network,
+        NetworkMode: 'none',
+        ExtraHosts: params.extraHosts?.split(/[,，\s]+/).filter(item => item),
         PortBindings: portBindings,
         RestartPolicy: {
           Name: params.restart,
           MaximumRetryCount: params.restart === RestartPolicy.OnFailure ? 5 : undefined,
         },
-        Mounts: params.mounts?.map(mount => ({
-          Target: mount.container,
-          Source: mount.type === 'bind' ? mount.hostBind : mount.volume,
-          Type: mount.type,
-          ReadOnly: mount.readonly,
-        })),
+        Devices: devices,
+        Mounts: mounts,
+        Privileged: params.privileged,
+        CapAdd: params.capAdd,
+        CapDrop: params.capDrop,
+        Memory: params.memory ? params.memory * 1024 * 1024 : undefined,
+        NanoCpus: params.nanoCpus ? params.nanoCpus * 10 ** 9 : undefined,
       },
     });
+
+    let networkError = null;
+    const networkList = await this.networkService.getNetworkList();
+    // 取消默认链接的none网络
+    const noneNetworkId = networkList.find(item => item.Name === 'none')?.Id;
+    await this.networkService.removeContainerToNetwork(noneNetworkId, container.id);
+    // 链接网络
+    if (params.networks.length > 0) {
+      for (let i = 0; i < params.networks.length; i++) {
+        const network = params.networks[i];
+        // host网络无法连接，链接其他网络后无法连接none网络
+        if (network.name === 'host' || (network.name === 'none' && i !== 0)) {
+          break;
+        }
+        if (network.name === 'bridge') {
+          network.ip = undefined;
+          network.ipV6 = undefined;
+        }
+        const networkInfo = networkList.find(item => item.Name === network.name);
+        try {
+          await this.networkService.addContainerToNetwork({
+            containerId: container.id,
+            networkId: networkInfo.Id,
+            ip: network.ip,
+            ipv6: network.ipV6,
+          });
+        } catch (error) {
+          console.error(error);
+          networkError = error;
+        }
+        if (network.name === 'none') {
+          break;
+        }
+      }
+    }
+    // 创建容器只能
     if (params.runAffterCreated) {
       await this.dockerService.docker.getContainer(container.id).start();
+    }
+    if (networkError) {
+      throw new BusinessException(BusinessErrorCode.NetworkConnectError, networkError);
     }
   }
 
@@ -79,7 +141,21 @@ export class ContainerService {
       }
     });
     const imageTag = params.image.indexOf(':') > 0 ? params.image : params.image + ':latest';
-
+    const devices = params.mounts
+      .filter(item => item.type === 'device')
+      .map(item => ({
+        PathOnHost: item.hostBind,
+        PathInContainer: item.container,
+        CgroupPermissions: item.readonly ? 'r' : 'rwm',
+      }));
+    const mounts = params.mounts
+      .filter(item => item.type !== 'device')
+      ?.map(mount => ({
+        Target: mount.container,
+        Source: mount.type === 'bind' ? mount.hostBind : mount.volume,
+        Type: mount.type as 'bind' | 'volume',
+        ReadOnly: mount.readonly,
+      }));
     const nextContainer = await this.dockerService.docker.createContainer({
       name: params.name,
       AttachStdin: containerDetail.Config.AttachStdin,
@@ -101,13 +177,13 @@ export class ContainerService {
       Volumes: containerDetail.Config.Volumes,
       WorkingDir: containerDetail.Config.WorkingDir,
       ExposedPorts: containerDetail.Config.ExposedPorts,
+      Hostname: params.hostname,
+      Domainname: params.domainName,
       HostConfig: {
         Links: containerDetail.HostConfig.Links,
-        Memory: containerDetail.HostConfig.Memory,
         MemorySwap: containerDetail.HostConfig.MemorySwap,
         MemoryReservation: containerDetail.HostConfig.MemoryReservation,
         KernelMemory: containerDetail.HostConfig.KernelMemory,
-        NanoCpus: containerDetail.HostConfig.NanoCpus,
         CpuPercent: containerDetail.HostConfig.CpuPercent,
         CpuShares: containerDetail.HostConfig.CpuShares,
         CpuPeriod: containerDetail.HostConfig.CpuPeriod,
@@ -117,22 +193,79 @@ export class ContainerService {
         CpusetCpus: containerDetail.HostConfig.CpusetCpus,
         CpusetMems: containerDetail.HostConfig.CpusetMems,
         BlkioWeight: containerDetail.HostConfig.BlkioWeight,
-        NetworkMode: params.network,
+        NetworkMode: 'none',
+        ExtraHosts: params.extraHosts?.split(/[,，\s]+/).filter(item => item),
         PortBindings: portBindings,
         RestartPolicy: {
           Name: params.restart,
           MaximumRetryCount: params.restart === RestartPolicy.OnFailure ? 5 : undefined,
         },
-        Mounts: params.mounts?.map(mount => ({
-          Target: mount.container,
-          Source: mount.type === 'bind' ? mount.hostBind : mount.volume,
-          Type: mount.type,
-          ReadOnly: mount.readonly,
-        })),
+        Devices: devices,
+        Mounts: mounts,
+        Privileged:
+          params.privileged !== undefined
+            ? params.privileged
+            : containerDetail.HostConfig.Privileged,
+        CapAdd: params.capAdd !== undefined ? params.capAdd : containerDetail.HostConfig.CapAdd,
+        CapDrop: params.capDrop !== undefined ? params.capDrop : containerDetail.HostConfig.CapDrop,
+        Memory:
+          params.memory !== undefined
+            ? params.memory * 1024 * 1024
+            : containerDetail.HostConfig.Memory,
+        NanoCpus:
+          params.nanoCpus !== undefined
+            ? params.nanoCpus * 10 ** 9
+            : containerDetail.HostConfig.NanoCpus,
       },
     });
+    // 链接网络
+    let networkError = null;
+    const networkList = await this.networkService.getNetworkList();
+    // 取消默认链接的none网络
+    const noneNetworkId = networkList.find(item => item.Name === 'none')?.Id;
+    await this.networkService.removeContainerToNetwork(noneNetworkId, nextContainer.id);
+    if (params.networks.length > 0) {
+      for (let i = 0; i < params.networks.length; i++) {
+        const network = params.networks[i];
+        // host网络无法连接，链接其他网络后无法连接none网络
+        if (network.name === 'host' || (network.name === 'none' && i !== 0)) {
+          break;
+        }
+        const networkInfo = networkList.find(item => item.Name === network.name);
+        try {
+          // 先尝试指定IP
+          await this.networkService.addContainerToNetwork({
+            containerId: nextContainer.id,
+            networkId: networkInfo.Id,
+            ip: network.ip,
+            ipv6: network.ipV6,
+          });
+        } catch (error) {
+          console.error(error);
+          // 再尝试不指定IP
+          try {
+            // 先尝试指定IP
+            await this.networkService.addContainerToNetwork({
+              containerId: nextContainer.id,
+              networkId: networkInfo.Id,
+            });
+          } catch (error) {
+            console.error(error);
+            // 再尝试不指定IP
+            networkError = error;
+          }
+        }
+        // 链接none网络后无法连接其他网络
+        if (network.name === 'none') {
+          break;
+        }
+      }
+    }
     if (params.runAffterCreated) {
       await nextContainer.start();
+    }
+    if (networkError) {
+      throw new BusinessException(BusinessErrorCode.NetworkConnectError, networkError);
     }
     return nextContainer;
   }
@@ -177,12 +310,17 @@ export class ContainerService {
         null,
       localUrl: detail.Config.Labels['docker.idocker.localUrl'] || null,
       internetUrl: detail.Config.Labels['docker.idocker.internetUrl'] || null,
-      isSelf: this.dockerService.currentContainerId === detail.Id,
+      isSelf: detail.Id.startsWith(this.dockerService.currentContainerId),
       canUpdate: await this.dockerService.imageCanUpdate(detail.Config.Image, detail.Image),
       restartPolicyName: detail.HostConfig.RestartPolicy?.Name,
       restartPolicyMaximumRetryCount: detail.HostConfig.RestartPolicy?.MaximumRetryCount,
-      cmd: detail.Config.Cmd,
+      cmd:
+        detail.Config.Cmd?.map(item => (item.indexOf(' ') > 0 ? `"${item}"` : item))?.join(' ') ||
+        '',
       entrypoint: detail.Config.Entrypoint,
+      hostname: detail.Config.Hostname,
+      domainName: detail.Config.Domainname,
+      extraHosts: detail.HostConfig.ExtraHosts?.join('\n'),
       mounts: (
         detail.Mounts as {
           Name?: string | undefined;
@@ -194,12 +332,21 @@ export class ContainerService {
           RW: boolean;
           Propagation: string;
         }[]
-      )?.map(item => ({
-        type: item.Type,
-        source: item.Type === 'bind' ? item.Source : item.Name,
-        target: item.Destination,
-        rw: item.RW,
-      })),
+      )
+        ?.map(item => ({
+          type: item.Type,
+          source: item.Type === 'bind' ? item.Source : item.Name,
+          target: item.Destination,
+          rw: item.RW,
+        }))
+        .concat(
+          detail.HostConfig.Devices?.map(device => ({
+            type: 'device',
+            source: device.PathOnHost,
+            target: device.PathInContainer,
+            rw: device.CgroupPermissions !== 'r',
+          })) || [],
+        ),
       ports,
       exposedPorts: detail.Config.ExposedPorts
         ? Object.keys(detail.Config.ExposedPorts).map(key => {
@@ -208,11 +355,11 @@ export class ContainerService {
           })
         : [],
       networks: detail.NetworkSettings.Networks
-        ? Object.entries(detail.NetworkSettings.Networks).map(([type, value]) => ({
+        ? Object.entries(detail.NetworkSettings.Networks).map(([name, value]) => ({
             id: value.NetworkID,
-            type,
-            ip: value.IPAddress,
-            ipV6: value.GlobalIPv6Address,
+            name,
+            ip: value.IPAddress || value.IPAMConfig?.IPv4Address,
+            ipV6: value.GlobalIPv6Address || value.IPAMConfig?.IPv6Address,
             gateway: value.Gateway,
             gatewayV6: value.GlobalIPv6Address,
             prefixLen: value.IPPrefixLen,
@@ -224,6 +371,15 @@ export class ContainerService {
         const [key, value] = item.split('=');
         return { key, value };
       }),
+      privileged: detail.HostConfig.Privileged,
+      capAdd: detail.HostConfig.CapAdd,
+      capDrop: detail.HostConfig.CapDrop,
+      memory: detail.HostConfig.Memory
+        ? Math.floor(detail.HostConfig.Memory / (1024 * 1024))
+        : undefined,
+      nanoCpus: detail.HostConfig.NanoCpus
+        ? Math.floor(detail.HostConfig.NanoCpus / 10 ** 9)
+        : undefined,
     };
   }
 
@@ -335,6 +491,7 @@ export class ContainerService {
       console.error(error);
     }
     await container.remove({ focus: true });
+    const networks = Object.entries(containerDetail.NetworkSettings.Networks);
     const nextContainer = await this.dockerService.docker.createContainer({
       name: containerDetail.Name.slice(1),
       AttachStdin: containerDetail.Config.AttachStdin,
@@ -351,9 +508,57 @@ export class ContainerService {
       Volumes: containerDetail.Config.Volumes,
       WorkingDir: containerDetail.Config.WorkingDir,
       ExposedPorts: containerDetail.Config.ExposedPorts,
-      HostConfig: containerDetail.HostConfig,
+      Hostname: containerDetail.Config.Hostname,
+      Domainname: containerDetail.Config.Domainname,
+      HostConfig: {
+        ...containerDetail.HostConfig,
+        NetworkMode: 'none',
+      },
     });
+    // 链接网络
+    let networkError = null;
+    const networkList = await this.networkService.getNetworkList();
+    // 取消默认链接的none网络
+    const noneNetworkId = networkList.find(item => item.Name === 'none')?.Id;
+    await this.networkService.removeContainerToNetwork(noneNetworkId, nextContainer.id);
+    if (networks.length > 0) {
+      for (let i = 0; i < networks.length; i++) {
+        const [name, config] = networks[i];
+        // host网络无法连接，链接其他网络后无法连接none网络
+        if (name === 'host' || (name === 'none' && i !== 0)) {
+          break;
+        }
+        const networkInfo = networkList.find(item => item.Name === name);
+        // 先尝试指定Ip
+        try {
+          await this.networkService.addContainerToNetwork({
+            containerId: nextContainer.id,
+            networkId: networkInfo.Id,
+            ip: config.IPAddress,
+            ipv6: config.GlobalIPv6Address,
+          });
+        } catch (error) {
+          // 再尝试不指定ip
+          try {
+            await this.networkService.addContainerToNetwork({
+              containerId: nextContainer.id,
+              networkId: networkInfo.Id,
+            });
+          } catch (error) {
+            console.error(error);
+            networkError = error;
+          }
+        }
+        // 链接none网络后无法连接其他网络
+        if (name === 'none') {
+          break;
+        }
+      }
+    }
     await nextContainer.start();
+    if (networkError) {
+      throw new BusinessException(BusinessErrorCode.NetworkConnectError, networkError);
+    }
     return { id: nextContainer.id };
   }
 }

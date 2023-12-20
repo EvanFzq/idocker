@@ -5,7 +5,6 @@
     autocomplete="off"
     :label-col="labelCol"
     :wrapper-col="wrapperCol"
-    style="max-width: 630px"
   >
     <a-form-item
       label="镜像"
@@ -19,16 +18,22 @@
         :field-names="{ label: 'name', value: 'id' }"
       />
     </a-form-item>
-    <a-form-item label="网络">
+    <a-form-item
+      label="网络"
+      style="margin-bottom: 12px"
+    >
       <a-select
         v-model:value="filter.network"
         placeholder="选择网络"
         allow-clear
         :options="networkList"
-        :field-names="{ label: 'name', value: 'id' }"
+        :field-names="{ label: 'name', value: 'name' }"
       />
     </a-form-item>
-    <a-form-item label="卷">
+    <a-form-item
+      label="卷"
+      style="margin-bottom: 12px"
+    >
       <a-select
         v-model:value="filter.volume"
         placeholder="选择卷"
@@ -37,7 +42,10 @@
         :field-names="{ label: 'name', value: 'name' }"
       />
     </a-form-item>
-    <a-space wrap>
+    <a-space
+      wrap
+      style="min-width: 290px; margin-bottom: 12px"
+    >
       <a-button
         type="primary"
         style="margin-left: 80px"
@@ -74,10 +82,10 @@ const wrapperCol = { style: { width: '210px' } };
 
 const props = defineProps<{ defaultValue: FilterData }>();
 
-const filter = ref(props.defaultValue);
+const filter = ref({ ...props.defaultValue });
 
 const imageList = ref<{ name: string; id: string }[]>([]);
-const networkList = ref<{ name: string; id: string }[]>([]);
+const networkList = ref<{ name: string }[]>([]);
 const volumekList = ref<{ name: string }[]>([]);
 
 const emits = defineEmits(['search']);
@@ -92,7 +100,7 @@ onMounted(async () => {
     imageList.value = imageRes.data.map(item => ({ name: item.Name, id: item.Id }));
   }
   if (networkRes.success) {
-    networkList.value = networkRes.data.map(item => ({ name: item.Name, id: item.Id }));
+    networkList.value = networkRes.data.map(item => ({ name: item.Name }));
   }
   if (volumeRes.success) {
     volumekList.value = volumeRes.data.map(item => ({ name: item.Name }));

@@ -8,9 +8,9 @@
     >
       <van-cell
         title="类型"
-        :value="network.type"
+        :value="network.name"
       />
-      <div v-if="network.type !== 'host'">
+      <div v-if="network.name !== 'host'">
         <van-cell
           title="NetworkID"
           :value="network.id.slice(0, 8)"
@@ -36,7 +36,7 @@
           :value="network.mac"
         />
       </div>
-      <div v-if="network.type === 'host'">
+      <div v-if="network.name === 'host'">
         <van-cell
           title="NetworkID"
           :value="network.id"

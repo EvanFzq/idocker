@@ -1,5 +1,5 @@
-export const commandFormat = (str: string): string[] | undefined => {
-  if (!str.trim()) return;
+export const commandFormat = (str?: string): string[] | undefined => {
+  if (!str || !str.trim()) return;
 
   const arr = [...str.matchAll(/".*?"/g)];
   for (let i = 0; i < arr.length; i++) {

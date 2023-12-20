@@ -12,7 +12,7 @@
       />
       <van-cell
         title="类型"
-        :value="item.type === 'bind' ? '路径' : '数据卷'"
+        :value="MountTypeList.find(mount => mount.value === item.type)?.label"
       />
       <van-cell
         :title="item.type === 'bind' ? '主机路径' : '数据卷'"
@@ -31,6 +31,7 @@
 </template>
 <script lang="ts" setup>
 import type { Mount } from '@common/types/container';
+import { MountTypeList } from '@common/constants/enum';
 defineProps<{ list?: Mount[] }>();
 </script>
 <style lang="less">

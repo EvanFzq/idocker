@@ -1,6 +1,7 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import Dockerode from 'dockerode';
 
-import { ImageOption } from '@common/types/image';
+import { ImageOption, ImageItem } from '@common/types/image';
 
 import { DockerService } from '../docker';
 
@@ -26,14 +27,14 @@ export class ImageService {
       console.error(error);
     }
   }
-  async getImageList() {
-    let imageList = await this.dockerService.docker.listImages();
+  async getImageList(): Promise<ImageItem[]> {
+    const imageList: Dockerode.ImageInfo[] = await this.dockerService.docker.listImages();
     const containerList = await this.dockerService.docker.listContainers({
       all: true,
     });
-    imageList = imageList.map(image => {
+    const list: ImageItem[] = imageList.map(image => {
       let containerNum = 0;
-      const [imageName] = image.RepoDigests[0].split('@');
+      const [imageName] = image.RepoDigests?.[0]?.split('@') || [''];
       containerList.forEach(container => {
         if (image.Id === container.ImageID) {
           containerNum++;
@@ -43,10 +44,10 @@ export class ImageService {
         ...image,
         Containers: containerNum,
         Name: imageName,
-        Tags: image.RepoTags.map(tag => tag.slice(imageName.length + 1)),
+        Tags: image.RepoTags?.map(tag => tag.slice(imageName.length + 1)),
       };
     });
-    return imageList;
+    return list;
   }
   async removeImage(id: string) {
     const image = this.dockerService.docker.getImage(id);

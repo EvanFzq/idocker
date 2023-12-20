@@ -27,12 +27,16 @@
         <slot name="extra" />
       </div>
     </div>
-    <div class="content">
+    <div
+      class="content"
+      :style="contentStyle"
+    >
       <slot />
     </div>
   </div>
 </template>
 <script setup lang="ts">
+import type { CSSProperties } from 'vue';
 import type { RouteLocationRaw } from 'vue-router';
 
 export interface Route {
@@ -43,6 +47,7 @@ export interface Route {
 defineProps<{
   breadcrumbs?: Route[];
   title?: string;
+  contentStyle?: CSSProperties;
 }>();
 </script>
 <style scoped lang="less">
@@ -66,9 +71,9 @@ defineProps<{
     }
     .title {
       font-weight: 700;
-      font-size: 24px;
+      font-size: 20px;
       color: #409eff;
-      height: 36px;
+      height: 24px;
       margin-bottom: 6px;
       flex: none;
     }

@@ -11,11 +11,12 @@ export class NetworkService {
     const containerList = await this.dockerService.docker.listContainers({
       all: true,
     });
+
     return networkList.map(network => {
       let containerNum = 0;
       containerList.forEach(container => {
-        Object.values(container.NetworkSettings.Networks).forEach(item => {
-          if (item.NetworkID === network.Id) {
+        Object.keys(container.NetworkSettings.Networks).forEach(name => {
+          if (name === network.Name) {
             containerNum++;
           }
         });

@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-v-html -->
 <template>
   <div>
     <van-cell-group
@@ -13,7 +14,22 @@
         autocomplete="off"
         :rules="[{ required: true, message: '请填写容器名' }]"
       />
+      <van-field label="图标类型">
+        <template #input>
+          <van-radio-group
+            v-model="iconType"
+            direction="horizontal"
+            style="margin-bottom: 12px"
+            @change="onIconTypeChange"
+          >
+            <van-radio name="upload">上传</van-radio>
+            <van-radio name="url">URL</van-radio>
+            <van-radio name="svg">SVG</van-radio>
+          </van-radio-group>
+        </template>
+      </van-field>
       <van-field
+        v-if="iconType === 'upload'"
         name="icon"
         label="图标"
       >
@@ -28,6 +44,36 @@
           />
         </template>
       </van-field>
+      <van-field
+        v-if="iconType === 'url' && form.icon[0]"
+        v-model="form.icon[0].url"
+        :spellcheck="false"
+        name="icon[0].url"
+        label="图标URL"
+        placeholder="请输入URL"
+      />
+      <van-image
+        v-if="iconType === 'url' && form.icon[0]?.url"
+        class="img-view"
+        placeholder
+        style="max-width: 80px; max-height: 80px; margin-left: 36%; margin-top: 8px"
+        :src="form.icon[0].url"
+      />
+      <van-field
+        v-if="iconType === 'svg' && form.icon[0]"
+        v-model="form.icon[0].svg"
+        name="icon[0].svg"
+        label="图标SVG"
+        type="textarea"
+        :autosize="{ maxHeight: 200, minHeight: 50 }"
+        :spellcheck="false"
+        placeholder="请输入SVG"
+      />
+      <div
+        v-if="iconType === 'svg' && form.icon[0]?.svg"
+        class="svg-view"
+        v-html="safeSvg(form.icon[0]?.svg) ? form.icon[0]?.svg : ''"
+      />
       <van-popover
         v-model:show="showImagePopover"
         placement="bottom-end"
@@ -72,31 +118,6 @@
         </div>
       </van-popover>
       <van-field
-        v-model="form.network"
-        required
-        is-link
-        readonly
-        name="network"
-        label="网络"
-        placeholder="点击选择网络"
-        :rules="[{ required: true, message: '请选择网络' }]"
-        @click="showNetworkPicker = true"
-      />
-      <van-popup
-        v-model:show="showNetworkPicker"
-        position="bottom"
-      >
-        <van-picker
-          :columns="networkList"
-          :columns-field-names="{
-            text: 'Name',
-            value: 'Name',
-          }"
-          @confirm="onNetworkConfirm"
-          @cancel="showNetworkPicker = false"
-        />
-      </van-popup>
-      <van-field
         name="runAffterCreated"
         label="创建后启动"
       >
@@ -122,29 +143,29 @@
   </div>
 </template>
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { showToast, type UploaderFileListItem } from 'vant';
 import Cropper from 'cropperjs';
 
 import 'cropperjs/dist/cropper.css';
 import type { Image } from '@common/types/image';
-import type { Network } from '@common/types/network';
 
-import { searchImage, getNetworkList, uploadImg } from '@/apis';
+import { searchImage, uploadImg } from '@/apis';
 import { numberFormat } from '@/utils/utils';
-import { dataURLtoFile } from '@/utils/utils';
+import { dataURLtoFile, safeSvg } from '@/utils/utils';
 
-import type { ContainerFormData } from './CreateOrEditContainerPage.vue';
+import type { ContainerFormData } from './type';
 
 const props = defineProps<{ formData: ContainerFormData }>();
 const emit = defineEmits(['valueChange']);
-const form = ref({
+const form = ref<Pick<ContainerFormData, 'name' | 'icon' | 'image' | 'runAffterCreated'>>({
   name: '',
-  icon: [] as UploaderFileListItem[],
+  icon: [],
   image: '',
-  network: '',
   runAffterCreated: false,
 });
+
+const iconType = ref<'upload' | 'url' | 'svg'>(props.formData.icon[0]?.svg ? 'svg' : 'upload');
 
 watch(
   () => props.formData,
@@ -153,9 +174,14 @@ watch(
       name: props.formData.name,
       icon: props.formData.icon,
       image: props.formData.image,
-      network: props.formData.network,
       runAffterCreated: props.formData.runAffterCreated,
     };
+
+    if (props.formData.icon[0]?.svg && iconType.value !== 'svg') {
+      iconType.value = 'svg';
+    } else if (props.formData.icon[0]?.url?.startsWith('http') && iconType.value !== 'url') {
+      iconType.value = 'url';
+    }
   },
   { deep: true },
 );
@@ -168,19 +194,24 @@ watch(
 );
 
 const showImagePopover = ref(false);
-const showNetworkPicker = ref(false);
 const showIconCropper = ref(false);
 const iconCropper = ref<Cropper | null>(null);
 const iconFileName = ref<string | undefined>('');
 const imageList = ref<Image[]>([]);
-const networkList = ref<Network[]>([]);
 
-onMounted(async () => {
-  const res = await getNetworkList();
-  if (res.success) {
-    networkList.value = res.data;
+const onIconTypeChange = (value: 'upload' | 'url' | 'svg') => {
+  if (value === 'url' || value === 'svg') {
+    form.value.icon = [
+      {
+        url: value === 'url' ? form.value.icon[0]?.url : '',
+        svg: value === 'svg' ? form.value.icon[0]?.svg : '',
+      },
+    ];
   }
-});
+  if (value === 'upload') {
+    form.value.icon = [];
+  }
+};
 
 let searchImageTimer: NodeJS.Timeout;
 const onImageChange = async (value: string) => {
@@ -199,11 +230,6 @@ const onImageChange = async (value: string) => {
 const onSelectImage = (selectImage: Image) => {
   form.value.image = selectImage.name;
   showImagePopover.value = false;
-};
-
-const onNetworkConfirm = ({ selectedValues }: { selectedValues: string[] }) => {
-  form.value.network = selectedValues[0];
-  showNetworkPicker.value = false;
 };
 
 const onIconOversize = () => {
@@ -233,7 +259,7 @@ const onIconCropperCancel = () => {
   form.value.icon = [];
 };
 const onIconCropperConfirm = async () => {
-  const croppedData = iconCropper.value?.getCroppedCanvas().toDataURL('image/jpeg');
+  const croppedData = iconCropper.value?.getCroppedCanvas().toDataURL('image/png');
   if (croppedData) {
     const file = dataURLtoFile(croppedData, iconFileName.value as string);
     const res = await uploadImg(file, { name: iconFileName.value, height: 240 });
@@ -250,6 +276,27 @@ const onIconCropperConfirm = async () => {
 </script>
 
 <style scoped lang="less">
+.icon-url {
+  border: solid 1px #ccc;
+  border-radius: 6px;
+  width: 100%;
+}
+.icon-svg {
+  border: solid 1px #ccc;
+  border-radius: 6px;
+  height: 100px;
+  width: 100%;
+}
+.svg-view {
+  width: 80px;
+  height: 80px;
+  margin-left: 36%;
+  margin-top: 8px;
+  border: solid 1px #ccc;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+}
 .image-list {
   width: 270px;
 

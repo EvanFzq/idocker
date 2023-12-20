@@ -1,3 +1,6 @@
 body {
   background-color: #fafafa;
 }
+#app {
+  height: 100%;
+}

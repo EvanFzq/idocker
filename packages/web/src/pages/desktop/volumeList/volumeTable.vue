@@ -4,17 +4,18 @@
     :columns="columns"
     :loading="loading"
     size="middle"
+    :pagination="{ showSizeChanger: true }"
   >
     <template #bodyCell="{ column, record }: { record: Volume; column: TableColumnProps<Volume> }">
       <template v-if="column.key === 'Containers'">
         <RouterLink
-          v-if="record.UsageData.RefCount"
+          v-if="record.ContainerNum"
           :to="'/d/container/list?volumeName=' + record.Name"
           class="image-containers"
         >
-          {{ record.UsageData.RefCount }}
+          {{ record.ContainerNum }}
         </RouterLink>
-        <span v-else>{{ record.UsageData.RefCount }}</span>
+        <span v-else>{{ record.ContainerNum }}</span>
       </template>
       <template v-if="column.key === 'Mountpoint'">
         <span style="word-break: break-all">{{ record.Mountpoint }}</span>
@@ -28,7 +29,7 @@
         <a-space>
           <a-button
             danger
-            :disabled="!!record.UsageData.RefCount"
+            :disabled="!!record.ContainerNum"
             type="primary"
             size="small"
             :icon="h(DeleteOutlined)"
@@ -52,7 +53,7 @@ import { message } from 'ant-design-vue';
 import type { Volume } from '@common/types/volume';
 
 import { removeVolume } from '@/apis';
-import { timeLongFormat, fileSizeFormat } from '@/utils/utils';
+import { timeLongFormat } from '@/utils/utils';
 
 import type { TableColumnProps } from 'ant-design-vue';
 
@@ -87,13 +88,6 @@ const columns: TableColumnProps[] = [
     title: '创建时间',
     width: 120,
     customRender: ({ value }) => timeLongFormat(dayjs.unix(value)),
-  },
-  {
-    key: 'size',
-    dataIndex: 'UsageData',
-    title: '大小',
-    width: 120,
-    customRender: ({ value }) => fileSizeFormat(value.Size) || '0KB',
   },
   {
     key: 'operate',

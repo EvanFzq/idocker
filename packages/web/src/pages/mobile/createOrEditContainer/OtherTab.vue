@@ -67,13 +67,13 @@ import { ref, watch } from 'vue';
 
 import { restartPolicyList } from '@common/constants/const';
 
-import type { ContainerFormData } from './CreateOrEditContainerPage.vue';
+import type { ContainerFormData } from './type';
 
 const props = defineProps<{ formData: ContainerFormData }>();
 const emit = defineEmits(['valueChange']);
 
 const showRestartPicker = ref(false);
-const form = ref({
+const form = ref<Pick<ContainerFormData, 'restart' | 'localUrl' | 'internetUrl'>>({
   restart: 'no',
   localUrl: '',
   internetUrl: '',

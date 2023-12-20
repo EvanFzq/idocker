@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-v-html -->
 <template>
   <div
     v-show="list.length === 0"
@@ -22,8 +23,15 @@
       @click="onClickApp(app)"
     >
       <van-image
+        v-if="getIcon(app.icon).type === 'url'"
         class="icon"
-        :src="app.icon"
+        fit="cover"
+        :src="getIcon(app.icon).content"
+      />
+      <div
+        v-if="getIcon(app.icon).type === 'svg'"
+        class="icon-svg"
+        v-html="getIcon(app.icon).content"
       />
       <div class="name">
         <div :class="app.status === 'running' || !app.status ? 'dot normal' : 'dot fail'"></div>
@@ -33,8 +41,8 @@
   </div>
   <van-floating-bubble
     class="switch-wallpaper"
-    :offset="{ x: 12, y: offsetY }"
-    :gap="12"
+    :offset="{ x: -20, y: offsetY }"
+    :gap="20"
     axis="xy"
     magnetic="x"
     @click="onSwitchWallpaper"
@@ -52,6 +60,7 @@ import { computed, ref, watchEffect, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 
 import type { AppInfo } from '@common/types/setting';
+import { getIcon } from '@common/utils/utils';
 
 import { getApps } from '@/apis/setting';
 import { getWallpaper, switchWallpaper } from '@/apis/setting';
@@ -122,9 +131,8 @@ const onClickApp = (app: AppInfo) => {
 </script>
 <style lang="less" scoped>
 .loading-box {
-  height: 0;
+  height: 100%;
   width: 100%;
-  flex: auto;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -141,7 +149,8 @@ const onClickApp = (app: AppInfo) => {
   background-size: cover;
   background-position: center;
   .app {
-    background-color: #fff;
+    background-color: rgba(255, 255, 255, 0.4);
+    backdrop-filter: blur(6px);
     border-radius: 8px;
     border: solid #aaa 1px;
     overflow: hidden;
@@ -150,11 +159,15 @@ const onClickApp = (app: AppInfo) => {
     justify-content: center;
     align-items: center;
     padding: 6px;
-    .icon {
+    .icon,
+    .icon-svg {
       width: 66px;
       height: 66px;
       border-radius: 4px;
       overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .name {
       font-size: 10px;
@@ -187,7 +200,8 @@ const onClickApp = (app: AppInfo) => {
     .app {
       padding: 10px;
       border-radius: 10px;
-      .icon {
+      .icon,
+      .icon-svg {
         width: 100px;
         height: 100px;
         border-radius: 6px;

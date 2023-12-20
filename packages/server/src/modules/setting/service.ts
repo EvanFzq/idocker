@@ -116,17 +116,54 @@ export class SettingService {
     const emailPassword = this.configService.getUserConfig<string>('emailPassword');
     const events = this.configService.getUserConfig<Record<string, string[]>>('noticeEvents');
     return {
-      emailType,
-      emailAccount,
-      emailPassword,
-      events,
+      email: {
+        type: emailType,
+        account: emailAccount,
+        password: emailPassword,
+      },
+      events: events || {},
     };
   }
   async updateNoticeSetting(data: NoticeInfo) {
-    await this.emailService.changeTransport(data.emailType, data.emailAccount, data.emailPassword);
-    this.configService.setUserConfig('emailType', data.emailType);
-    this.configService.setUserConfig('emailAccount', data.emailAccount);
-    this.configService.setUserConfig('emailPassword', data.emailPassword);
-    this.configService.setUserConfig('noticeEvents', data.events);
+    if (data.email) {
+      const { type, account, password } = data.email;
+      try {
+        await this.emailService.changeTransport(type, account, password);
+        this.configService.setUserConfig('emailType', type);
+        this.configService.setUserConfig('emailAccount', account);
+        this.configService.setUserConfig('emailPassword', password);
+      } catch (error) {
+        console.error(error);
+        throw new HttpException('邮件地址或密码（授权码）错误', HttpStatus.BAD_REQUEST);
+      }
+    }
+    if (data.events) {
+      this.configService.setUserConfig('noticeEvents', data.events);
+    }
+  }
+  async getSystemInfo() {
+    const data = await this.dockerService.docker.info();
+    return {
+      containers: data.Containers,
+      containersRunning: data.ContainersRunning,
+      containersPaused: data.ContainersPaused,
+      containersStopped: data.ContainersStopped,
+      images: data.Images,
+      kernelVersion: data.KernelVersion,
+      operatingSystem: data.OperatingSystem,
+      oSType: data.OSType,
+      architecture: data.Architecture,
+      nCPU: data.NCPU,
+      memTotal: data.MemTotal,
+      indexServerAddress: data.IndexServerAddress,
+      registryConfig: data.RegistryConfig,
+      httpProxy: data.HttpProxy,
+      httpsProxy: data.HttpsProxy,
+      noProxy: data.NoProxy,
+      name: data.Name,
+      serverVersion: data.ServerVersion,
+      runtimes: data.Runtimes,
+      defaultRuntime: data.DefaultRuntime,
+    };
   }
 }

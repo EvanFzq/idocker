@@ -4,6 +4,7 @@
       <a-menu
         v-model:selectedKeys="selectedKeys"
         :inline-collapsed="collapsed"
+        mode="inline"
         :items="items"
         @click="onMenuSelect"
       >
@@ -17,6 +18,11 @@ import {
   AppstoreOutlined,
   ApartmentOutlined,
   FileOutlined,
+  SettingOutlined,
+  UserOutlined,
+  NotificationOutlined,
+  ContainerOutlined,
+  TrophyOutlined,
 } from '@ant-design/icons-vue';
 import { useRouter, useRoute } from 'vue-router';
 import { ref, h } from 'vue';
@@ -28,6 +34,12 @@ const selectedKeys = ref([route.path]);
 
 const items = ref([
   {
+    key: '/d/nav',
+    icon: () => h(AppstoreOutlined),
+    label: '导航',
+    title: '导航',
+  },
+  {
     key: '/d/container/list',
     icon: () => h(PlayCircleOutlined),
     label: '容器',
@@ -35,7 +47,7 @@ const items = ref([
   },
   {
     key: '/d/image/list',
-    icon: () => h(AppstoreOutlined),
+    icon: () => h(ContainerOutlined),
     label: '镜像',
     title: '镜像',
   },
@@ -50,6 +62,32 @@ const items = ref([
     icon: () => h(FileOutlined),
     label: '数据',
     title: '数据',
+  },
+  {
+    key: '/d/setting',
+    icon: () => h(SettingOutlined),
+    label: '设置',
+    title: '设置',
+    children: [
+      {
+        icon: () => h(UserOutlined),
+        key: '/d/setting/user',
+        label: '用户信息',
+        title: '用户信息',
+      },
+      {
+        icon: () => h(NotificationOutlined),
+        key: '/d/setting/notice',
+        label: '通知',
+        title: '通知',
+      },
+      {
+        icon: () => h(TrophyOutlined),
+        key: '/about',
+        label: '关于',
+        title: '关于',
+      },
+    ],
   },
 ]);
 

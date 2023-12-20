@@ -76,7 +76,7 @@ const activeName = ref('all');
 const list = ref<ContainerDetail[]>([]);
 const filter = ref<FilterData>({
   image: route.query.imageId ? (route.query.imageId as string) : null,
-  network: route.query.networkId ? (route.query.networkId as string) : null,
+  network: route.query.networkName ? (route.query.networkName as string) : null,
   volume: route.query.volumeName ? (route.query.volumeName as string) : null,
 });
 const totalData = ref({
@@ -89,7 +89,7 @@ const totalData = ref({
 const getData = async (hasMetrics?: boolean) => {
   const res = await getContainerList({
     imageId: filter.value.image || undefined,
-    networkId: filter.value.network || undefined,
+    networkName: filter.value.network || undefined,
     volumeName: filter.value.volume || undefined,
     hasMetrics,
   });
@@ -141,18 +141,22 @@ const onGoToAdd = () => {
 }
 .top {
   display: flex;
-  justify-content: space-evenly;
-  height: 180px;
+  justify-content: space-between;
   .divider {
-    height: 100%;
+    min-height: 180px;
+    margin: 0 56px;
+    flex: none;
     border-left: solid 1px #e5e5e5;
   }
   .right {
+    flex: auto;
+    width: 50%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     .btn-row {
       text-align: right;
+      flex: none;
     }
   }
 }

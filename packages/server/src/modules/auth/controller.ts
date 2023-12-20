@@ -26,10 +26,10 @@ export class AuthController {
 
   @Put('password')
   async changePassword(@Body() body: ChangePasswordDto) {
-    const date = dayjs().format('YYYY-MM-DD');
+    const hours = Math.floor(dayjs().unix() / 3600).toString();
     await this.authService.changePassword(
-      AesDecrypt(body.currentPassword, date),
-      AesDecrypt(body.newPassword, date),
+      AesDecrypt(body.currentPassword, hours),
+      AesDecrypt(body.newPassword, hours),
     );
   }
 }

@@ -17,3 +17,15 @@ export class DockerException extends HttpException {
     super({ code, msg: DockerErrorMsg[code], error }, HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }
+
+export enum BusinessErrorCode {
+  NetworkConnectError = 20000,
+}
+const BusinessErrorMsg = {
+  [BusinessErrorCode.NetworkConnectError]: '网络链接异常',
+};
+export class BusinessException extends HttpException {
+  constructor(code: BusinessErrorCode, error?: Error) {
+    super({ code, msg: BusinessErrorMsg[code], error }, HttpStatus.OK);
+  }
+}

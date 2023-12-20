@@ -15,20 +15,25 @@
           v-model="mount.type"
           direction="horizontal"
         >
-          <van-radio name="bind"> 路径 </van-radio>
-          <van-radio name="volume"> 数据卷 </van-radio>
+          <van-radio
+            v-for="item in MountTypeList"
+            :key="item.value"
+            :name="item.value"
+          >
+            {{ item.label }}
+          </van-radio>
         </van-radio-group>
       </template>
     </van-field>
 
     <van-field
-      v-if="mount.type === 'bind'"
+      v-if="['bind', 'device'].includes(mount.type)"
       v-model="mount.hostBind"
       :name="'mounts[' + index + '].hostBind'"
-      label="主机路径"
-      placeholder="请输入主机路径"
+      label="主机(设备)路径"
+      placeholder="请输入主机(设备)路径"
       required
-      :rules="[{ required: true, message: '请输入主机路径' }]"
+      :rules="[{ required: true, message: '请输入主机(设备)路径' }]"
     />
     <van-field
       v-if="mount.type === 'volume'"
@@ -40,18 +45,9 @@
       label="数据卷"
       placeholder="点击选择数据卷"
       :rules="[{ required: true, message: '请选择数据卷' }]"
-      @click="showVolumePicker = true"
+      @click="onSelectVolume(index)"
     />
-    <van-popup
-      v-model:show="showVolumePicker"
-      position="bottom"
-    >
-      <van-picker
-        :columns="volumeList"
-        @confirm="(value: PickerValue) => onVolumeConfirm(index, value)"
-        @cancel="showVolumePicker = false"
-      />
-    </van-popup>
+
     <van-field
       v-model="mount.container"
       :name="'mounts[' + index + '].container'"
@@ -79,6 +75,16 @@
       @click="() => onDeleteMount(index)"
     />
   </van-cell-group>
+  <van-popup
+    v-model:show="showVolumePicker"
+    position="bottom"
+  >
+    <van-picker
+      :columns="volumeList"
+      @confirm="onVolumeConfirm"
+      @cancel="showVolumePicker = false"
+    />
+  </van-popup>
   <div class="add-mount">
     <van-button
       size="small"
@@ -93,10 +99,11 @@
 import { ref, onMounted, watch } from 'vue';
 
 import type { MountConfig } from '@common/types/container';
+import { MountTypeList } from '@common/constants/enum';
 
 import { getVolumeList } from '@/apis/volume';
 
-import type { ContainerFormData } from './CreateOrEditContainerPage.vue';
+import type { ContainerFormData } from './type';
 
 const props = defineProps<{ formData: ContainerFormData }>();
 
@@ -107,6 +114,7 @@ interface PickerValue {
 const mountList = ref<MountConfig[]>(props.formData.mounts || []);
 const volumeList = ref<{ text: string; value: string }[]>([]);
 const showVolumePicker = ref(false);
+const seletcVolumeIndex = ref(0);
 
 const emit = defineEmits(['valueChange']);
 
@@ -147,9 +155,12 @@ const onAddMount = () => {
 const onDeleteMount = (index: number) => {
   mountList.value.splice(index, 1);
 };
-
-const onVolumeConfirm = (index: number, { selectedValues }: PickerValue) => {
-  mountList.value[index].volume = selectedValues[0];
+const onSelectVolume = (index: number) => {
+  showVolumePicker.value = true;
+  seletcVolumeIndex.value = index;
+};
+const onVolumeConfirm = ({ selectedValues }: PickerValue) => {
+  mountList.value[seletcVolumeIndex.value].volume = selectedValues[0];
   showVolumePicker.value = false;
 };
 </script>

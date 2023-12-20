@@ -1,3 +1,5 @@
+import type { NetworkConfig } from './network';
+
 export interface ContainerStats {
   id: string;
   cpu: number;
@@ -7,7 +9,7 @@ export interface ContainerStats {
 }
 
 export interface MountConfig {
-  type: 'bind' | 'volume';
+  type: 'bind' | 'volume' | 'device';
   hostBind?: string;
   volume?: string;
   container: string;
@@ -34,24 +36,32 @@ export interface NewEnv {
 }
 
 export interface CreateContainerParams {
-  command: string;
+  command?: string;
   name: string;
   icon: string;
   image: string;
-  network: string;
+  networks: NetworkConfig[];
   restart: string;
   localUrl?: string;
   internetUrl?: string;
   runAffterCreated: boolean;
+  hostname?: string;
+  domainName?: string;
+  extraHosts?: string;
   ports: NewPort[];
   mounts: NewMount[];
   envs: NewEnv[];
+  privileged?: boolean;
+  capAdd?: string[];
+  capDrop?: string[];
+  memory?: number;
+  nanoCpus?: number;
 }
 
 export type UpdateContainerParams = CreateContainerParams & { id: string };
 
 export interface ContainerListParams {
-  networkId?: string;
+  networkName?: string;
   imageId?: string;
   volumeName?: string;
   hasMetrics?: boolean;
@@ -77,7 +87,7 @@ export interface ContainerListItem {
 }
 
 export interface Mount {
-  type: 'volume' | 'bind' | 'tmpfs';
+  type: 'volume' | 'bind' | 'tmpfs' | 'device';
   source: string;
   target: string;
   rw: boolean;
@@ -90,7 +100,7 @@ export interface Port {
 }
 
 export interface Network {
-  type: string;
+  name: string;
   id: string;
   ip?: string;
   ipV6?: string;
@@ -107,11 +117,19 @@ export interface Env {
 export interface ContainerDetail extends ContainerListItem {
   restartPolicyName: string;
   restartPolicyMaximumRetryCount: number;
-  cmd?: string[];
+  cmd?: string;
   entrypoint?: string | string[];
   mounts?: Mount[];
   ports?: Port[];
+  hostname?: string;
+  domainName?: string;
+  extraHosts?: string;
   exposedPorts?: Pick<Port, 'hostPort' | 'protocol'>[];
   networks: Network[];
   envs: Env[];
+  privileged?: boolean;
+  capAdd?: string[];
+  capDrop?: string[];
+  memory?: number;
+  nanoCpus?: number;
 }

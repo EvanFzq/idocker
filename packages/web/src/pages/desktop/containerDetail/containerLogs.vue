@@ -1,4 +1,13 @@
 <template>
+  <div style="margin-bottom: 16px">
+    <a-button
+      type="primary"
+      :icon="h(ReloadOutlined)"
+      @click="onRefresh"
+    >
+      刷新
+    </a-button>
+  </div>
   <ul
     class="infinite-list"
     style="overflow: auto"
@@ -20,7 +29,8 @@
   </ul>
 </template>
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, h } from 'vue';
+import { ReloadOutlined } from '@ant-design/icons-vue';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 
@@ -45,10 +55,10 @@ const load = async () => {
   if (res.success) {
     if (res.data.length === 0) {
       hasMore.value = false;
-      return;
+    } else {
+      lines.value = lines.value.concat(res.data);
+      endTime = lines.value[lines.value.length - 1].date;
     }
-    lines.value = lines.value.concat(res.data);
-    endTime = lines.value[lines.value.length - 1].date;
   }
   isLoading.value = false;
 };
@@ -73,6 +83,11 @@ onMounted(() => {
   load();
   addMoreListen();
 });
+
+const onRefresh = () => {
+  endTime = dayjs().utc().format('YYYY-MM-DDTHH:mm:ss') + '.000000000Z';
+  load();
+};
 </script>
 <style scoped lang="less">
 .infinite-list {

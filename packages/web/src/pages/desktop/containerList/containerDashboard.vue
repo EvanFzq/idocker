@@ -15,11 +15,11 @@
     <div class="dashboard-item">
       <a-progress
         type="dashboard"
-        :percent="totalData.memoryUsage / totalData.memoryLimit"
+        :percent="(totalData.memoryUsage * 100) / totalData.memoryLimit"
       >
         <template #format>
           <div class="percentage-value">
-            {{ Number((totalData.memoryUsage / totalData.memoryLimit).toFixed(2)) }}%
+            {{ Number(((totalData.memoryUsage * 100) / totalData.memoryLimit).toFixed(2)) }}%
           </div>
           <div class="percentage-label">
             {{
@@ -44,6 +44,8 @@ defineProps<{
 <style scoped lang="less">
 .dashboard {
   display: flex;
+  flex: auto;
+  width: 50%;
   justify-content: space-evenly;
   .dashboard-item {
     display: flex;

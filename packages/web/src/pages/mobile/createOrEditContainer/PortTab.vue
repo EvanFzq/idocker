@@ -62,10 +62,10 @@ import { ref, watch } from 'vue';
 
 import type { PortConfig } from '@common/types/network';
 
-import type { ContainerFormData } from './CreateOrEditContainerPage.vue';
+import type { ContainerFormData } from './type';
 
 const props = defineProps<{ formData: ContainerFormData }>();
-const portList = ref<PortConfig[]>(props.formData.ports || []);
+const portList = ref<Partial<PortConfig>[]>(props.formData.ports || []);
 
 const emit = defineEmits(['valueChange']);
 

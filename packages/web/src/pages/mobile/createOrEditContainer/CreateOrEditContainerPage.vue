@@ -28,7 +28,17 @@
           />
         </van-tab>
         <van-tab
-          v-if="formData.network !== 'host'"
+          class="tab"
+          title="网络"
+          :dot="networkError"
+        >
+          <NetworkTab
+            :form-data="formData"
+            @value-change="onFieldChange"
+          />
+        </van-tab>
+        <van-tab
+          v-if="!['host', 'none'].includes(formData.networks[0]?.name || '')"
           class="tab"
           title="端口"
           :dot="portError"
@@ -87,52 +97,37 @@ import { showSuccessToast, showLoadingToast } from 'vant';
 import { useRoute, useRouter } from 'vue-router';
 import set from 'lodash-es/set';
 
-import type { CreateContainerParams, MountConfig, Env } from '@common/types/container';
-import type { PortConfig } from '@common/types/network';
+import type { CreateContainerParams } from '@common/types/container';
 
 import { getContainerDetail } from '@/apis/container';
 import TitleBar from '@/components/mobile/TitleBar.vue';
 import { createContainer, updateContainer } from '@/apis';
 
-import type { UploaderFileListItem } from 'vant';
 import BaseinfoCard from './BaseinfoCard.vue';
 import CommandTab from './CommandTab.vue';
+import NetworkTab from './NetworkTab.vue';
 import MountTab from './MountTab.vue';
 import PortTab from './PortTab.vue';
 import EnvVarTab from './EnvVarTab.vue';
 import OtherTab from './OtherTab.vue';
-
-export interface ContainerFormData {
-  id?: string;
-  name: string;
-  icon: UploaderFileListItem[];
-  image: string;
-  network: string;
-  runAffterCreated: boolean;
-  command: string;
-  envs: Env[];
-  mounts: MountConfig[];
-  ports: PortConfig[];
-  restart: string;
-  localUrl: string;
-  internetUrl: string;
-}
+import type { ContainerFormData } from './type';
 
 const activeTab = ref(0);
+const networkError = ref(false);
 const portError = ref(false);
 const mountError = ref(false);
 const envError = ref(false);
-const formData = ref({
+const formData = ref<ContainerFormData>({
   id: '',
   name: '',
-  icon: [] as UploaderFileListItem[],
+  icon: [],
   image: '',
-  network: '',
+  networks: [{ name: 'bridge' }],
   runAffterCreated: false,
   command: '',
-  envs: [] as Env[],
-  mounts: [] as MountConfig[],
-  ports: [] as PortConfig[],
+  envs: [],
+  mounts: [],
+  ports: [],
   restart: 'no',
   localUrl: '',
   internetUrl: '',
@@ -162,20 +157,44 @@ onMounted(async () => {
       localUrl,
       internetUrl,
     } = res.data;
+    // 处理icon
+    const iconList = [];
+    if (icon) {
+      const index = icon.indexOf('|');
+      // 在前10个字符中寻找｜，存在则判断类型，否则默认为URL（兼容之前版本）
+      if (index > 0 && index < 10) {
+        const iconType = icon.slice(0, index);
+        const iconContent = icon.slice(index + 1);
+        if (iconType === 'svg') {
+          iconList.push({
+            svg: iconContent,
+          });
+        } else {
+          iconList.push({
+            url: iconContent,
+          });
+        }
+      } else {
+        iconList.push({
+          url: icon,
+        });
+      }
+    }
+
     formData.value = {
       id: id,
       name: name,
       image: image,
-      network: networks[0]?.type,
+      networks: networks,
       restart: restartPolicyName,
       runAffterCreated: true,
-      command: cmd?.map(item => (item.indexOf(' ') > 0 ? `"${item}"` : item))?.join(' ') || '',
+      command: cmd,
       envs,
       mounts:
         mounts?.map(item => ({
           type: item.type as 'bind' | 'volume',
           container: item.target,
-          hostBind: item.type === 'bind' ? item.source : undefined,
+          hostBind: ['bind', 'device'].includes(item.type as string) ? item.source : undefined,
           volume: item.type === 'volume' ? item.source : undefined,
           readonly: !item.rw,
         })) || [],
@@ -185,11 +204,7 @@ onMounted(async () => {
           container: Number(port.containerPort),
           protocol: port.protocol as 'tcp' | 'udp',
         })) || [],
-      icon: [
-        {
-          url: icon,
-        },
-      ],
+      icon: iconList,
       localUrl: localUrl || '',
       internetUrl: internetUrl || '',
     };
@@ -208,14 +223,25 @@ const onSubmit = async (values: Record<string, string | number | boolean>) => {
     forbidClick: true,
     duration: 0,
   });
-  values.icon =
-    Array.isArray(values.icon) && values.icon.length > 0 ? values.icon[0].url : undefined;
+  const iconContent =
+    Array.isArray(values.icon) && values.icon.length > 0
+      ? values.icon[0].url
+      : values['icon[0].url'] || values['icon[0].svg'];
+  const icon = iconContent ? `${values['icon[0].svg'] ? 'svg' : 'url'}|${iconContent}` : '';
+  delete values['icon[0].url'];
+  delete values['icon[0].svg'];
   const params: CreateContainerParams = {} as CreateContainerParams;
   Object.entries(values).forEach(([key, value]: [string, string | number | boolean]) => {
     set(params, key, value);
   });
+  params.networks = params.networks.map(item => ({
+    name: item.name,
+    ip: item.ip || undefined,
+    ipV6: item.ip || undefined,
+    mac: item.ip || undefined,
+  }));
   if (formData.value.id) {
-    const res = await updateContainer({ id: formData.value.id, ...params });
+    const res = await updateContainer({ id: formData.value.id, ...params, icon });
     if (res.success) {
       showSuccessToast({
         message: '更新成功',
@@ -225,7 +251,7 @@ const onSubmit = async (values: Record<string, string | number | boolean>) => {
       });
     }
   } else {
-    const res = await createContainer(params);
+    const res = await createContainer({ ...params, icon });
     if (res.success) {
       showSuccessToast({
         message: '创建成功',
@@ -238,10 +264,14 @@ const onSubmit = async (values: Record<string, string | number | boolean>) => {
 };
 
 const onFailed = (errorInfo: { values: object; errors: { message: string; name: string }[] }) => {
+  networkError.value = false;
   mountError.value = false;
   portError.value = false;
   envError.value = false;
   errorInfo.errors.forEach(item => {
+    if (item.name.startsWith('networks')) {
+      mountError.value = true;
+    }
     if (item.name.startsWith('mounts')) {
       mountError.value = true;
     }

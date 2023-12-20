@@ -20,7 +20,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   async validate(username: string, password: string): Promise<UserInfo> {
     const user = await this.authService.validateUser(
       username,
-      AesDecrypt(password, username + dayjs().format('YYYY-MM-DD')),
+      AesDecrypt(password, username + Math.floor(dayjs().unix() / 3600)),
     );
     if (!user) {
       throw new UnauthorizedException('账户或密码错误！');

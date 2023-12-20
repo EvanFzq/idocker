@@ -70,3 +70,15 @@ export const isMobile = () => {
     userAgent.indexOf('iPad') > 0
   );
 };
+
+export const safeSvg = (svg?: string): boolean => {
+  if (!svg) {
+    return false;
+  }
+  if (
+    ['<script', '</script', ']]>', '-->', '\u2028', '\u2029'].some(item => svg.indexOf(item) >= 0)
+  ) {
+    return false;
+  }
+  return true;
+};

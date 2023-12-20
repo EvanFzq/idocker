@@ -28,7 +28,9 @@ export class ImageController {
   }
   @Post('list')
   async getImageList() {
-    return this.imageService.getImageList();
+    let list = await this.imageService.getImageList();
+    list = list.sort((a, b) => a.Name.localeCompare(b.Name));
+    return list;
   }
 
   @Post('update/check')

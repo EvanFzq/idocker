@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/no-v-html -->
 <template>
   <div
     class="box"
@@ -8,10 +9,11 @@
       class="left"
     >
       <van-image
+        v-if="getIcon(icon).type === 'url'"
         width="80"
         height="80"
         fit="contain"
-        :src="icon"
+        :src="getIcon(icon).content"
       >
         <template #error>
           {{
@@ -22,6 +24,11 @@
           }}
         </template>
       </van-image>
+      <div
+        v-if="icon && getIcon(icon).type === 'svg'"
+        class="icon-svg"
+        v-html="getIcon(icon).content"
+      />
     </div>
     <div
       v-else
@@ -154,6 +161,7 @@ import {
   ContainerStatusColor,
   ContainerStatusName,
 } from '@common/constants/enum';
+import { getIcon } from '@common/utils/utils';
 
 import { fileSizeFormat, timeLongFormat } from '@/utils/utils';
 import { activeContainer, updateContainerImage } from '@/apis/container';
@@ -271,6 +279,13 @@ const onUpdateImage = async (e: MouseEvent) => {
   line-height: 16px;
   vertical-align: middle;
   background-color: #fff;
+}
+.icon-svg {
+  width: 60px;
+  height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .right {

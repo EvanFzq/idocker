@@ -1,10 +1,14 @@
 import MobilePage from '@/pages/mobile/mobilePage.vue';
 import DesktopPage from '@/pages/desktop/desktopPage.vue';
-import AppsPage from '@/pages/mobile/apps/AppsPage.vue';
+import AppsPage from '@/pages/common/apps/AppsPage.vue';
 
 export const routes = [
   { path: '/apps/local', component: AppsPage },
   { path: '/apps/internet', component: AppsPage },
+  {
+    path: '/about',
+    component: () => import('@/pages/common/about/aboutPage.vue'),
+  },
   {
     path: '/m',
     component: MobilePage,
@@ -57,6 +61,10 @@ export const routes = [
     component: DesktopPage,
     children: [
       {
+        path: '/d/nav',
+        component: () => import('@/pages/desktop/nav/navPage.vue'),
+      },
+      {
         path: '/d/container/list',
         component: () => import('@/pages/desktop/containerList/containerListPage.vue'),
       },
@@ -81,6 +89,15 @@ export const routes = [
         path: '/d/volume/list',
         component: () => import('@/pages/desktop/volumeList/volumeListPage.vue'),
       },
+      {
+        path: '/d/setting/user',
+        component: () => import('@/pages/desktop/setting/user/userSettingPage.vue'),
+      },
+      {
+        path: '/d/setting/notice',
+        component: () => import('@/pages/desktop/setting/notice/noticeSettingPage.vue'),
+      },
+
       { path: '/d/:error*', component: () => import('@/pages/desktop/error404/ErrerPage.vue') },
     ],
   },

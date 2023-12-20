@@ -9,7 +9,9 @@ export class VolumeController {
 
   @Post('list')
   async getVolumeList() {
-    return this.volumeService.getVolumeList();
+    let list = await this.volumeService.getVolumeList();
+    list = list.sort((a, b) => a.Name.localeCompare(b.Name));
+    return list;
   }
   @Post()
   async createVolume(@Body() body: CreateVolumeDto) {
