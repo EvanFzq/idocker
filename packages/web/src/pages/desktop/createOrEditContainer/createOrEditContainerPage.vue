@@ -74,6 +74,7 @@ import { message } from 'ant-design-vue';
 
 import type { Network } from '@common/types/network';
 import { defaultCapability, Capability } from '@common/constants/enum';
+import { parseImage } from '@common/utils/utils';
 
 import PageLayout from '@/components/desktop/PageLayout.vue';
 import { getContainerDetail, updateContainer, createContainer, getNetworkList } from '@/apis';
@@ -95,12 +96,16 @@ const route = useRoute();
 const router = useRouter();
 const isEdit = !!route.query.id;
 const mode = ref<'base' | 'advanced'>(isEdit ? 'advanced' : 'base');
+const imageInfo = parseImage(route.query.image as string);
 const formData = ref<FormData>({
   id: '',
   name: '',
   icon: [],
-  image: route.query.image as string,
-  tag: route.query.tag as string,
+  image: imageInfo
+    ? `${imageInfo.project ? imageInfo.project + '/' : ''}${imageInfo.image}`
+    : undefined,
+  registry: imageInfo?.repo,
+  tag: imageInfo?.tag,
   networks: [{ name: 'bridge' }],
   runAffterCreated: false,
   command: undefined,
@@ -133,6 +138,7 @@ const getContainerData = async (id: string) => {
       id,
       name,
       image,
+      registry,
       networks,
       envs,
       cmd,
@@ -185,6 +191,7 @@ const getContainerData = async (id: string) => {
       id: id,
       name: name,
       image: image.split(':')[0],
+      registry,
       tag: image.split(':')[1],
       hostname,
       domainName,
@@ -242,12 +249,13 @@ onMounted(async () => {
 
 const onSubmit = async () => {
   await formRef.value?.validate();
-  const { image, icon, tag, ports, envs, id, ...args } = formData.value as FormData;
+  const { image, icon, tag, ports, envs, id, registry, ...args } = formData.value as FormData;
   submitLoading.value = true;
   const { url, svg } = icon[0] || {};
   const params = {
     ...args,
     image: `${image}:${tag}`,
+    registry: registry === 'hub.docker.com' ? undefined : registry,
     icon: url || svg ? `${svg ? 'svg' : 'url'}|${svg ? svg : url}` : '',
     envs: envs.map(env => ({ key: env.envKey, value: env.envValue })),
     ports: ports.map(port => ({

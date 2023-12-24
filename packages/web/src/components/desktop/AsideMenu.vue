@@ -23,6 +23,7 @@ import {
   NotificationOutlined,
   ContainerOutlined,
   TrophyOutlined,
+  CloudOutlined,
 } from '@ant-design/icons-vue';
 import { useRouter, useRoute } from 'vue-router';
 import { ref, h } from 'vue';
@@ -74,6 +75,12 @@ const items = ref([
         key: '/d/setting/user',
         label: '用户信息',
         title: '用户信息',
+      },
+      {
+        icon: () => h(CloudOutlined),
+        key: '/d/setting/docker',
+        label: 'Docker',
+        title: 'Docker',
       },
       {
         icon: () => h(NotificationOutlined),

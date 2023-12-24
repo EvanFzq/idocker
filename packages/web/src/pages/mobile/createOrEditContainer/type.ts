@@ -8,6 +8,7 @@ export interface ContainerFormData {
   name: string;
   icon: (UploaderFileListItem & { svg?: string })[];
   image: string;
+  registry?: string;
   networks: NetworkConfig[];
   runAffterCreated: boolean;
   command?: string;

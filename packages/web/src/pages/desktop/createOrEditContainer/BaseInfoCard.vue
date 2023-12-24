@@ -194,6 +194,23 @@
         </div>
       </a-form-item>
     </a-col>
+    <a-col
+      v-if="mode === 'advanced'"
+      v-bind="fieldLayout"
+    >
+      <a-form-item
+        label="镜像源"
+        name="registry"
+      >
+        <a-select
+          v-model:value="form.registry"
+          style="width: 100%"
+          placeholder="请选择"
+          :options="registryList"
+          :field-names="{ label: 'name', value: 'url' }"
+        />
+      </a-form-item>
+    </a-col>
     <a-col v-bind="fieldLayout">
       <a-form-item
         label="重启策略"
@@ -339,7 +356,7 @@
   />
 </template>
 <script setup lang="ts">
-import { ref, watch, h } from 'vue';
+import { ref, watch, h, onMounted } from 'vue';
 import { InboxOutlined, FireFilled, StarFilled, PlusOutlined } from '@ant-design/icons-vue';
 import { message } from 'ant-design-vue';
 import Cropper from 'cropperjs';
@@ -347,10 +364,11 @@ import 'cropperjs/dist/cropper.css';
 
 import type { Network } from '@common/types/network';
 import type { Image } from '@common/types/image';
+import type { DockerRegistry } from '@common/types/setting';
 import { restartPolicyList } from '@common/constants/const';
 
 import CreateNetworkModal from '@/components/desktop/CreateNetworkModal.vue';
-import { searchImage, uploadImg } from '@/apis';
+import { searchImage, uploadImg, getRegistryList } from '@/apis';
 import { dataURLtoFile, numberFormat, safeSvg } from '@/utils/utils';
 
 import type { FormData } from './type';
@@ -377,10 +395,12 @@ const iconCropper = ref<Cropper | null>(null);
 const iconFileName = ref<string | undefined>('');
 const showCreateNetworkModal = ref(false);
 const imageList = ref<Image[]>([]);
+const registryList = ref<DockerRegistry[]>([]);
 const {
   name,
   icon,
   image,
+  registry,
   tag,
   networks,
   runAffterCreated,
@@ -398,6 +418,7 @@ const form = ref<
     | 'name'
     | 'icon'
     | 'image'
+    | 'registry'
     | 'tag'
     | 'networks'
     | 'runAffterCreated'
@@ -413,6 +434,7 @@ const form = ref<
   name,
   icon,
   image,
+  registry,
   tag,
   networks,
   runAffterCreated,
@@ -432,6 +454,7 @@ watch(
       name,
       icon,
       image,
+      registry,
       tag,
       networks,
       runAffterCreated,
@@ -447,6 +470,7 @@ watch(
       name,
       icon,
       image,
+      registry,
       tag,
       networks,
       runAffterCreated,
@@ -473,6 +497,11 @@ watch(
   },
   { deep: true },
 );
+
+onMounted(async () => {
+  const res = await getRegistryList();
+  registryList.value = res.data;
+});
 
 const onIconTypeChange = (e: RadioChangeEvent) => {
   const type = e.target.value;

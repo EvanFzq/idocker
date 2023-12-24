@@ -58,7 +58,7 @@ export class ContainerController {
       });
     }
     // 排序
-    const { sortBy = 'name', sortAsc = true } = body;
+    const { sortBy = 'created', sortAsc = false } = body;
     list = list.sort((a, b) => {
       const aVal = a[sortBy];
       const bVal = b[sortBy];

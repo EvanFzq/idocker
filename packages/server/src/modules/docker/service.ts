@@ -6,6 +6,8 @@ import axios, { AxiosInstance } from 'axios';
 import dayjs from 'dayjs';
 
 import { EventAction, EventType, EventTypeName, EventActionName } from '@common/constants/enum';
+import { parseImage } from '@common/utils/utils';
+import { DockerRegistry } from '@common/types/setting';
 
 import { DockerException, DockerErrorCode } from '@/constants/exception';
 import { ConfigService } from '@/modules/config';
@@ -191,10 +193,31 @@ export class DockerService {
 
   async pullImage(env: string, image: string, catchError?: boolean): Promise<void> {
     const fetch = this.getFetch(env);
+    const imageInfo = parseImage(image);
+    let tokenBase64 = '';
+    if (imageInfo.repo) {
+      const dockerRegistrys = this.configService.getUserConfig<DockerRegistry[]>(
+        'dockerRegistrys',
+        [],
+      );
+      const registry = dockerRegistrys.find(item => item.url === imageInfo.repo);
+      if (registry && registry.username && registry.password) {
+        const token = JSON.stringify({
+          username: registry.username,
+          password: registry.password,
+        });
+        tokenBase64 = Buffer.from(token).toString('base64');
+      }
+    }
     const tag = image.indexOf(':') > 0 ? image.split(':')[1] : 'latest';
     image = image.indexOf(':') > 0 ? image.split(':')[0] : image;
     const res = await fetch.post(`/v1.37/images/create?fromImage=${image}&tag=${tag}`, null, {
       timeout: 0,
+      headers: tokenBase64
+        ? {
+            ['X-Registry-Auth']: tokenBase64,
+          }
+        : undefined,
     });
 
     if (res?.status === 404 && !catchError)

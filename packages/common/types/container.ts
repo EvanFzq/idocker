@@ -71,6 +71,7 @@ export interface ContainerListItem {
   id: string;
   name: string;
   image: string;
+  registry?: string;
   status: string;
   startedAt: number;
   created: number;

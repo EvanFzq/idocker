@@ -4,7 +4,7 @@ import path from 'path';
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 
 import { ContainerStatus, EmailType } from '@common/constants/enum';
-import { AppInfo, NoticeInfo, UserInfo } from '@common/types/setting';
+import { AppInfo, NoticeInfo, UserInfo, DockerRegistry } from '@common/types/setting';
 import { webUrlTemplateFormat } from '@common/utils/utils';
 
 import { wallpaperDir } from '@/constants/fs';
@@ -12,6 +12,7 @@ import { DockerService } from '@/modules/docker';
 import { ConfigService } from '@/modules/config';
 import { EmailService } from '@/modules/email';
 import { ContainerService } from '@/modules/container';
+import { defaultDockerRegistrys } from '@/constants/setting';
 
 import { UpdateUserInfoDto } from './dto';
 
@@ -165,5 +166,14 @@ export class SettingService {
       runtimes: data.Runtimes,
       defaultRuntime: data.DefaultRuntime,
     };
+  }
+  async getDockerRegistry() {
+    return this.configService.getUserConfig<DockerRegistry[]>(
+      'dockerRegistrys',
+      defaultDockerRegistrys,
+    );
+  }
+  async setDockerRegistry(dockerRegistrys: DockerRegistry[]) {
+    await this.configService.setUserConfig('dockerRegistrys', dockerRegistrys);
   }
 }

@@ -97,6 +97,10 @@ export const routes = [
         path: '/d/setting/notice',
         component: () => import('@/pages/desktop/setting/notice/noticeSettingPage.vue'),
       },
+      {
+        path: '/d/setting/docker',
+        component: () => import('@/pages/desktop/setting/docker/dockerSettingPage.vue'),
+      },
 
       { path: '/d/:error*', component: () => import('@/pages/desktop/error404/ErrerPage.vue') },
     ],

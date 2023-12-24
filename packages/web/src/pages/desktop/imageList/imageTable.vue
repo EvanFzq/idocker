@@ -26,7 +26,7 @@
       </template>
       <template v-if="column.key === 'Tags'">
         <div
-          v-for="tag in record.Tags"
+          v-for="tag in record.RepoTags"
           :key="tag"
         >
           {{ tag }}
@@ -102,7 +102,7 @@ const columns: TableColumnProps[] = [
   {
     key: 'Tags',
     dataIndex: 'Tags',
-    title: 'Tag',
+    title: 'Tags',
   },
   {
     key: 'Size',
@@ -132,8 +132,7 @@ const onGoToCreate = async (record: ImageItem) => {
   router.push({
     path: '/d/container/newOrEdit',
     query: {
-      image: record.Name,
-      tag: record.Tags[0],
+      image: record.RepoTags[0] || record.Name,
     },
   });
 };

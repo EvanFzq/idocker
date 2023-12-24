@@ -3,6 +3,7 @@ import Docker, { PortBinding } from 'dockerode';
 import dayjs from 'dayjs';
 
 import { ContainerStats, ContainerDetail, Port } from '@common/types/container';
+import { parseImage } from '@common/utils/utils';
 import { ContainerActive, RestartPolicy } from '@common/constants/enum';
 
 import { BusinessErrorCode, BusinessException } from '@/constants/exception';
@@ -23,8 +24,9 @@ export class ContainerService {
 
   async createContainer(params: CreateContainerDto) {
     const imageTag = params.image.indexOf(':') > 0 ? params.image : params.image + ':latest';
-
-    await this.imageService.pullImage(imageTag);
+    params.registry = params.registry === 'hub.docker.com' ? undefined : params.registry;
+    const registryPrefix = params.registry ? params.registry + '/' : '';
+    await this.imageService.pullImage(`${registryPrefix}${imageTag}`);
 
     const portBindings: Record<string, [{ HostPort: string }]> = {};
     params.ports?.forEach(port => {
@@ -59,7 +61,7 @@ export class ContainerService {
       },
       Env: params.envs?.map(env => `${env.key}=${env.value}`),
       Cmd: commandFormat(params.command),
-      Image: imageTag,
+      Image: `${registryPrefix}${imageTag}`,
       Hostname: params.hostname,
       Domainname: params.domainName,
       HostConfig: {
@@ -124,6 +126,10 @@ export class ContainerService {
   }
 
   async updateContainer(params: UpdateContainerDto) {
+    params.registry = params.registry === 'hub.docker.com' ? undefined : params.registry;
+    const registryPrefix = params.registry ? params.registry + '/' : '';
+    const imageTag = params.image.indexOf(':') > 0 ? params.image : params.image + ':latest';
+    await this.imageService.pullImage(`${registryPrefix}${imageTag}`);
     const container = this.dockerService.docker.getContainer(params.id);
     const containerDetail = await container.inspect();
     try {
@@ -140,7 +146,7 @@ export class ContainerService {
         portBindings[`${port.container}/${port.protocol}`].push({ HostPort: port.host });
       }
     });
-    const imageTag = params.image.indexOf(':') > 0 ? params.image : params.image + ':latest';
+
     const devices = params.mounts
       .filter(item => item.type === 'device')
       .map(item => ({
@@ -167,7 +173,7 @@ export class ContainerService {
       Env: params.envs?.map(env => `${env.key}=${env.value}`),
       Cmd: commandFormat(params.command),
       Entrypoint: containerDetail.Config.Entrypoint,
-      Image: imageTag,
+      Image: `${registryPrefix}${imageTag}`,
       Labels: {
         ...containerDetail.Config.Labels,
         'docker.idocker.icon': params.icon,
@@ -294,11 +300,12 @@ export class ContainerService {
         },
       );
     }
-
+    const imageInfo = parseImage(detail.Config.Image);
     return {
       id: detail.Id,
       name: detail.Name.slice(1),
-      image: detail.Config.Image,
+      image: imageInfo.imageTag,
+      registry: imageInfo.repo,
       status: detail.State.Status,
       startedAt: dayjs(detail.State.StartedAt).valueOf(),
       created: dayjs(detail.Created).valueOf(),
@@ -483,8 +490,7 @@ export class ContainerService {
   async updateContainerImage(id: string) {
     const container = this.dockerService.docker.getContainer(id);
     const containerDetail = await container.inspect();
-    const imageTag = containerDetail.Config.Image;
-    await this.dockerService.pullImage('local', imageTag);
+    await this.dockerService.pullImage('local', containerDetail.Config.Image);
     try {
       await container.stop();
     } catch (error) {
@@ -503,7 +509,7 @@ export class ContainerService {
       Env: containerDetail.Config.Env,
       Cmd: containerDetail.Config.Cmd,
       Entrypoint: containerDetail.Config.Entrypoint,
-      Image: imageTag,
+      Image: containerDetail.Config.Image,
       Labels: containerDetail.Config.Labels,
       Volumes: containerDetail.Config.Volumes,
       WorkingDir: containerDetail.Config.WorkingDir,

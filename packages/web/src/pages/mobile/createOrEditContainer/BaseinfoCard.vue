@@ -118,6 +118,15 @@
         </div>
       </van-popover>
       <van-field
+        v-model="form.registry"
+        is-link
+        readonly
+        name="registry"
+        label="镜像源"
+        placeholder="点击选择镜像源"
+        @click="showRegistryPicker = true"
+      />
+      <van-field
         name="runAffterCreated"
         label="创建后启动"
       >
@@ -140,28 +149,46 @@
         <img id="container-icon-cropper" />
       </div>
     </van-dialog>
+    <van-popup
+      v-model:show="showRegistryPicker"
+      position="bottom"
+    >
+      <van-picker
+        :columns="registryList"
+        @confirm="onRegistryConfirm"
+        @cancel="showRegistryPicker = false"
+      />
+    </van-popup>
   </div>
 </template>
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch, onMounted } from 'vue';
 import { showToast, type UploaderFileListItem } from 'vant';
 import Cropper from 'cropperjs';
 
 import 'cropperjs/dist/cropper.css';
 import type { Image } from '@common/types/image';
 
-import { searchImage, uploadImg } from '@/apis';
+import { searchImage, uploadImg, getRegistryList } from '@/apis';
 import { numberFormat } from '@/utils/utils';
 import { dataURLtoFile, safeSvg } from '@/utils/utils';
 
 import type { ContainerFormData } from './type';
 
+interface PickerValue {
+  selectedValues: string[];
+}
+
 const props = defineProps<{ formData: ContainerFormData }>();
 const emit = defineEmits(['valueChange']);
-const form = ref<Pick<ContainerFormData, 'name' | 'icon' | 'image' | 'runAffterCreated'>>({
+
+const form = ref<
+  Pick<ContainerFormData, 'name' | 'icon' | 'image' | 'runAffterCreated' | 'registry'>
+>({
   name: '',
   icon: [],
   image: '',
+  registry: undefined,
   runAffterCreated: false,
 });
 
@@ -174,6 +201,7 @@ watch(
       name: props.formData.name,
       icon: props.formData.icon,
       image: props.formData.image,
+      registry: props.formData.registry,
       runAffterCreated: props.formData.runAffterCreated,
     };
 
@@ -198,6 +226,16 @@ const showIconCropper = ref(false);
 const iconCropper = ref<Cropper | null>(null);
 const iconFileName = ref<string | undefined>('');
 const imageList = ref<Image[]>([]);
+const showRegistryPicker = ref(false);
+const registryList = ref<{ text: string; value: string }[]>([]);
+
+onMounted(async () => {
+  const res = await getRegistryList();
+  registryList.value = res.data.map(item => ({
+    text: `${item.name} (${item.url})`,
+    value: item.url,
+  }));
+});
 
 const onIconTypeChange = (value: 'upload' | 'url' | 'svg') => {
   if (value === 'url' || value === 'svg') {
@@ -272,6 +310,10 @@ const onIconCropperConfirm = async () => {
       showIconCropper.value = false;
     }
   }
+};
+const onRegistryConfirm = ({ selectedValues }: PickerValue) => {
+  form.value.registry = selectedValues[0];
+  showRegistryPicker.value = false;
 };
 </script>
 

@@ -13,6 +13,7 @@ import {
 import { Type } from 'class-transformer';
 
 import { EmailType } from '@common/constants/enum';
+import { DockerRegistry } from '@common/types/setting';
 
 export class GetAppsDto {
   @IsBoolean()
@@ -84,4 +85,26 @@ export class UpdateNoticeInfoDto {
   @ValidateNested()
   @Type(() => Events)
   events: Record<string, string[]>;
+}
+
+export class Registry {
+  @IsString()
+  name: string;
+
+  @IsString()
+  url: string;
+
+  @IsOptional()
+  @IsString()
+  username?: string;
+
+  @IsOptional()
+  @IsString()
+  password?: string;
+}
+
+export class UpdateRegistryDto {
+  @ValidateNested({ each: true })
+  @Type(() => Registry)
+  registrys: DockerRegistry[];
 }

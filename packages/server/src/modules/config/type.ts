@@ -1,4 +1,6 @@
 import { EmailType } from '@common/constants/enum';
+import { DockerRegistry } from '@common/types/setting';
+
 // 用户可修改的
 export interface UserConfig {
   username: string; //用户名
@@ -9,6 +11,7 @@ export interface UserConfig {
   emailAccount: string; //邮箱账号
   emailPassword: string; //邮箱密码或授权码
   noticeEvents: Record<string, string[]>; //通知事件
+  dockerRegistrys: DockerRegistry[];
 }
 // 程序生成的用户无感知的
 export interface SystemConfig {

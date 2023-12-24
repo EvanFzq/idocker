@@ -44,7 +44,6 @@ export class ImageService {
         ...image,
         Containers: containerNum,
         Name: imageName,
-        Tags: image.RepoTags?.map(tag => tag.slice(imageName.length + 1)),
       };
     });
     return list;
@@ -62,10 +61,14 @@ export class ImageService {
         );
       }
     });
-    await image.remove();
+    await image.remove({ force: true });
     return;
   }
   async checkImageUpdate(names: string[]) {
-    return await Promise.all(names.map(name => this.dockerService.pullImage('local', name, true)));
+    return await Promise.all(
+      names.map(name => {
+        return this.dockerService.pullImage('local', name, true);
+      }),
+    );
   }
 }

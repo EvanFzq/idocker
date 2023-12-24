@@ -136,6 +136,10 @@ export class CreateContainerDto {
   @IsString()
   image: string;
 
+  @IsOptional()
+  @IsString()
+  registry: string;
+
   @ValidateNested({ each: true })
   @Type(() => NewNetwork)
   networks: NewNetwork[];
