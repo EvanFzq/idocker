@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.16.0](///compare/v1.15.1...v1.16.0) (2023-12-24)
+
+
+### Features
+
+* 增加镜像源配置已经创建容器时选择镜像源 75c0f08
+
 ### [1.15.1](///compare/v1.15.0...v1.15.1) (2023-12-20)
 
 
