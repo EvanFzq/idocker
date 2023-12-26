@@ -14,28 +14,30 @@
   <div
     v-show="list.length !== 0"
     ref="bgRef"
-    class="app-list"
+    class="app-container"
   >
-    <div
-      v-for="app in list"
-      :key="app.name"
-      class="app"
-      @click="onClickApp(app)"
-    >
-      <van-image
-        v-if="getIcon(app.icon).type === 'url'"
-        class="icon"
-        fit="cover"
-        :src="getIcon(app.icon).content"
-      />
+    <div class="app-list">
       <div
-        v-if="getIcon(app.icon).type === 'svg'"
-        class="icon-svg"
-        v-html="getIcon(app.icon).content"
-      />
-      <div class="name">
-        <div :class="app.status === 'running' || !app.status ? 'dot normal' : 'dot fail'"></div>
-        <span>{{ app.name }}</span>
+        v-for="app in list"
+        :key="app.name"
+        class="app"
+        @click="onClickApp(app)"
+      >
+        <van-image
+          v-if="getIcon(app.icon).type === 'url'"
+          class="icon"
+          fit="cover"
+          :src="getIcon(app.icon).content"
+        />
+        <div
+          v-if="getIcon(app.icon).type === 'svg'"
+          class="icon-svg"
+          v-html="getIcon(app.icon).content"
+        />
+        <div class="name">
+          <div :class="app.status === 'running' || !app.status ? 'dot normal' : 'dot fail'"></div>
+          <span>{{ app.name }}</span>
+        </div>
       </div>
     </div>
   </div>
@@ -137,8 +139,14 @@ const onClickApp = (app: AppInfo) => {
   justify-content: center;
   align-items: center;
 }
-
+.app-container {
+  background-size: cover;
+  background-position: center;
+  height: 100%;
+  overflow-y: auto;
+}
 .app-list {
+  width: 100%;
   padding: 10px;
   display: grid;
   flex: auto;
@@ -146,8 +154,7 @@ const onClickApp = (app: AppInfo) => {
   grid-gap: 10px;
   justify-content: space-evenly;
   align-content: flex-start;
-  background-size: cover;
-  background-position: center;
+
   .app {
     background-color: rgba(255, 255, 255, 0.4);
     backdrop-filter: blur(6px);

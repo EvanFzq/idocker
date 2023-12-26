@@ -1,9 +1,10 @@
 <template>
   <div class="about-page">
-    <TitleBar />
+    <TitleBar v-if="!hiddenBack" />
     <div class="content">
       <a-image
         class="logo"
+        :preview="false"
         src="/img/docker-500x374.png"
       />
       <a-typography-title style="color: #1989fa">iDocker</a-typography-title>
@@ -19,6 +20,10 @@
         <span>QQ群：</span>
         <a-typography-paragraph :copyable="{ text: '930498439' }">930498439</a-typography-paragraph>
       </div>
+      <a-image
+        height="200px"
+        src="/img/qq.png"
+      />
     </div>
   </div>
 </template>
@@ -26,6 +31,8 @@
 import TitleBar from '@/components/mobile/TitleBar.vue';
 
 import packageData from '../../../../../../package.json';
+
+defineProps<{ hiddenBack?: boolean }>();
 </script>
 <style scoped lang="less">
 .about-page {

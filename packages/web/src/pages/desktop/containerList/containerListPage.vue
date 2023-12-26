@@ -9,13 +9,23 @@
           @search="onSearch"
         />
         <div class="btn-row">
-          <a-button
-            type="primary"
-            :icon="h(PlusOutlined)"
-            @click="onGoToAdd"
-          >
-            创建容器
-          </a-button>
+          <a-space>
+            <a-button
+              type="primary"
+              :icon="h(UpCircleOutlined)"
+              style="background-color: #07c160"
+              @click="onCheckUpdate"
+            >
+              检查更新
+            </a-button>
+            <a-button
+              type="primary"
+              :icon="h(PlusOutlined)"
+              @click="onGoToAdd"
+            >
+              创建容器
+            </a-button>
+          </a-space>
         </div>
       </div>
     </div>
@@ -56,13 +66,14 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, h } from 'vue';
-import { PlusOutlined } from '@ant-design/icons-vue';
+import { PlusOutlined, UpCircleOutlined } from '@ant-design/icons-vue';
 import { useRouter, useRoute } from 'vue-router';
+import { message } from 'ant-design-vue';
 
 import { ContainerStatus } from '@common/constants/enum';
 import type { ContainerDetail } from '@common/types/container';
 
-import { getContainerList } from '@/apis/container';
+import { getContainerList, checkImageUpdate } from '@/apis';
 
 import ContainerTable from './containerTable.vue';
 import ContainerDashboard from './containerDashboard.vue';
@@ -133,6 +144,11 @@ const onSearch = (filterData: FilterData) => {
 };
 const onGoToAdd = () => {
   router.push('/d/container/newOrEdit');
+};
+const onCheckUpdate = async () => {
+  message.info('后台检查中...');
+  await checkImageUpdate(list.value.map(item => item.image));
+  message.success('更新检查完成！');
 };
 </script>
 <style scoped lang="less">
