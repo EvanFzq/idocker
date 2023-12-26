@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.17.0](///compare/v1.16.1...v1.17.0) (2023-12-26)
+
+
+### Features
+
+* 桌面端容器、镜像、网络、数据卷列表支持排序 f551eac
+
+
+### Bug Fixes
+
+* 修复导航页布局异常、桌面端增加镜像更新检查，其他优化 e81cd28
+
 ### [1.16.1](///compare/v1.16.0...v1.16.1) (2023-12-24)
 
 ## [1.16.0](///compare/v1.15.1...v1.16.0) (2023-12-24)
