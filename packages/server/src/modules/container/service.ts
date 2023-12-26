@@ -37,14 +37,14 @@ export class ContainerService {
       }
     });
     const devices = params.mounts
-      .filter(item => item.type === 'device')
+      ?.filter(item => item.type === 'device')
       .map(item => ({
         PathOnHost: item.hostBind,
         PathInContainer: item.container,
         CgroupPermissions: item.readonly ? 'r' : 'rwm',
       }));
     const mounts = params.mounts
-      .filter(item => item.type !== 'device')
+      ?.filter(item => item.type !== 'device')
       ?.map(mount => ({
         Target: mount.container,
         Source: mount.type === 'bind' ? mount.hostBind : mount.volume,
@@ -132,11 +132,10 @@ export class ContainerService {
     await this.imageService.pullImage(`${registryPrefix}${imageTag}`);
     const container = this.dockerService.docker.getContainer(params.id);
     const containerDetail = await container.inspect();
-    try {
+    if (['running', 'paused', 'restarting'].includes(containerDetail.State.Status)) {
       await container.stop();
-    } catch (error) {
-      console.error(error);
     }
+
     await container.remove({ focus: true });
     const portBindings: Record<string, [{ HostPort: string }]> = {};
     params.ports?.forEach(port => {
@@ -148,14 +147,14 @@ export class ContainerService {
     });
 
     const devices = params.mounts
-      .filter(item => item.type === 'device')
+      ?.filter(item => item.type === 'device')
       .map(item => ({
         PathOnHost: item.hostBind,
         PathInContainer: item.container,
         CgroupPermissions: item.readonly ? 'r' : 'rwm',
       }));
     const mounts = params.mounts
-      .filter(item => item.type !== 'device')
+      ?.filter(item => item.type !== 'device')
       ?.map(mount => ({
         Target: mount.container,
         Source: mount.type === 'bind' ? mount.hostBind : mount.volume,
@@ -230,7 +229,7 @@ export class ContainerService {
     // 取消默认链接的none网络
     const noneNetworkId = networkList.find(item => item.Name === 'none')?.Id;
     await this.networkService.removeContainerToNetwork(noneNetworkId, nextContainer.id);
-    if (params.networks.length > 0) {
+    if (params.networks?.length > 0) {
       for (let i = 0; i < params.networks.length; i++) {
         const network = params.networks[i];
         // host网络无法连接，链接其他网络后无法连接none网络

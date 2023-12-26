@@ -254,9 +254,11 @@
           </a-tooltip>
           <a-tooltip
             v-if="
-              [ContainerStatus.running, ContainerStatus.restarting].includes(
-                record.status as ContainerStatus,
-              )
+              [
+                ContainerStatus.running,
+                ContainerStatus.restarting,
+                ContainerStatus.paused,
+              ].includes(record.status as ContainerStatus)
             "
             title="关闭"
             placement="bottom"

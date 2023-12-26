@@ -70,7 +70,7 @@
               :name="['networks', index, 'ip']"
               :rules="[
                 {
-                  pattern: IPv4AddressRegExp,
+                  validator: validatorIpV4,
                   message: '请输入IPv4地址',
                 },
               ]"
@@ -90,7 +90,7 @@
               :name="['networks', index, 'ipV6']"
               :rules="[
                 {
-                  pattern: IPv6AddressRegExp,
+                  validator: validatorIpV6,
                   message: '请输入IPv6地址',
                 },
               ]"
@@ -109,7 +109,7 @@
             :name="['networks', index, 'mac']"
             :rules="[
               {
-                pattern: macAddress48RegExp,
+                validator: validatorMAC,
                 message: '请输入MAC地址',
               },
             ]"
@@ -149,6 +149,7 @@ import CreateNetworkModal from '@/components/desktop/CreateNetworkModal.vue';
 
 import type { FormData } from './type';
 import type { TableColumnProps } from 'ant-design-vue';
+import type { Rule } from 'ant-design-vue/es/form';
 
 const props = defineProps<{ formData: FormData; networkList: Network[] }>();
 const emit = defineEmits(['valueChange', 'reloadNetworkList']);
@@ -236,6 +237,26 @@ const validatorNetworkName = () => {
   }
   return Promise.resolve();
 };
+const validatorIpV4 = (_: Rule, value: string) => {
+  if (typeof value !== 'string' || !value.trim() || IPv4AddressRegExp.test(value)) {
+    return Promise.resolve();
+  }
+  return Promise.reject('请输入IPv4地址');
+};
+
+const validatorIpV6 = (_: Rule, value: string) => {
+  if (typeof value !== 'string' || !value.trim() || IPv6AddressRegExp.test(value)) {
+    return Promise.resolve();
+  }
+  return Promise.reject('请输入IPv6地址');
+};
+const validatorMAC = (_: Rule, value: string) => {
+  if (typeof value !== 'string' || !value.trim() || macAddress48RegExp.test(value)) {
+    return Promise.resolve();
+  }
+  return Promise.reject('请输入MAC地址');
+};
+
 const onNetworkNameChange = (value: string, index: number) => {
   form.value.networks[index] = { name: value };
 };
