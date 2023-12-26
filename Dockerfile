@@ -1,4 +1,4 @@
-FROM node:16-alpine
+FROM node:16
 LABEL org.opencontainers.image.authors=evan_feng
 LABEL org.opencontainers.image.email=1143046586@qq.com
 

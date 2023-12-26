@@ -7,7 +7,7 @@
     <van-loading v-if="loading" />
     <van-empty
       v-else
-      description="暂无内容"
+      description="暂无应用，给容器添加内、外网地址后会出现在此页面"
     />
   </div>
 

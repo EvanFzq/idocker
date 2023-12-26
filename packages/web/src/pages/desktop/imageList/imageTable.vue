@@ -82,21 +82,24 @@ defineProps<{ list: ImageItem[]; loading: boolean }>();
 const emits = defineEmits(['reload']);
 
 const operateLoadingId = ref('');
-const columns: TableColumnProps[] = [
+const columns: TableColumnProps<ImageItem>[] = [
   {
     key: 'Name',
     dataIndex: 'Name',
     title: '名称',
+    sorter: (a: ImageItem, b: ImageItem) => a.Name?.localeCompare(b.Name) || 0,
   },
   {
     key: 'Containers',
     dataIndex: 'Containers',
     title: '容器数量',
+    sorter: (a: ImageItem, b: ImageItem) => a.Containers - b.Containers,
   },
   {
     key: 'Created',
     dataIndex: 'Created',
     title: '创建时间',
+    sorter: (a: ImageItem, b: ImageItem) => a.Created - b.Created,
     customRender: ({ value }) => timeLongFormat(dayjs.unix(value)),
   },
   {
@@ -108,6 +111,7 @@ const columns: TableColumnProps[] = [
     key: 'Size',
     dataIndex: 'Size',
     title: '大小',
+    sorter: (a: ImageItem, b: ImageItem) => a.Size - b.Size,
   },
   {
     key: 'operate',
