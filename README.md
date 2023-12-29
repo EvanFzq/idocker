@@ -73,7 +73,7 @@ docker-compose up -d
 ```
 ### 初始账户密码
 服务启动后查看容器日志输出，可以找到如下图的一条日志
-![](screenshots/init-account.jpg)
+![](docs/screenshots/init-account.jpg)
 
 初始帐号默认为`admin`，初始密码为随机八位字符串，帐号和密码可在网页端进行修改
 
