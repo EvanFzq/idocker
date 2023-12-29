@@ -1,22 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { showFailToast } from 'vant';
-import { message } from 'ant-design-vue';
+
 import axios from 'axios';
 
-import { isMobile } from '@/utils/utils';
+import { isMobile, showError } from '@/utils/utils';
 
 import type { AxiosRequestConfig } from 'axios';
-
-const showError = (msg: string, onClose?: () => void) => {
-  if (!isMobile()) {
-    message.error(msg, undefined, onClose);
-  } else {
-    showFailToast({
-      message: msg,
-      onClose,
-    });
-  }
-};
 
 export const _fetch = axios.create({
   timeout: 60000,

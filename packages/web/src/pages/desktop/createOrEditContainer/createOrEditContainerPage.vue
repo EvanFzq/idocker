@@ -35,6 +35,7 @@
           :form-data="formData"
           :network-list="networkList"
           :mode="mode"
+          :is-edit="isEdit"
           @value-change="onFieldChange"
           @reload-network-list="getNetworkData()"
         />
@@ -70,7 +71,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { message } from 'ant-design-vue';
+import { Modal, message } from 'ant-design-vue';
 
 import type { Network } from '@common/types/network';
 import { defaultCapability, Capability } from '@common/constants/enum';
@@ -264,11 +265,21 @@ const onSubmit = async () => {
       protocol: port.protocol,
     })),
   };
+  const loadingModal = Modal.info({
+    title: '容器创建中...',
+    content: '拉取镜像可能耗时较久，请耐心等候！',
+    centered: true,
+    footer: null,
+    closable: false,
+    keyboard: false,
+    maskClosable: false,
+  });
   if (formData.value.id) {
     const res = await updateContainer({
       id: id as string,
       ...params,
     });
+    loadingModal.destroy();
     if (res.success) {
       message.success({
         content: '更新成功! ' + res.msg,
@@ -279,6 +290,7 @@ const onSubmit = async () => {
     }
   } else {
     const res = await createContainer(params);
+    loadingModal.destroy();
     if (res.success) {
       message.success({
         content: '创建成功！' + res.msg,

@@ -27,7 +27,7 @@
       <template v-if="column.key === 'operate'">
         <a-space>
           <a-button
-            v-if="record.Name !== 'host'"
+            v-if="!['host', 'none', 'bridge'].includes(record.Name)"
             danger
             :disabled="!!record.Containers || ['host', 'none', 'bridge'].includes(record.Name)"
             type="primary"

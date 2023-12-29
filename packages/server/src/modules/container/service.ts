@@ -29,13 +29,16 @@ export class ContainerService {
     await this.imageService.pullImage(`${registryPrefix}${imageTag}`);
 
     const portBindings: Record<string, [{ HostPort: string }]> = {};
-    params.ports?.forEach(port => {
-      if (!portBindings[`${port.container}/${port.protocol}`]) {
-        portBindings[`${port.container}/${port.protocol}`] = [{ HostPort: port.host }];
-      } else {
-        portBindings[`${port.container}/${port.protocol}`].push({ HostPort: port.host });
-      }
-    });
+    // host网络不需要绑定端口
+    if (!params.networks?.some(item => item.name === 'host')) {
+      params.ports?.forEach(port => {
+        if (!portBindings[`${port.container}/${port.protocol}`]) {
+          portBindings[`${port.container}/${port.protocol}`] = [{ HostPort: port.host }];
+        } else {
+          portBindings[`${port.container}/${port.protocol}`].push({ HostPort: port.host });
+        }
+      });
+    }
     const devices = params.mounts
       ?.filter(item => item.type === 'device')
       .map(item => ({
@@ -65,7 +68,7 @@ export class ContainerService {
       Hostname: params.hostname,
       Domainname: params.domainName,
       HostConfig: {
-        NetworkMode: 'none',
+        NetworkMode: params.networks?.[0]?.name || 'bridge',
         ExtraHosts: params.extraHosts?.split(/[,，\s]+/).filter(item => item),
         PortBindings: portBindings,
         RestartPolicy: {
@@ -84,11 +87,17 @@ export class ContainerService {
 
     let networkError = null;
     const networkList = await this.networkService.getNetworkList();
-    // 取消默认链接的none网络
-    const noneNetworkId = networkList.find(item => item.Name === 'none')?.Id;
-    await this.networkService.removeContainerToNetwork(noneNetworkId, container.id);
+    // 第一个网络如果是自定义网络先取消链接再附加ip、mac参数链接
+    if (
+      params.networks?.[0]?.name &&
+      !['host', 'none', 'bridge'].includes(params.networks?.[0]?.name)
+    ) {
+      const firstNetworkId = networkList.find(item => item.Name === params.networks?.[0]?.name)?.Id;
+      await this.networkService.removeContainerToNetwork(firstNetworkId, container.id);
+    }
+
     // 链接网络
-    if (params.networks.length > 0) {
+    if (params.networks?.length > 0) {
       for (let i = 0; i < params.networks.length; i++) {
         const network = params.networks[i];
         // host网络无法连接，链接其他网络后无法连接none网络
@@ -106,6 +115,7 @@ export class ContainerService {
             networkId: networkInfo.Id,
             ip: network.ip,
             ipv6: network.ipV6,
+            mac: network.mac,
           });
         } catch (error) {
           console.error(error);
@@ -138,13 +148,16 @@ export class ContainerService {
 
     await container.remove({ focus: true });
     const portBindings: Record<string, [{ HostPort: string }]> = {};
-    params.ports?.forEach(port => {
-      if (!portBindings[`${port.container}/${port.protocol}`]) {
-        portBindings[`${port.container}/${port.protocol}`] = [{ HostPort: port.host }];
-      } else {
-        portBindings[`${port.container}/${port.protocol}`].push({ HostPort: port.host });
-      }
-    });
+    // host网络不需要绑定端口
+    if (!params.networks?.some(item => item.name === 'host')) {
+      params.ports?.forEach(port => {
+        if (!portBindings[`${port.container}/${port.protocol}`]) {
+          portBindings[`${port.container}/${port.protocol}`] = [{ HostPort: port.host }];
+        } else {
+          portBindings[`${port.container}/${port.protocol}`].push({ HostPort: port.host });
+        }
+      });
+    }
 
     const devices = params.mounts
       ?.filter(item => item.type === 'device')
@@ -198,7 +211,7 @@ export class ContainerService {
         CpusetCpus: containerDetail.HostConfig.CpusetCpus,
         CpusetMems: containerDetail.HostConfig.CpusetMems,
         BlkioWeight: containerDetail.HostConfig.BlkioWeight,
-        NetworkMode: 'none',
+        NetworkMode: params.networks?.[0]?.name || 'bridge',
         ExtraHosts: params.extraHosts?.split(/[,，\s]+/).filter(item => item),
         PortBindings: portBindings,
         RestartPolicy: {
@@ -226,15 +239,24 @@ export class ContainerService {
     // 链接网络
     let networkError = null;
     const networkList = await this.networkService.getNetworkList();
-    // 取消默认链接的none网络
-    const noneNetworkId = networkList.find(item => item.Name === 'none')?.Id;
-    await this.networkService.removeContainerToNetwork(noneNetworkId, nextContainer.id);
+    // 第一个网络如果是自定义网络先取消链接再附加ip、mac参数链接
+    if (
+      params.networks?.[0]?.name &&
+      !['host', 'none', 'bridge'].includes(params.networks?.[0]?.name)
+    ) {
+      const firstNetworkId = networkList.find(item => item.Name === params.networks?.[0]?.name)?.Id;
+      await this.networkService.removeContainerToNetwork(firstNetworkId, nextContainer.id);
+    }
     if (params.networks?.length > 0) {
       for (let i = 0; i < params.networks.length; i++) {
         const network = params.networks[i];
         // host网络无法连接，链接其他网络后无法连接none网络
         if (network.name === 'host' || (network.name === 'none' && i !== 0)) {
           break;
+        }
+        if (network.name === 'bridge') {
+          network.ip = undefined;
+          network.ipV6 = undefined;
         }
         const networkInfo = networkList.find(item => item.Name === network.name);
         try {
@@ -299,6 +321,7 @@ export class ContainerService {
         },
       );
     }
+
     const imageInfo = parseImage(detail.Config.Image);
     return {
       id: detail.Id,
@@ -397,6 +420,15 @@ export class ContainerService {
       const { cpu_stats, precpu_stats, memory_stats, id } = item as Docker.ContainerStats & {
         id: string;
       };
+      if (!cpu_stats || !memory_stats) {
+        return {
+          id,
+          cpu: 0,
+          cpuNum: 1,
+          memoryUsage: memory_stats?.usage || 0,
+          memoryLimit: memory_stats?.limit || 0,
+        };
+      }
       const cpuDelta = cpu_stats.cpu_usage.total_usage - precpu_stats.cpu_usage.total_usage;
       const systemDelta = cpu_stats.system_cpu_usage - precpu_stats.system_cpu_usage;
       return {
@@ -517,21 +549,27 @@ export class ContainerService {
       Domainname: containerDetail.Config.Domainname,
       HostConfig: {
         ...containerDetail.HostConfig,
-        NetworkMode: 'none',
+        NetworkMode: networks[0]?.[0] || 'bridge',
       },
     });
     // 链接网络
     let networkError = null;
     const networkList = await this.networkService.getNetworkList();
-    // 取消默认链接的none网络
-    const noneNetworkId = networkList.find(item => item.Name === 'none')?.Id;
-    await this.networkService.removeContainerToNetwork(noneNetworkId, nextContainer.id);
+    // 第一个网络如果是自定义网络先取消链接再附加ip、mac参数链接
+    if (networks[0]?.[0] && !['host', 'none', 'bridge'].includes(networks[0]?.[0])) {
+      const firstNetworkId = networkList.find(item => item.Name === networks[0]?.[0])?.Id;
+      await this.networkService.removeContainerToNetwork(firstNetworkId, container.id);
+    }
     if (networks.length > 0) {
       for (let i = 0; i < networks.length; i++) {
         const [name, config] = networks[i];
         // host网络无法连接，链接其他网络后无法连接none网络
         if (name === 'host' || (name === 'none' && i !== 0)) {
           break;
+        }
+        if (name === 'bridge') {
+          config.IPAddress = undefined;
+          config.GlobalIPv6Address = undefined;
         }
         const networkInfo = networkList.find(item => item.Name === name);
         // 先尝试指定Ip

@@ -65,6 +65,7 @@
 </template>
 <script setup lang="ts">
 import { ref, onMounted, h } from 'vue';
+import { onBeforeRouteUpdate } from 'vue-router';
 import { SearchOutlined, RollbackOutlined } from '@ant-design/icons-vue';
 
 import { getImageList } from '@/apis/image';
@@ -89,6 +90,15 @@ const networkList = ref<{ name: string }[]>([]);
 const volumekList = ref<{ name: string }[]>([]);
 
 const emits = defineEmits(['search']);
+
+onBeforeRouteUpdate(to => {
+  filter.value = {
+    image: to.query.imageId ? (to.query.imageId as string) : null,
+    network: to.query.networkName ? (to.query.networkName as string) : null,
+    volume: to.query.volumeName ? (to.query.volumeName as string) : null,
+  };
+  emits('search', filter.value);
+});
 
 onMounted(async () => {
   const [imageRes, networkRes, volumeRes] = await Promise.all([

@@ -111,6 +111,7 @@
           style="width: 100%"
           show-search
           placeholder="请输入选择"
+          :disabled="isEdit"
           :show-arrow="false"
           :filter-option="false"
           :not-found-content="null"
@@ -154,6 +155,7 @@
       >
         <a-input
           v-model:value="form.tag"
+          :disabled="isEdit"
           style="width: 100%"
           placeholder="请输入"
         />
@@ -352,7 +354,7 @@
   </a-modal>
   <CreateNetworkModal
     v-model:open="showCreateNetworkModal"
-    @created="emit('reloadNetworkList')"
+    @finish="emit('reloadNetworkList')"
   />
 </template>
 <script setup lang="ts">
@@ -382,6 +384,7 @@ const fieldLayout = {
 };
 const props = defineProps<{
   formData: FormData;
+  isEdit: boolean;
   mode: 'base' | 'advanced';
   networkList: Network[];
 }>();

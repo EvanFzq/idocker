@@ -30,6 +30,20 @@
           请添加
         </a-button>
       </template>
+      <template #headerCell="{ column }">
+        <template v-if="column.key === 'name'">
+          <div>
+            <span style="margin-right: 6px">网络</span>
+            <a-tooltip>
+              <template #title>
+                <span>host网络仅适用于Linux</span>&nbsp;
+                <a href="https://www.haoyizebo.com/posts/fd0b9bd8/">参考资料</a>
+              </template>
+              <QuestionCircleOutlined />
+            </a-tooltip>
+          </div>
+        </template>
+      </template>
       <template #bodyCell="{ column, record, index }">
         <template v-if="column.key === 'name'">
           <a-form-item
@@ -135,12 +149,12 @@
   </a-card>
   <CreateNetworkModal
     v-model:open="showCreateNetworkModal"
-    @created="emit('reloadNetworkList')"
+    @finish="emit('reloadNetworkList')"
   />
 </template>
 <script setup lang="ts">
 import { ref, h, watch } from 'vue';
-import { PlusOutlined } from '@ant-design/icons-vue';
+import { PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons-vue';
 
 import type { Network, NetworkConfig } from '@common/types/network';
 import { IPv4AddressRegExp, IPv6AddressRegExp, macAddress48RegExp } from '@common/constants/const';

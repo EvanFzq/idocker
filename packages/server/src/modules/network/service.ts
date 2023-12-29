@@ -61,6 +61,7 @@ export class NetworkService {
     await network.connect({
       Container: data.containerId,
       EndpointConfig: {
+        MacAddress: data.mac,
         IPAMConfig: {
           IPv4Address: data.ip,
           IPv6Address: data.ipv6,

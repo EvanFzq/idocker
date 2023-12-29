@@ -65,6 +65,7 @@ import type { AppInfo } from '@common/types/setting';
 import { getIcon } from '@common/utils/utils';
 
 import { getApps } from '@/apis/setting';
+import { showError } from '@/utils/utils';
 import { getWallpaper, switchWallpaper } from '@/apis/setting';
 import switchWallpaperImg from '@/assets/switch-wallpaper.webp';
 
@@ -128,7 +129,11 @@ onMounted(async () => {
   }
 });
 const onClickApp = (app: AppInfo) => {
-  window.open(app.url, '_blank', 'noreferrer,noopener');
+  try {
+    window.open(app.url, '_blank', 'noreferrer,noopener');
+  } catch (error) {
+    showError('打开失败，URL可能不正确！' + (error as Error)?.message);
+  }
 };
 </script>
 <style lang="less" scoped>

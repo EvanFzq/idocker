@@ -76,6 +76,11 @@ export class DockerService {
     // 添加事件监听
     this.envs.forEach(async env => {
       const getEvents = async () => {
+        if (!this.emailService.ready) {
+          console.info('emailService not ready');
+          setTimeout(getEvents, 60 * 1000);
+          return;
+        }
         const noticeEvents = this.configService.getUserConfig<Record<
           EventType,
           EventAction[]
@@ -88,7 +93,7 @@ export class DockerService {
             responseType: 'stream',
           });
           const events: Event[] = [];
-          res.data.on('data', (chunk: Buffer) => {
+          res.data?.on('data', (chunk: Buffer) => {
             try {
               // 处理流数据的逻辑
               const event: Event = JSON.parse(chunk.toString('utf-8'));
@@ -103,10 +108,10 @@ export class DockerService {
               console.error(error);
             }
           });
-          res.data.on('error', error => {
+          res.data?.on('error', error => {
             console.error('notice events error', error);
           });
-          res.data.on('close', async () => {
+          res.data?.on('close', async () => {
             try {
               if (events.length > 0) {
                 await this.sendEmail(env.name, events);

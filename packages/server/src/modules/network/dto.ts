@@ -1,4 +1,4 @@
-import { IsBoolean, IsIP, IsOptional, IsString } from 'class-validator';
+import { IsBoolean, IsIP, IsOptional, IsString, IsMACAddress } from 'class-validator';
 
 export class AddNetworkDto {
   @IsString()
@@ -43,6 +43,10 @@ export class AddContainerToNetworkDto {
   @IsIP('6')
   @IsOptional()
   ipv6?: string;
+
+  @IsMACAddress()
+  @IsOptional()
+  mac?: string;
 }
 
 export class RemoveContainerToNetworkDto {

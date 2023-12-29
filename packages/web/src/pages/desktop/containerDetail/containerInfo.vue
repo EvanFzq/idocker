@@ -83,6 +83,7 @@
       </template>
     </a-table>
     <a-descriptions
+      v-if="!detail.networks.find(item => item.name === 'host')"
       title="端口信息"
       bordered
       class="block"
@@ -100,7 +101,10 @@
       </a-descriptions-item>
     </a-descriptions>
     <div
-      v-if="!detail.ports || detail.ports.length === 0"
+      v-if="
+        (!detail.ports || detail.ports.length === 0) &&
+          !detail.networks.find(item => item.name === 'host')
+      "
       style="background-color: #fff; padding: 12px 0 1px"
     >
       <a-empty

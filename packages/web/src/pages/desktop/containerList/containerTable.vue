@@ -148,6 +148,17 @@
             />
           </a-tooltip>
           <a-tooltip
+            title="信息"
+            placement="top"
+          >
+            <a-button
+              :icon="h(InfoCircleOutlined)"
+              type="link"
+              size="small"
+              @click="onView(record.id)"
+            />
+          </a-tooltip>
+          <a-tooltip
             title="日志"
             placement="top"
           >
@@ -169,18 +180,6 @@
               @click="onTermianl(record.id)"
             />
           </a-tooltip>
-          <a-tooltip
-            title="信息"
-            placement="top"
-          >
-            <a-button
-              :icon="h(InfoCircleOutlined)"
-              type="link"
-              size="small"
-              @click="onView(record.id)"
-            />
-          </a-tooltip>
-
           <a-tooltip
             title="编辑"
             placement="top"
