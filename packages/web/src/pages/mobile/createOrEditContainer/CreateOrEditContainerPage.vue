@@ -234,11 +234,11 @@ const onSubmit = async (values: Record<string, string | number | boolean>) => {
   Object.entries(values).forEach(([key, value]: [string, string | number | boolean]) => {
     set(params, key, value);
   });
-  params.networks = params.networks.map(item => ({
+  params.networks = params.networks?.map(item => ({
     name: item.name,
     ip: item.ip || undefined,
-    ipV6: item.ip || undefined,
-    mac: item.ip || undefined,
+    ipV6: item.ipV6 || undefined,
+    mac: item.mac || undefined,
   }));
   if (formData.value.id) {
     const res = await updateContainer({ id: formData.value.id, ...params, icon });
@@ -264,13 +264,14 @@ const onSubmit = async (values: Record<string, string | number | boolean>) => {
 };
 
 const onFailed = (errorInfo: { values: object; errors: { message: string; name: string }[] }) => {
+  console.error(errorInfo);
   networkError.value = false;
   mountError.value = false;
   portError.value = false;
   envError.value = false;
   errorInfo.errors.forEach(item => {
     if (item.name.startsWith('networks')) {
-      mountError.value = true;
+      networkError.value = true;
     }
     if (item.name.startsWith('mounts')) {
       mountError.value = true;

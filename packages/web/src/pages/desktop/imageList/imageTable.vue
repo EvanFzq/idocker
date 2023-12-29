@@ -26,7 +26,7 @@
       </template>
       <template v-if="column.key === 'Tags'">
         <div
-          v-for="tag in record.Tags"
+          v-for="tag in record.RepoTags"
           :key="tag"
         >
           {{ tag }}
@@ -82,32 +82,36 @@ defineProps<{ list: ImageItem[]; loading: boolean }>();
 const emits = defineEmits(['reload']);
 
 const operateLoadingId = ref('');
-const columns: TableColumnProps[] = [
+const columns: TableColumnProps<ImageItem>[] = [
   {
     key: 'Name',
     dataIndex: 'Name',
     title: '名称',
+    sorter: (a: ImageItem, b: ImageItem) => a.Name?.localeCompare(b.Name) || 0,
   },
   {
     key: 'Containers',
     dataIndex: 'Containers',
     title: '容器数量',
+    sorter: (a: ImageItem, b: ImageItem) => a.Containers - b.Containers,
   },
   {
     key: 'Created',
     dataIndex: 'Created',
     title: '创建时间',
+    sorter: (a: ImageItem, b: ImageItem) => a.Created - b.Created,
     customRender: ({ value }) => timeLongFormat(dayjs.unix(value)),
   },
   {
     key: 'Tags',
     dataIndex: 'Tags',
-    title: 'Tag',
+    title: 'Tags',
   },
   {
     key: 'Size',
     dataIndex: 'Size',
     title: '大小',
+    sorter: (a: ImageItem, b: ImageItem) => a.Size - b.Size,
   },
   {
     key: 'operate',
@@ -132,8 +136,7 @@ const onGoToCreate = async (record: ImageItem) => {
   router.push({
     path: '/d/container/newOrEdit',
     query: {
-      image: record.Name,
-      tag: record.Tags[0],
+      image: record.RepoTags[0] || record.Name,
     },
   });
 };

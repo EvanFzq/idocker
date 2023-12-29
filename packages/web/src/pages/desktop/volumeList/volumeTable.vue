@@ -7,7 +7,7 @@
     :pagination="{ showSizeChanger: true }"
   >
     <template #bodyCell="{ column, record }: { record: Volume; column: TableColumnProps<Volume> }">
-      <template v-if="column.key === 'Containers'">
+      <template v-if="column.key === 'ContainerNum'">
         <RouterLink
           v-if="record.ContainerNum"
           :to="'/d/container/list?volumeName=' + record.Name"
@@ -61,19 +61,21 @@ defineProps<{ list: Volume[]; loading: boolean }>();
 const emits = defineEmits(['reload']);
 
 const operateLoadingName = ref('');
-const columns: TableColumnProps[] = [
+const columns: TableColumnProps<Volume>[] = [
   {
     key: 'Name',
     dataIndex: 'Name',
     title: '名称',
     width: 120,
+    sorter: (a: Volume, b: Volume) => a.Name.localeCompare(b.Name),
     customRender: ({ value }) =>
       value.length > 20 ? value.slice(0, 10) + '...' + value.slice(-10) : value,
   },
   {
-    key: 'Containers',
-    dataIndex: 'Containers',
+    key: 'ContainerNum',
+    dataIndex: 'ContainerNum',
     title: '容器数量',
+    sorter: (a: Volume, b: Volume) => a.ContainerNum - b.ContainerNum,
     width: 80,
   },
   {
@@ -87,6 +89,7 @@ const columns: TableColumnProps[] = [
     dataIndex: 'CreatedAt',
     title: '创建时间',
     width: 120,
+    sorter: (a: Volume, b: Volume) => a.CreatedAt.localeCompare(b.CreatedAt),
     customRender: ({ value }) => timeLongFormat(dayjs.unix(value)),
   },
   {

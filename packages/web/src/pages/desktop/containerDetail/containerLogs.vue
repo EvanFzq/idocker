@@ -20,12 +20,14 @@
       <span class="date">{{ dayjs(line.date).format('YYYY-MM-DD HH:mm:ss.SSS') }}</span>
       <span> {{ line.text }}</span>
     </li>
-    <li
+    <a-button
       v-if="hasMore"
       id="logHasMore"
+      type="link"
+      @click="load"
     >
       加载更多...
-    </li>
+    </a-button>
   </ul>
 </template>
 <script setup lang="ts">
@@ -85,6 +87,7 @@ onMounted(() => {
 });
 
 const onRefresh = () => {
+  lines.value = [];
   endTime = dayjs().utc().format('YYYY-MM-DDTHH:mm:ss') + '.000000000Z';
   load();
 };

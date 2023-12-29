@@ -19,7 +19,16 @@
       size="middle"
       :pagination="false"
     >
-      <template #emptyText> 无条目，请添加 </template>
+      <template #emptyText>
+        无条目，
+        <a-button
+          size="small"
+          type="link"
+          @click="form.ports?.push({ protocol: 'tcp' } as PortConfig)"
+        >
+          请添加
+        </a-button>
+      </template>
       <template #bodyCell="{ column, record, index }">
         <template v-if="column.key === 'host'">
           <a-form-item

@@ -35,6 +35,7 @@
           :form-data="formData"
           :network-list="networkList"
           :mode="mode"
+          :is-edit="isEdit"
           @value-change="onFieldChange"
           @reload-network-list="getNetworkData()"
         />
@@ -70,10 +71,11 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { message } from 'ant-design-vue';
+import { Modal, message } from 'ant-design-vue';
 
 import type { Network } from '@common/types/network';
 import { defaultCapability, Capability } from '@common/constants/enum';
+import { parseImage } from '@common/utils/utils';
 
 import PageLayout from '@/components/desktop/PageLayout.vue';
 import { getContainerDetail, updateContainer, createContainer, getNetworkList } from '@/apis';
@@ -95,12 +97,16 @@ const route = useRoute();
 const router = useRouter();
 const isEdit = !!route.query.id;
 const mode = ref<'base' | 'advanced'>(isEdit ? 'advanced' : 'base');
+const imageInfo = parseImage(route.query.image as string);
 const formData = ref<FormData>({
   id: '',
   name: '',
   icon: [],
-  image: route.query.image as string,
-  tag: route.query.tag as string,
+  image: imageInfo
+    ? `${imageInfo.project ? imageInfo.project + '/' : ''}${imageInfo.image}`
+    : undefined,
+  registry: imageInfo?.repo,
+  tag: imageInfo?.tag,
   networks: [{ name: 'bridge' }],
   runAffterCreated: false,
   command: undefined,
@@ -133,6 +139,7 @@ const getContainerData = async (id: string) => {
       id,
       name,
       image,
+      registry,
       networks,
       envs,
       cmd,
@@ -185,6 +192,7 @@ const getContainerData = async (id: string) => {
       id: id,
       name: name,
       image: image.split(':')[0],
+      registry,
       tag: image.split(':')[1],
       hostname,
       domainName,
@@ -242,12 +250,13 @@ onMounted(async () => {
 
 const onSubmit = async () => {
   await formRef.value?.validate();
-  const { image, icon, tag, ports, envs, id, ...args } = formData.value as FormData;
+  const { image, icon, tag, ports, envs, id, registry, ...args } = formData.value as FormData;
   submitLoading.value = true;
   const { url, svg } = icon[0] || {};
   const params = {
     ...args,
     image: `${image}:${tag}`,
+    registry: registry === 'hub.docker.com' ? undefined : registry,
     icon: url || svg ? `${svg ? 'svg' : 'url'}|${svg ? svg : url}` : '',
     envs: envs.map(env => ({ key: env.envKey, value: env.envValue })),
     ports: ports.map(port => ({
@@ -256,11 +265,21 @@ const onSubmit = async () => {
       protocol: port.protocol,
     })),
   };
+  const loadingModal = Modal.info({
+    title: '容器创建中...',
+    content: '拉取镜像可能耗时较久，请耐心等候！',
+    centered: true,
+    footer: null,
+    closable: false,
+    keyboard: false,
+    maskClosable: false,
+  });
   if (formData.value.id) {
     const res = await updateContainer({
       id: id as string,
       ...params,
     });
+    loadingModal.destroy();
     if (res.success) {
       message.success({
         content: '更新成功! ' + res.msg,
@@ -271,6 +290,7 @@ const onSubmit = async () => {
     }
   } else {
     const res = await createContainer(params);
+    loadingModal.destroy();
     if (res.success) {
       message.success({
         content: '创建成功！' + res.msg,

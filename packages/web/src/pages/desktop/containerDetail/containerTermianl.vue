@@ -12,6 +12,7 @@
         </a-button>
       </template>
     </a-empty>
+    <div> 命令行工具 <a-input /> </div>
     <div
       ref="terminalRef"
       style="background-color: #000"

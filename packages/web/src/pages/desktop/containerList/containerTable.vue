@@ -148,6 +148,17 @@
             />
           </a-tooltip>
           <a-tooltip
+            title="信息"
+            placement="top"
+          >
+            <a-button
+              :icon="h(InfoCircleOutlined)"
+              type="link"
+              size="small"
+              @click="onView(record.id)"
+            />
+          </a-tooltip>
+          <a-tooltip
             title="日志"
             placement="top"
           >
@@ -169,18 +180,6 @@
               @click="onTermianl(record.id)"
             />
           </a-tooltip>
-          <a-tooltip
-            title="信息"
-            placement="top"
-          >
-            <a-button
-              :icon="h(InfoCircleOutlined)"
-              type="link"
-              size="small"
-              @click="onView(record.id)"
-            />
-          </a-tooltip>
-
           <a-tooltip
             title="编辑"
             placement="top"
@@ -254,9 +253,11 @@
           </a-tooltip>
           <a-tooltip
             v-if="
-              [ContainerStatus.running, ContainerStatus.restarting].includes(
-                record.status as ContainerStatus,
-              )
+              [
+                ContainerStatus.running,
+                ContainerStatus.restarting,
+                ContainerStatus.paused,
+              ].includes(record.status as ContainerStatus)
             "
             title="关闭"
             placement="bottom"
@@ -337,12 +338,14 @@ const columns: TableColumnProps<ContainerDetail>[] = [
     dataIndex: 'name',
     title: '名称',
     width: 180,
+    sorter: (a: ContainerDetail, b: ContainerDetail) => a.name.localeCompare(b.name),
   },
   {
     key: 'status',
     dataIndex: 'status',
     title: '状态',
     width: 100,
+    sorter: (a: ContainerDetail, b: ContainerDetail) => a.status.localeCompare(b.status),
   },
   {
     key: 'image',
@@ -355,6 +358,7 @@ const columns: TableColumnProps<ContainerDetail>[] = [
     dataIndex: 'id',
     title: '资源消耗',
     width: 300,
+    sorter: (a: ContainerDetail, b: ContainerDetail) => (a.cpu || 0) - (b.cpu || 0),
   },
   {
     key: 'networks',
@@ -378,7 +382,8 @@ const columns: TableColumnProps<ContainerDetail>[] = [
     key: 'created',
     dataIndex: 'created',
     title: '启动时间',
-    width: 80,
+    width: 100,
+    sorter: (a: ContainerDetail, b: ContainerDetail) => a.created - b.created,
   },
   {
     key: 'operate',

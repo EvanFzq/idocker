@@ -2,8 +2,8 @@
   <div class="home-page">
     <NavTab v-if="active === 'nav'" />
     <ContainerTab v-if="active === 'container'" />
-    <TemplateTab v-if="active === 'template'" />
     <SettingTab v-if="active === 'setting'" />
+    <AboutTab v-if="active === 'about'" />
     <van-tabbar
       :model-value="active"
       @change="onTabChange"
@@ -29,16 +29,16 @@
         </div>
       </van-tabbar-item>
       <van-tabbar-item
-        name="template"
-        icon="records"
-      >
-        模版
-      </van-tabbar-item>
-      <van-tabbar-item
         name="setting"
         icon="setting-o"
       >
         设置
+      </van-tabbar-item>
+      <van-tabbar-item
+        name="about"
+        icon="award-o"
+      >
+        关于
       </van-tabbar-item>
     </van-tabbar>
   </div>
@@ -51,7 +51,7 @@ import { useRouter } from 'vue-router';
 import ContainerTab from './ContainerTab.vue';
 import SettingTab from './SettingTab.vue';
 import NavTab from './NavTab.vue';
-import TemplateTab from './TemplateTab.vue';
+import AboutTab from './AboutTab.vue';
 const active = ref('nav');
 
 const router = useRouter();

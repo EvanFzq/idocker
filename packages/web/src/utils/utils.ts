@@ -1,5 +1,7 @@
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { showFailToast } from 'vant';
+import { message } from 'ant-design-vue';
 
 import 'dayjs/locale/zh-cn';
 import { VolumeUnit, VolumeUnitSize, NumberLevel } from '@common/constants/enum';
@@ -81,4 +83,15 @@ export const safeSvg = (svg?: string): boolean => {
     return false;
   }
   return true;
+};
+
+export const showError = (msg: string, onClose?: () => void) => {
+  if (!isMobile()) {
+    message.error(msg, undefined, onClose);
+  } else {
+    showFailToast({
+      message: msg,
+      onClose,
+    });
+  }
 };

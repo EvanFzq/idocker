@@ -22,7 +22,9 @@
         </van-tag>
       </template>
     </van-nav-bar>
-    <AppsPage :is-local="isLocal" />
+    <div class="list">
+      <AppsPage :is-local="isLocal" />
+    </div>
   </div>
 </template>
 <script setup lang="ts">
@@ -41,5 +43,11 @@ const onOpenAlonePage = () => {
   height: 100%;
   display: flex;
   flex-direction: column;
+}
+.list {
+  width: 100%;
+  flex: auto;
+  height: 0;
+  padding-bottom: 50px;
 }
 </style>

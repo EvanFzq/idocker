@@ -1,6 +1,28 @@
 <template>
   <div class="header">
-    <div class="logo">iDocker</div>
+    <div class="left">
+      <div class="logo">iDocker</div>
+      <div class="left-menu">
+        <a
+          href="https://www.runoob.com/docker/docker-tutorial.html"
+          referrerpolicy="no-referrer"
+          target="_blank"
+        >
+          Docker 教程
+        </a>
+        <a-divider
+          type="vertical"
+          style="height: 20px; background-color: #fff; border-width: 2px"
+        />
+        <a
+          href="https://hub.docker.com/"
+          referrerpolicy="no-referrer"
+          target="_blank"
+        >
+          Docker Hub
+        </a>
+      </div>
+    </div>
     <div class="right-menu">
       <a-dropdown>
         <div class="name">
@@ -144,13 +166,30 @@ const onConfirmChangePassword = async () => {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  .left {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
   .logo {
     color: #fff;
     margin: 0;
     font-size: 24px;
     font-weight: 700;
   }
-
+  .left-menu {
+    margin-left: 64px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 500;
+    a {
+      color: #fff;
+      padding: 4px 12px;
+      &:hover {
+        border-bottom: solid 2px #fff;
+      }
+    }
+  }
   .name {
     cursor: pointer;
     color: #fff;

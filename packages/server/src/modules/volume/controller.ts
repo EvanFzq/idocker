@@ -10,7 +10,7 @@ export class VolumeController {
   @Post('list')
   async getVolumeList() {
     let list = await this.volumeService.getVolumeList();
-    list = list.sort((a, b) => a.Name.localeCompare(b.Name));
+    list = list.sort((a, b) => b.CreatedAt.localeCompare(a.CreatedAt));
     return list;
   }
   @Post()

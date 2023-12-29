@@ -4,3 +4,4 @@ export * from './auth';
 export * from './network';
 export * from './common';
 export * from './volume';
+export * from './setting';

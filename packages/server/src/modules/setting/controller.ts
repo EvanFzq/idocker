@@ -1,13 +1,19 @@
 import { Controller, Post, Body, Put, Req } from '@nestjs/common';
 
-import { AppInfo, UserInfo, NoticeInfo, SystemInfo } from '@common/types/setting';
+import { AppInfo, UserInfo, NoticeInfo, SystemInfo, DockerRegistry } from '@common/types/setting';
 
 import { wallpaperDir } from '@/constants/fs';
 import { mkdir } from '@/utils/fs';
 import { ConfigPublic } from '@/decorators';
 
 import { SettingService } from './service';
-import { GetAppsDto, AppsPublicDto, UpdateUserInfoDto, UpdateNoticeInfoDto } from './dto';
+import {
+  GetAppsDto,
+  AppsPublicDto,
+  UpdateUserInfoDto,
+  UpdateNoticeInfoDto,
+  UpdateRegistryDto,
+} from './dto';
 
 @Controller('setting')
 export class SettingController {
@@ -62,5 +68,13 @@ export class SettingController {
   @Post('system/info')
   async getSystemInfo(): Promise<SystemInfo> {
     return this.settingService.getSystemInfo();
+  }
+  @Post('registrys')
+  async getRegistrySetting(): Promise<DockerRegistry[]> {
+    return this.settingService.getDockerRegistry();
+  }
+  @Put('registrys')
+  async setRegistrySetting(@Body() body: UpdateRegistryDto): Promise<void> {
+    return this.settingService.setDockerRegistry(body.registrys);
   }
 }

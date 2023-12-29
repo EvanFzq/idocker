@@ -1,77 +1,75 @@
 SettingTab
 <template>
-  <van-nav-bar title="设置" />
-  <div class="setting">
-    <h3 class="username">{{ userInfo.userName }}</h3>
-    <van-cell-group
-      title="个人信息"
-      inset
-      class="setting-list"
-    >
-      <van-cell
-        title="用户设置"
-        is-link
-        to="/m/user/setting"
-      />
-      <van-cell
-        title="修改密码"
-        is-link
-        @click="showChangePassword = true"
-      />
-    </van-cell-group>
-    <van-cell-group
-      title="Docker 管理"
-      inset
-      class="setting-list"
-    >
-      <van-cell
-        title="镜像列表"
-        is-link
-        to="/m/image/list"
-      />
-      <van-cell
-        title="网络列表"
-        is-link
-        to="/m/network/list"
-      />
-      <van-cell
-        title="数据卷列表"
-        is-link
-        to="/m/volume/list"
-      />
-    </van-cell-group>
-    <van-cell-group
-      title="其他设置"
-      inset
-      class="setting-list"
-    >
-      <van-cell
-        title="导航页设置"
-        is-link
-        to="/m/apps/setting"
-      />
-      <van-cell
-        title="通知设置"
-        is-link
-        to="/m/notice/setting"
-      />
-      <van-cell
-        title="关于"
-        is-link
-        to="/about"
-      />
-    </van-cell-group>
-    <div class="btns">
-      <van-button
-        type="primary"
-        round
-        block
-        @click="onLogout"
+  <div class="setting-tab">
+    <van-nav-bar title="设置" />
+    <div class="setting">
+      <h3 class="username">{{ userInfo.userName }}</h3>
+      <van-cell-group
+        title="个人信息"
+        inset
+        class="setting-list"
       >
-        注销
-      </van-button>
+        <van-cell
+          title="用户设置"
+          is-link
+          to="/m/user/setting"
+        />
+        <van-cell
+          title="修改密码"
+          is-link
+          @click="showChangePassword = true"
+        />
+      </van-cell-group>
+      <van-cell-group
+        title="Docker 管理"
+        inset
+        class="setting-list"
+      >
+        <van-cell
+          title="镜像列表"
+          is-link
+          to="/m/image/list"
+        />
+        <van-cell
+          title="网络列表"
+          is-link
+          to="/m/network/list"
+        />
+        <van-cell
+          title="数据卷列表"
+          is-link
+          to="/m/volume/list"
+        />
+      </van-cell-group>
+      <van-cell-group
+        title="其他设置"
+        inset
+        class="setting-list"
+      >
+        <van-cell
+          title="导航页设置"
+          is-link
+          to="/m/apps/setting"
+        />
+        <van-cell
+          title="通知设置"
+          is-link
+          to="/m/notice/setting"
+        />
+      </van-cell-group>
+      <div class="btns">
+        <van-button
+          type="primary"
+          round
+          block
+          @click="onLogout"
+        >
+          注销
+        </van-button>
+      </div>
     </div>
   </div>
+
   <van-dialog
     :show="showChangePassword"
     title="修改密码"
@@ -181,13 +179,22 @@ const onChangePasswordSubmit = async () => {
 </script>
 
 <style lang="less" scoped>
+.setting-tab {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
 .username {
   font-size: 28px;
   margin: 16px 16px 0;
 }
 .setting {
+  width: 100%;
+  flex: auto;
+  height: 0;
   position: relative;
   padding-bottom: 72px;
+  overflow: auto;
 
   .setting-list {
     margin: 12px;

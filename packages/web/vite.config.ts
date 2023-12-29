@@ -48,7 +48,7 @@ export default defineConfig({
     }),
     visualizer({
       // 打包完成后自动打开浏览器，显示产物体积报告
-      open: true,
+      open: false,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }) as any,
   ],

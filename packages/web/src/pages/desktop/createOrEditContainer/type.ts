@@ -8,7 +8,8 @@ export interface FormData {
   name: string;
   icon: (UploadFile & { svg?: string })[];
   image?: string;
-  tag: string;
+  registry?: string;
+  tag?: string;
   networks: NetworkConfig[];
   runAffterCreated: boolean;
   command?: string;

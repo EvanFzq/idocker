@@ -24,5 +24,4 @@ export interface ImageItem {
   Size: number;
   VirtualSize: number;
   Name: string;
-  Tags: string[];
 }

@@ -1,4 +1,10 @@
-import type { AppInfo, UserInfo, NoticeInfo, SystemInfo } from '@common/types/setting';
+import type {
+  AppInfo,
+  UserInfo,
+  NoticeInfo,
+  SystemInfo,
+  DockerRegistry,
+} from '@common/types/setting';
 
 import { fetch } from './fetch';
 
@@ -40,4 +46,12 @@ export const updateNoticeInfo = (info: NoticeInfo) => {
 
 export const getSystemInfo = () => {
   return fetch.post<SystemInfo>('/setting/system/info');
+};
+
+export const getRegistryList = () => {
+  return fetch.post<DockerRegistry[]>('/setting/registrys');
+};
+
+export const updateRegistryList = (registrys: DockerRegistry[]) => {
+  return fetch.put<void>('/setting/registrys', { registrys });
 };

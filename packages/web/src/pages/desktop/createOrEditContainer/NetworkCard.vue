@@ -20,7 +20,30 @@
       size="middle"
       :pagination="false"
     >
-      <template #emptyText> 无条目，请添加 </template>
+      <template #emptyText>
+        无条目，
+        <a-button
+          size="small"
+          type="link"
+          @click="form.networks?.push({} as NetworkConfig)"
+        >
+          请添加
+        </a-button>
+      </template>
+      <template #headerCell="{ column }">
+        <template v-if="column.key === 'name'">
+          <div>
+            <span style="margin-right: 6px">网络</span>
+            <a-tooltip>
+              <template #title>
+                <span>host网络仅适用于Linux</span>&nbsp;
+                <a href="https://www.haoyizebo.com/posts/fd0b9bd8/">参考资料</a>
+              </template>
+              <QuestionCircleOutlined />
+            </a-tooltip>
+          </div>
+        </template>
+      </template>
       <template #bodyCell="{ column, record, index }">
         <template v-if="column.key === 'name'">
           <a-form-item
@@ -61,7 +84,7 @@
               :name="['networks', index, 'ip']"
               :rules="[
                 {
-                  pattern: IPv4AddressRegExp,
+                  validator: validatorIpV4,
                   message: '请输入IPv4地址',
                 },
               ]"
@@ -81,7 +104,7 @@
               :name="['networks', index, 'ipV6']"
               :rules="[
                 {
-                  pattern: IPv6AddressRegExp,
+                  validator: validatorIpV6,
                   message: '请输入IPv6地址',
                 },
               ]"
@@ -100,7 +123,7 @@
             :name="['networks', index, 'mac']"
             :rules="[
               {
-                pattern: macAddress48RegExp,
+                validator: validatorMAC,
                 message: '请输入MAC地址',
               },
             ]"
@@ -126,12 +149,12 @@
   </a-card>
   <CreateNetworkModal
     v-model:open="showCreateNetworkModal"
-    @created="emit('reloadNetworkList')"
+    @finish="emit('reloadNetworkList')"
   />
 </template>
 <script setup lang="ts">
 import { ref, h, watch } from 'vue';
-import { PlusOutlined } from '@ant-design/icons-vue';
+import { PlusOutlined, QuestionCircleOutlined } from '@ant-design/icons-vue';
 
 import type { Network, NetworkConfig } from '@common/types/network';
 import { IPv4AddressRegExp, IPv6AddressRegExp, macAddress48RegExp } from '@common/constants/const';
@@ -140,6 +163,7 @@ import CreateNetworkModal from '@/components/desktop/CreateNetworkModal.vue';
 
 import type { FormData } from './type';
 import type { TableColumnProps } from 'ant-design-vue';
+import type { Rule } from 'ant-design-vue/es/form';
 
 const props = defineProps<{ formData: FormData; networkList: Network[] }>();
 const emit = defineEmits(['valueChange', 'reloadNetworkList']);
@@ -227,6 +251,26 @@ const validatorNetworkName = () => {
   }
   return Promise.resolve();
 };
+const validatorIpV4 = (_: Rule, value: string) => {
+  if (typeof value !== 'string' || !value.trim() || IPv4AddressRegExp.test(value)) {
+    return Promise.resolve();
+  }
+  return Promise.reject('请输入IPv4地址');
+};
+
+const validatorIpV6 = (_: Rule, value: string) => {
+  if (typeof value !== 'string' || !value.trim() || IPv6AddressRegExp.test(value)) {
+    return Promise.resolve();
+  }
+  return Promise.reject('请输入IPv6地址');
+};
+const validatorMAC = (_: Rule, value: string) => {
+  if (typeof value !== 'string' || !value.trim() || macAddress48RegExp.test(value)) {
+    return Promise.resolve();
+  }
+  return Promise.reject('请输入MAC地址');
+};
+
 const onNetworkNameChange = (value: string, index: number) => {
   form.value.networks[index] = { name: value };
 };

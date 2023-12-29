@@ -4,6 +4,7 @@ import { Injectable } from '@nestjs/common';
 import { parse, stringify } from 'yaml';
 
 import { configDirPath, userConfigFilePath, systemConfigFilePath } from '@/constants/fs';
+import { defaultDockerRegistrys } from '@/constants/setting';
 import { mkdirSync } from '@/utils/fs';
 
 import { UserConfig, SystemConfig } from './type';
@@ -17,6 +18,7 @@ export class ConfigService {
       username: 'admin',
       passwordMaxRetryNum: 10,
       appsPagePublic: false,
+      dockerRegistrys: defaultDockerRegistrys,
     };
     this.systemConfig = {};
     this.init();

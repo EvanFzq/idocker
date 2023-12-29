@@ -26,7 +26,7 @@
       :placeholder="'网段：' + (getNetworkInfo(network.name)?.subnet || '无')"
       :rules="[
         {
-          pattern: IPv4AddressRegExp,
+          validator: validatorIpV4,
           message: '请输入IPv4地址',
         },
       ]"
@@ -39,7 +39,7 @@
       :placeholder="'网段：' + (getNetworkInfo(network.name)?.subnetV6 || '无')"
       :rules="[
         {
-          pattern: IPv6AddressRegExp,
+          validator: validatorIpV6,
           message: '请输入IPv6地址',
         },
       ]"
@@ -50,6 +50,12 @@
       :name="'networks[' + index + '].mac'"
       label="MAC 地址"
       placeholder="请输入MAC 地址"
+      :rules="[
+        {
+          validator: validatorMAC,
+          message: '请输入MAC地址',
+        },
+      ]"
     />
 
     <van-button
@@ -85,7 +91,7 @@
 import { ref, onMounted, watch, computed } from 'vue';
 
 import type { NetworkConfig, Network } from '@common/types/network';
-import { IPv4AddressRegExp, IPv6AddressRegExp } from '@common/constants/const';
+import { IPv4AddressRegExp, IPv6AddressRegExp, macAddress48RegExp } from '@common/constants/const';
 
 import { getNetworkList } from '@/apis/network';
 
@@ -154,6 +160,25 @@ const onSelectNetwork = (index: number) => {
 const onNetworkConfirm = ({ selectedValues }: PickerValue) => {
   networkFormList.value[seletcNetworkIndex.value].name = selectedValues[0];
   showNetworkPicker.value = false;
+};
+const validatorIpV4 = (value: string) => {
+  if (typeof value !== 'string' || !value.trim() || IPv4AddressRegExp.test(value)) {
+    return true;
+  }
+  return Promise.reject('请输入IPv4地址');
+};
+
+const validatorIpV6 = (value: string) => {
+  if (typeof value !== 'string' || !value.trim() || IPv6AddressRegExp.test(value)) {
+    return true;
+  }
+  return Promise.reject('请输入IPv6地址');
+};
+const validatorMAC = (value: string) => {
+  if (typeof value !== 'string' || !value.trim() || macAddress48RegExp.test(value)) {
+    return true;
+  }
+  return Promise.reject('请输入MAC地址');
 };
 </script>
 <style scoped lang="less">

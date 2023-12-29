@@ -18,7 +18,7 @@
     <div class="row">
       <div class="tag-row">
         <van-tag
-          v-for="tag in image.Tags"
+          v-for="tag in image.RepoTags"
           :key="tag"
           class="tag"
           type="primary"

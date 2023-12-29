@@ -48,3 +48,37 @@ export const getIcon = (icon?: string): { type: 'url' | 'svg'; content: string }
     return { type: 'url', content: icon };
   }
 };
+
+export const parseImage = (
+  str: string,
+):
+  | undefined
+  | {
+      repo?: string;
+      project?: string;
+      image: string;
+      tag: string;
+      imageTag: string;
+    } => {
+  if (!str) {
+    return undefined;
+  }
+  const arr = str.split('/');
+  const [image, tag] = arr.pop().split(':');
+  let project, repo;
+  for (let i = 0; i < arr.length; i++) {
+    const ele = arr[i];
+    if (ele.indexOf('.') === -1) {
+      project = ele;
+    } else {
+      repo = ele;
+    }
+  }
+  return {
+    repo,
+    project,
+    image,
+    tag: tag || 'latest',
+    imageTag: `${project ? `${project}/` : ''}${image}:${tag || 'latest'}`,
+  };
+};

@@ -27,7 +27,7 @@
       <template v-if="column.key === 'operate'">
         <a-space>
           <a-button
-            v-if="record.Name !== 'host'"
+            v-if="!['host', 'none', 'bridge'].includes(record.Name)"
             danger
             :disabled="!!record.Containers || ['host', 'none', 'bridge'].includes(record.Name)"
             type="primary"
@@ -241,16 +241,19 @@ const columns: TableColumnProps<Network>[] = [
     key: 'Name',
     dataIndex: 'Name',
     title: '名称',
+    sorter: (a: Network, b: Network) => a.Name.localeCompare(b.Name),
   },
   {
     key: 'Containers',
     dataIndex: 'Containers',
     title: '容器数量',
+    sorter: (a: Network, b: Network) => a.Containers - b.Containers,
   },
   {
     key: 'Created',
     dataIndex: 'Created',
     title: '创建时间',
+    sorter: (a: Network, b: Network) => a.Created.localeCompare(b.Created),
     customRender: ({ value }) => timeLongFormat(dayjs.unix(value)),
   },
   {

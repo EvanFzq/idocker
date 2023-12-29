@@ -11,7 +11,7 @@ export interface Network {
   Ingress: boolean;
   ConfigFrom: ConfigFrom;
   ConfigOnly: boolean;
-  Containers: Record<string, string>;
+  Containers: number;
   Options: Record<string, string>;
   Labels: Record<string, string>;
 }

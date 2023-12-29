@@ -26,7 +26,9 @@
         </a-button>
       </a-space>
     </template>
-    <AppsPage :is-local="isLocal" />
+    <div class="list">
+      <AppsPage :is-local="isLocal" />
+    </div>
   </PageLayout>
 </template>
 <script setup lang="ts">
@@ -42,3 +44,8 @@ const onOpenAlonePage = () => {
   window.open(isLocal.value ? '/apps/local' : '/apps/internet');
 };
 </script>
+<style scoped lang="less">
+.list {
+  width: 100%;
+}
+</style>

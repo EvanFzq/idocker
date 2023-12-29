@@ -24,6 +24,7 @@ export class EmailService {
     emailAccount: string,
     emailPassword: string,
   ): Promise<void> {
+    this.ready = false;
     this.transport = createTransport({
       ...EmailConfig[emailType],
       auth: {
