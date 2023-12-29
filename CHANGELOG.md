@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.17.2](///compare/v1.17.1...v1.17.2) (2023-12-29)
+
+
+### Bug Fixes
+
+* 补充文档，修复一些bug d513de5
+
 ### [1.17.1](///compare/v1.17.0...v1.17.1) (2023-12-26)
 
 
