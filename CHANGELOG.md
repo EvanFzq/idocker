@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.18.0](///compare/v1.17.2...v1.18.0) (2023-12-29)
+
+
+### Features
+
+* 添加友情链接 71cc103
+
+
+### Bug Fixes
+
+* Create LICENSE 8436b9d
+
 ### [1.17.2](///compare/v1.17.1...v1.17.2) (2023-12-29)
 
 
