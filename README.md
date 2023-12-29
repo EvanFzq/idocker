@@ -37,12 +37,19 @@
 | 移动端支持管理镜像源 | UI美化     | 应用市场       |
 | 路径提示             |            | 多环境管理     |
   
-## 部署方式
+## 安装
 
-### 1、使用 `docker-compose.yml`
+### 安装方式
+可使用下面两种方式进行安装
+#### 使用`docker`安装
+使用终端执行下面命令（注意修改host配置文件路径）
+```
+docker run -name idocker -d -p 3580:3580 -v /var/run/docker.sock:/var/run/docker.sock -v /host/file/path:/idocker evanfzq/idocker:latest
+```
+#### 使用 `docker-compose`安装
 
 到宿主机对应文件目录下使用下面命令创建文件夹及`docker-compose.yml`文件
-```
+```shell
 mkdir idocker
 cd idocker
 touch docker-compose.yml
@@ -57,33 +64,25 @@ services:  # 为project定义服务
     ports:  # 暴露端口信息
       - 3580:3580
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock  # 与docker宿主通信的 sock 地址
-      - /host/file/path:/idocker # 服务配置文件存放的地方
+      - /var/run/docker.sock:/var/run/docker.sock  # 与docker宿主通信的 sock 地址，勿修改
+      - /host/file/path:/idocker # 服务配置文件存放的地方，请修改为自己的磁盘路径
 ```
 在`docker-compose.yml`文件所在文件夹下执行下列命令启动服务
-```
+```shell
 docker-compose up -d 
 ```
+### 初始账户密码
+服务启动后查看容器日志输出，可以找到如下图的一条日志
+![](screenshots/init-account.jpg)
 
-### 2、使用`docker run`
-使用终端执行下面命令（注意修改host配置文件路径）
-```
-docker run -name idocker -d -p 3580:3580 -v /var/run/docker.sock:/var/run/docker.sock -v /host/file/path:/idocker evanfzq/idocker:latest
-```
+初始帐号默认为`admin`，初始密码为随机八位字符串，帐号和密码可在网页端进行修改
 
-## 配置文件
-配置文件在容器的`/idocker/config`目录下，一般情况下系统配置用户无需改动，由程序自行管理
-### 用户配置
-文件名为`userConfig.yml`
-
-### 系统配置
-文件名为`systemConfig.yml`
-
-### 重置密码
+### 忘记密码
 针对忘记密码的情况，可通过下面步骤进行重置
 
 - 停止服务
-- 删除系统配置`systemConfig.yml`的`passwordHash`字段
+- 进入`iDocker`配置文件夹中的`config`文件夹
+- 删除系统配置`systemConfig.yml`文件的`passwordHash`字段
 - 启动服务，通过查看docker容器日志获取重置后的用户名和密码
 
 ## 更新日志
