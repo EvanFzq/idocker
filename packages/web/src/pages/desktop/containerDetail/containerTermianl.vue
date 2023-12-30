@@ -40,11 +40,11 @@ const lineHeight = 1.2;
 
 const getRows = () =>
   Math.floor((document.body.clientHeight - 200) / (fontSize * lineHeight * lineHeight));
-const rows = getRows();
 
 const connect = () => {
   isLoading.value = true;
   isClose.value = false;
+  const rows = getRows();
   const socket = io('/container');
   socket.on('connect', () => {
     const terminal = new Terminal({
