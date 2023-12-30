@@ -12,10 +12,9 @@
         </a-button>
       </template>
     </a-empty>
-    <div> 命令行工具 <a-input /> </div>
     <div
       ref="terminalRef"
-      style="background-color: #000"
+      style="background-color: #000; height: 100%"
     />
   </div>
 </template>
@@ -36,12 +35,23 @@ const terminalRef = ref();
 const isLoading = ref(true);
 const isClose = ref(false);
 
+const fontSize = 16;
+const lineHeight = 1.2;
+
+const getRows = () =>
+  Math.floor((document.body.clientHeight - 200) / (fontSize * lineHeight * lineHeight));
+const rows = getRows();
+
 const connect = () => {
   isLoading.value = true;
   isClose.value = false;
   const socket = io('/container');
   socket.on('connect', () => {
-    const terminal = new Terminal({});
+    const terminal = new Terminal({
+      rows,
+      fontSize,
+      lineHeight,
+    });
     const fitAddon = new FitAddon();
     terminal.loadAddon(fitAddon);
 
@@ -56,7 +66,11 @@ const connect = () => {
     terminal.options.cursorBlink = true;
 
     window.onresize = function () {
-      fitAddon.fit();
+      fitAddon?.fit();
+      const rows = getRows();
+      terminal.resize(terminal.cols, rows);
+      terminal.scrollToBottom();
+      socket.emit('terminal-resize', { rows, cols: terminal.cols });
     };
 
     socket.on('data', chunk => {
@@ -76,7 +90,7 @@ const connect = () => {
       terminal.dispose();
     });
     terminal.loadAddon(new CanvasAddon());
-    socket.emit('terminal', { id: props.id });
+    socket.emit('terminal', { id: props.id, cols: terminal.cols, rows });
   });
   socket.on('disconnect', () => {
     isClose.value = true;

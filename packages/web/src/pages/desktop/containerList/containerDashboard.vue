@@ -3,6 +3,7 @@
     <div class="dashboard-item">
       <a-progress
         type="dashboard"
+        :stroke-color="strokeColor(Math.floor(totalData.cpu / totalData.cpuNum))"
         :percent="Math.floor(totalData.cpu / totalData.cpuNum)"
       >
         <template #format>
@@ -15,6 +16,7 @@
     <div class="dashboard-item">
       <a-progress
         type="dashboard"
+        :stroke-color="strokeColor((totalData.memoryUsage * 100) / totalData.memoryLimit)"
         :percent="(totalData.memoryUsage * 100) / totalData.memoryLimit"
       >
         <template #format>
@@ -40,6 +42,16 @@ import { fileSizeFormat } from '@/utils/utils';
 defineProps<{
   totalData: { cpu: number; cpuNum: number; memoryUsage: number; memoryLimit: number };
 }>();
+
+const strokeColor = (value: number) => {
+  if (value < 30) {
+    return 'rgb(7, 193, 96)';
+  }
+  if (value > 80) {
+    return '#ff4d4f';
+  }
+  return '#f60';
+};
 </script>
 <style scoped lang="less">
 .dashboard {

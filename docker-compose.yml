@@ -8,3 +8,5 @@ services:  # 为project定义服务
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /Users/evan/Documents/docker/idocker:/idocker
+    environment:
+      TZ: Asia/Shanghai
