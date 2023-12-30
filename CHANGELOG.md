@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.18.2](///compare/v1.18.1...v1.18.2) (2023-12-30)
+
+
+### Bug Fixes
+
+* 修复无法同时多个打开多个终端 198f4fb
+
 ### [1.18.1](///compare/v1.18.0...v1.18.1) (2023-12-30)
 
 
