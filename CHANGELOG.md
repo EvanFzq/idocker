@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.18.3](///compare/v1.18.2...v1.18.3) (2023-12-30)
+
+
+### Bug Fixes
+
+* 修复exec链接未释放问题 e767f04
+
 ### [1.18.2](///compare/v1.18.1...v1.18.2) (2023-12-30)
 
 
