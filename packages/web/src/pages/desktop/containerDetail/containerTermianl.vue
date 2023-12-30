@@ -34,7 +34,6 @@ const props = defineProps<{ id: string }>();
 const terminalRef = ref();
 const isLoading = ref(true);
 const isClose = ref(false);
-const execId = ref('');
 
 const fontSize = 16;
 const lineHeight = 1.2;
@@ -59,27 +58,22 @@ const connect = () => {
     terminal.loadAddon(new SearchAddon());
     terminal.loadAddon(new WebLinksAddon());
     terminal.onData(data => {
-      socket.emit('terminal-data', { execId: execId.value, text: data });
+      socket.emit('terminal-data', data);
     });
     terminal.open(terminalRef.value);
     terminal.focus();
     fitAddon.fit();
     terminal.options.cursorBlink = true;
-
     window.onresize = function () {
       fitAddon?.fit();
       const rows = getRows();
       terminal.resize(terminal.cols, rows);
       terminal.scrollToBottom();
       socket.emit('terminal-resize', {
-        execId: execId.value,
         rows,
         cols: terminal.cols,
       });
     };
-    socket.on('success', id => {
-      execId.value = id;
-    });
     socket.on('data', chunk => {
       isLoading.value = false;
       terminal.write(chunk);

@@ -20,6 +20,15 @@ export class ContainerGateway {
     this.execStreamMap = new Map();
   }
 
+  async handleConnection(client: Socket) {
+    console.info('handleConnection', client.id);
+  }
+  async handleDisconnect(client: Socket) {
+    console.info('handleDisconnect', client.id);
+    this.execMap.set(client.id, null);
+    this.execStreamMap.set(client.id, null);
+  }
+
   @SubscribeMessage('terminal')
   async handleTerminal(
     @MessageBody() body: { id: string; rows: number; cols: number },
@@ -44,33 +53,35 @@ export class ContainerGateway {
       hijack: true,
     });
 
-    client.emit('success', exec.id);
-    this.execMap.set(exec.id, exec);
-    this.execStreamMap.set(exec.id, stream);
+    this.execMap.set(client.id, exec);
+    this.execStreamMap.set(client.id, stream);
     try {
       await exec.resize({ h: body.rows, w: body.cols });
     } catch (error) {
-      console.error(exec.id, error);
+      console.error(client.id, error);
     }
 
     stream.on('data', (chunk: Buffer) => {
       client.emit('data', chunk.toString());
     });
     stream.on('error', error => {
-      console.error(exec.id, error);
+      console.error(client.id, error);
       client.emit('error', error);
     });
     stream.on('end', () => {
-      console.info(exec.id, 'stream end: ');
+      console.info(client.id, 'stream end: ');
       client.emit('end');
     });
   }
   @SubscribeMessage('terminal-data')
-  async handleMessage(@MessageBody() body: { execId: string; text: string }) {
-    this.execStreamMap.get(body.execId)?.write(body.text, 'utf-8');
+  async handleMessage(@MessageBody() body: string, @ConnectedSocket() client: Socket) {
+    this.execStreamMap.get(client.id)?.write(body, 'utf-8');
   }
   @SubscribeMessage('terminal-resize')
-  async handleResize(@MessageBody() body: { execId: string; rows: number; cols: number }) {
-    await this.execMap.get(body.execId).resize({ h: body.rows, w: body.cols });
+  async handleResize(
+    @MessageBody() body: { rows: number; cols: number },
+    @ConnectedSocket() client: Socket,
+  ) {
+    await this.execMap.get(client.id).resize({ h: body.rows, w: body.cols });
   }
 }
