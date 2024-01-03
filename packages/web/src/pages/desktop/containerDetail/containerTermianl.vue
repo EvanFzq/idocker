@@ -12,10 +12,9 @@
         </a-button>
       </template>
     </a-empty>
-    <div> 命令行工具 <a-input /> </div>
     <div
       ref="terminalRef"
-      style="background-color: #000"
+      style="background-color: #000; height: 100%"
     />
   </div>
 </template>
@@ -36,47 +35,65 @@ const terminalRef = ref();
 const isLoading = ref(true);
 const isClose = ref(false);
 
+const fontSize = 16;
+const lineHeight = 1.2;
+
+const getRows = () =>
+  Math.floor((document.body.clientHeight - 200) / (fontSize * lineHeight * lineHeight));
+
 const connect = () => {
   isLoading.value = true;
   isClose.value = false;
+  const rows = getRows();
   const socket = io('/container');
   socket.on('connect', () => {
-    const terminal = new Terminal({});
+    const terminal = new Terminal({
+      rows,
+      fontSize,
+      lineHeight,
+    });
     const fitAddon = new FitAddon();
     terminal.loadAddon(fitAddon);
 
     terminal.loadAddon(new SearchAddon());
     terminal.loadAddon(new WebLinksAddon());
     terminal.onData(data => {
-      socket.send(data);
+      socket.emit('terminal-data', data);
     });
     terminal.open(terminalRef.value);
     terminal.focus();
     fitAddon.fit();
     terminal.options.cursorBlink = true;
-
     window.onresize = function () {
-      fitAddon.fit();
+      fitAddon?.fit();
+      const rows = getRows();
+      terminal.resize(terminal.cols, rows);
+      terminal.scrollToBottom();
+      socket.emit('terminal-resize', {
+        rows,
+        cols: terminal.cols,
+      });
     };
-
     socket.on('data', chunk => {
       isLoading.value = false;
       terminal.write(chunk);
     });
     socket.on('error', () => {
-      socket.close();
       terminal.write('\n\r(connection closed)');
       setTimeout(() => {
+        socket.close();
         terminal.dispose();
-      }, 1000);
+      }, 5000);
     });
     socket.on('end', () => {
-      socket.close();
       terminal.write('\n\r(connection closed)');
-      terminal.dispose();
+      setTimeout(() => {
+        socket.close();
+        terminal.dispose();
+      }, 5000);
     });
     terminal.loadAddon(new CanvasAddon());
-    socket.emit('terminal', { id: props.id });
+    socket.emit('terminal', { id: props.id, cols: terminal.cols, rows });
   });
   socket.on('disconnect', () => {
     isClose.value = true;

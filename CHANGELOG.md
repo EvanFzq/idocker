@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.18.4](///compare/v1.18.3...v1.18.4) (2023-12-30)
+
+
+### Bug Fixes
+
+* 修复终端宽度计算问题 7e8441a
+
+### [1.18.3](///compare/v1.18.2...v1.18.3) (2023-12-30)
+
+
+### Bug Fixes
+
+* 修复exec链接未释放问题 e767f04
+
+### [1.18.2](///compare/v1.18.1...v1.18.2) (2023-12-30)
+
+
+### Bug Fixes
+
+* 修复无法同时多个打开多个终端 198f4fb
+
+### [1.18.1](///compare/v1.18.0...v1.18.1) (2023-12-30)
+
+
+### Bug Fixes
+
+* 修复终端换行异常问题、容器资源占有添加颜色级别，容器列表增加IP展示 79d599c
+
 ## [1.18.0](///compare/v1.17.2...v1.18.0) (2023-12-29)
 
 

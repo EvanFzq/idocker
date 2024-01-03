@@ -4,24 +4,40 @@ import {
   WebSocketGateway,
   SubscribeMessage,
   MessageBody,
-  WebSocketServer,
+  ConnectedSocket,
 } from '@nestjs/websockets';
-import { Server } from 'socket.io';
+import { Socket } from 'socket.io';
+import Dockerode from 'dockerode';
 
 import { DockerService } from '../docker';
 
 @WebSocketGateway({ namespace: 'container' })
 export class ContainerGateway {
-  constructor(private readonly dockerService: DockerService) {}
-  @WebSocketServer()
-  server: Server;
-  execStream: stream.Duplex;
+  execMap?: Map<string, Dockerode.Exec>;
+  execStreamMap?: Map<string, stream.Duplex>;
+  constructor(private readonly dockerService: DockerService) {
+    this.execMap = new Map();
+    this.execStreamMap = new Map();
+  }
+
+  async handleConnection(client: Socket) {
+    console.info('handleConnection', client.id);
+  }
+  async handleDisconnect(client: Socket) {
+    console.info('handleDisconnect', client.id);
+    this.execMap.set(client.id, null);
+    this.execStreamMap.set(client.id, null);
+  }
+
   @SubscribeMessage('terminal')
-  async handleTerminal(@MessageBody() body: { id: string }) {
+  async handleTerminal(
+    @MessageBody() body: { id: string; rows: number; cols: number },
+    @ConnectedSocket() client: Socket,
+  ) {
     const container = await this.dockerService.docker.getContainer(body.id);
     if (!container) {
-      await this.server.emitWithAck('error', { msg: '容器不存在' });
-      this.server.disconnectSockets(true);
+      await client.emitWithAck('error', { msg: '容器不存在' });
+      client.disconnect(true);
     }
     const exec = await container.exec({
       AttachStderr: true,
@@ -36,19 +52,36 @@ export class ContainerGateway {
       stdin: true,
       hijack: true,
     });
-    this.execStream = stream;
-    this.execStream.on('data', (chunk: Buffer) => {
-      this.server.emit('data', chunk.toString());
+
+    this.execMap.set(client.id, exec);
+    this.execStreamMap.set(client.id, stream);
+    try {
+      await exec.resize({ h: body.rows, w: body.cols });
+    } catch (error) {
+      console.error(client.id, error);
+    }
+
+    stream.on('data', (chunk: Buffer) => {
+      client.emit('data', chunk.toString());
     });
-    this.execStream.on('error', error => {
-      this.server.emit('error', error);
+    stream.on('error', error => {
+      console.error(client.id, error);
+      client.emit('error', error);
     });
-    this.execStream.on('end', () => {
-      this.server.emit('end');
+    stream.on('end', () => {
+      console.info(client.id, 'stream end: ');
+      client.emit('end');
     });
   }
-  @SubscribeMessage('message')
-  async handleMessage(@MessageBody() body: string) {
-    this.execStream.write(body, 'utf-8');
+  @SubscribeMessage('terminal-data')
+  async handleMessage(@MessageBody() body: string, @ConnectedSocket() client: Socket) {
+    this.execStreamMap.get(client.id)?.write(body, 'utf-8');
+  }
+  @SubscribeMessage('terminal-resize')
+  async handleResize(
+    @MessageBody() body: { rows: number; cols: number },
+    @ConnectedSocket() client: Socket,
+  ) {
+    await this.execMap.get(client.id).resize({ h: body.rows, w: body.cols });
   }
 }

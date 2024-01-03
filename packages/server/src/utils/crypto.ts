@@ -1,6 +1,8 @@
 import { createReadStream, promises as fs } from 'fs';
 import { createHash } from 'node:crypto';
 
+import { v4 as uuidV4 } from 'uuid';
+
 export const getFileHash = async (path: string) => {
   await fs.access(path, fs.constants.R_OK);
   const hash = createHash('sha256');
@@ -21,3 +23,5 @@ export const hash = (str: string) => {
   hash.update(str, 'utf8');
   return hash.digest('hex');
 };
+
+export const uuid = (): string => uuidV4().split('-').join('');

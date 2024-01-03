@@ -63,7 +63,10 @@
             class="progress"
             :size="[120, 18]"
             :show-info="false"
-            :percent="Number(record.cpu ? record.cpu.toFixed(2) : '0')"
+            :stroke-color="
+              strokeColor(Number(record.cpu ? (record.cpu / (record.cpuNum || 1)).toFixed(2) : '0'))
+            "
+            :percent="Number(record.cpu ? (record.cpu / (record.cpuNum || 1)).toFixed(2) : '0')"
           >
           </a-progress>
           <div class="progress-text">
@@ -76,6 +79,13 @@
             class="progress"
             :size="[120, 18]"
             :show-info="false"
+            :stroke-color="
+              strokeColor(
+                record.memoryLimit
+                  ? Math.floor(((record.memoryUsage || 0) * 100) / record.memoryLimit)
+                  : 0,
+              )
+            "
             :percent="
               record.memoryLimit
                 ? Math.floor(((record.memoryUsage || 0) * 100) / record.memoryLimit)
@@ -94,7 +104,13 @@
           v-for="(network, index) in record.networks"
           :key="index"
         >
-          <span>{{ network.name }}</span>
+          <div style="background: #eee; padding: 4px 8px; border-radius: 4px; margin-bottom: 6px">
+            <div style="font-size: 16px; font-weight: 500">
+              {{ network.name }}
+            </div>
+            <div v-if="network.ip">IP: {{ network.ip }}</div>
+            <div v-if="network.ipV6">IPv6: {{ network.ipV6 }}</div>
+          </div>
         </div>
       </template>
       <template v-if="column.key === 'ports'">
@@ -364,7 +380,7 @@ const columns: TableColumnProps<ContainerDetail>[] = [
     key: 'networks',
     dataIndex: 'networks',
     title: '网络',
-    width: 120,
+    width: 180,
   },
   {
     key: 'ports',
@@ -399,6 +415,15 @@ const tableWidth: number = (columns as { width: number }[]).reduce(
   0,
 );
 
+const strokeColor = (value: number) => {
+  if (value < 30) {
+    return 'rgb(7, 193, 96)';
+  }
+  if (value > 80) {
+    return '#ff4d4f';
+  }
+  return '#f60';
+};
 const handleActive = async (id: string, type: ContainerActive) => {
   activeLoadingId.value = id;
   const res = await activeContainer(id, type);
